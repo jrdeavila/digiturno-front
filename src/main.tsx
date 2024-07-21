@@ -9,22 +9,26 @@ import AttentionProfileProvider from "./providers/attention-profile-provider.tsx
 import ClientProvider from "./providers/client-provider.tsx";
 import ClientTypeProvider from "./providers/client-type-provider.tsx";
 import ServiceProvider from "./providers/service-provider.tsx";
+import { SectionalProvider } from "./hooks/use-sectional.tsx";
+import { LoadingProvider } from "./hooks/use-loading.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <>
-    <BrowserRouter>
-      <Provider>
-        <ServiceProvider>
-          <AttentionProfileProvider>
-            <ClientTypeProvider>
-              <ClientProvider>
-                <App />
-              </ClientProvider>
-            </ClientTypeProvider>
-          </AttentionProfileProvider>
-        </ServiceProvider>
-      </Provider>
-    </BrowserRouter>
-    <NotificationContainer />
-  </>
+  <LoadingProvider>
+    <SectionalProvider>
+      <BrowserRouter>
+        <Provider>
+          <ServiceProvider>
+            <AttentionProfileProvider>
+              <ClientTypeProvider>
+                <ClientProvider>
+                  <App />
+                </ClientProvider>
+              </ClientTypeProvider>
+            </AttentionProfileProvider>
+          </ServiceProvider>
+        </Provider>
+      </BrowserRouter>
+      <NotificationContainer />
+    </SectionalProvider>
+  </LoadingProvider>
 );

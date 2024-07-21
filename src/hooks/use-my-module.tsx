@@ -1,5 +1,7 @@
-import LoadingPage from "@/components/loading-page";
+import ConfigureQualificationModulePage from "@/components/configure-qualification-module-page";
+import ModuleType from "@/models/module-type";
 import ModuleConfigPage from "@/pages/module-config";
+import useQualificationModule from "@/services/use-qualification-module";
 import delay from "@/utils/delay";
 import React, {
   createContext,
@@ -10,10 +12,89 @@ import React, {
 } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import useAsync from "./use-async";
+import useLoading from "./use-loading";
 import useHttpModuleService, { Module } from "./use-module-service";
+import useSectional from "./use-sectional";
+
+interface ConfigureModuleCtxProps {
+  pared: boolean;
+  checking: boolean;
+  requestQualificationModule: () => void;
+}
+
+const ConfigureModuleCtx = createContext<ConfigureModuleCtxProps | undefined>(
+  undefined
+);
+
+export const ConfigureModuleProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
+  const [pared, setPared] = useState<boolean>(false);
+  const [checking, setChecking] = useState<boolean>(false);
+
+  const { type } = useMyModule();
+  const qualificationModuleService = useQualificationModule();
+
+  useAsync<HIDDevice | undefined>(
+    async () => {
+      return await delay<HIDDevice | undefined>(
+        1000,
+        () => {
+          setChecking(true);
+        },
+        () => {
+          setChecking(false);
+        },
+        () => {
+          return qualificationModuleService.getQualificationModule();
+        }
+      );
+    },
+    (data) => {
+      console.log(type?.useQualification);
+      if (type?.useQualification) {
+        setPared(data !== undefined);
+      } else {
+        setPared(true);
+      }
+    },
+    (error) => {
+      console.error(error);
+    },
+    () => {},
+    [pared, type]
+  );
+
+  // ==================================================================
+
+  const requestQualificationModule = async () => {
+    const res = await qualificationModuleService.requestQualificationModule();
+    setPared(res);
+  };
+
+  // ==================================================================
+
+  return (
+    <ConfigureModuleCtx.Provider
+      value={{
+        pared,
+        checking,
+        requestQualificationModule,
+      }}
+    >
+      {children}
+      {!checking && !pared && <ConfigureQualificationModulePage />}
+    </ConfigureModuleCtx.Provider>
+  );
+};
+
+export const useConfigureModule = () => {
+  return useContext(ConfigureModuleCtx) as ConfigureModuleCtxProps;
+};
 
 interface MyModuleCtxProps {
   myModule: Module | undefined;
+  type: ModuleType | undefined;
   shouldRequestIp: boolean;
   refreshMyModule: () => void;
   configureModuleInfo: (moduleInfo: MyModuleProps) => void;
@@ -42,12 +123,17 @@ export class MyModuleProps {
 
 export const MyModuleProvider: React.FC = () => {
   const [myModule, setMyModule] = useState<Module>();
-  const [loading, setLoading] = useState<boolean>(true);
   const myModuleService = useHttpModuleService();
   const [myModuleInfo, setMyModuleInfo] = useState<MyModuleProps | undefined>(
     undefined
   );
   const [shouldRequestIp, setShouldRequestIp] = useState<boolean>(false);
+  const [moduleType, setModuleType] = useState<ModuleType | undefined>(
+    undefined
+  );
+
+  const { moduleTypes } = useSectional();
+  const { setLoading } = useLoading();
 
   // ==================================================================
 
@@ -110,6 +196,15 @@ export const MyModuleProvider: React.FC = () => {
     setShouldRequestIp(!myModuleInfo);
   }, [myModuleInfo]);
 
+  useEffect(() => {
+    if (myModuleInfo) {
+      const moduleType = moduleTypes.find(
+        (type) => type.id === myModuleInfo.moduleTypeId
+      );
+      setModuleType(moduleType);
+    }
+  }, [moduleTypes, myModuleInfo]);
+
   // ==================================================================
 
   const refreshMyModule = () => {
@@ -144,16 +239,13 @@ export const MyModuleProvider: React.FC = () => {
         refreshMyModule,
         shouldRequestIp,
         configureModuleInfo,
+        type: moduleType,
       }}
     >
-      <Outlet />
-      {loading ? (
-        <LoadingPage />
-      ) : shouldRequestIp ? (
-        <ModuleConfigPage />
-      ) : (
-        redirection
-      )}
+      <ConfigureModuleProvider>
+        <Outlet />
+        {shouldRequestIp ? <ModuleConfigPage /> : redirection}
+      </ConfigureModuleProvider>
     </MyModuleContext.Provider>
   );
 };
