@@ -1,21 +1,14 @@
 import { CreateClientForm } from "@/components/create-client-form";
 import { timeToQualify } from "@/config/qualification";
-import useMyModule, { useConfigureModule } from "@/hooks/use-my-module";
+import useMyModule from "@/hooks/use-my-module";
 import useShiftService from "@/hooks/use-shift-service";
 import Client from "@/models/client";
 import Service from "@/models/service";
 import { Modal, ModalContent } from "@nextui-org/modal";
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  CircularProgress,
-  Spinner,
-} from "@nextui-org/react";
+import { Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
 import React, { useContext, useEffect, useState } from "react";
-import { useClientTypeResource } from "./client-type-provider";
 import { toast } from "react-toastify";
+import { useClientTypeResource } from "./client-type-provider";
 
 export const CreateShiftContext = React.createContext<{
   client: Client | undefined;
@@ -174,7 +167,6 @@ const CreateShiftProvider: React.FC<{
 const WaitingClientQualification: React.FC<{
   onQualified: () => void;
 }> = ({ onQualified }) => {
-  const {} = useConfigureModule();
   // ==============================================================================
   useEffect(() => {
     const timeout = setTimeout(() => {
