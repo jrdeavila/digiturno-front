@@ -5,6 +5,7 @@ import NotFoundPage from "@/pages/not-found";
 import UsersPage from "@/pages/users";
 import LoginPage from "@/pages/login";
 import { MyModuleProvider } from "./hooks/use-my-module";
+import OperatorPage from "./pages/operator";
 
 function App() {
   return (
@@ -14,16 +15,7 @@ function App() {
           <Route element={<SectionalModulePage />} index />
           <Route element={<UsersPage />} path="/modulo-seccional/clientes" />
         </Route>
-        <Route
-          element={
-            <>
-              <span>
-                <h1>CAJA</h1>
-              </span>
-            </>
-          }
-          path="/caja"
-        />
+        <Route element={<OperatorPage />} path="/caja" />
         <Route
           element={
             <>

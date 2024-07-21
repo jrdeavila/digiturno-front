@@ -75,7 +75,6 @@ export default class QualificationModuleService {
 
   public disconnect(): void {
     if (this.qualificationModule) {
-      this.qualificationModule.removeEventListener("disconnect", () => {});
       this.qualificationModule.oninputreport = null;
     }
   }

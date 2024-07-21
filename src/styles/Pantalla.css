@@ -1,0 +1,45 @@
+.pantalla {
+  background-image: url('../img/Fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.info-section {
+  width: 60%;
+  max-width: 800px;
+}
+
+.info-headers {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.info-header-user {
+  flex: 1;
+  text-align: left;
+  font-weight: bold;
+  color:white;
+}
+.info-header-module
+{
+  flex: auto;
+  text-align: right;
+  font-weight: bold;
+  color: white;
+  
+}
+  

@@ -1,0 +1,21 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 20px; /* Ajusta el margen según sea necesario */
+  width: 100%; /* Asegura que el contenedor tome todo el ancho */
+  max-width: none; /* Asegura que no haya límite en el ancho */
+}
+
+.logo {
+  width: 80vw; /* Ajusta el tamaño del logo */
+  max-width: 400px; /* Asegura que el logo no se expanda más allá del contenedor */
+  height: auto;
+}
+
+.welcome-text {
+  color: white;
+  margin-top: 10px; /* Ajusta el margen según sea necesario */
+  font-size: 1.2em; /* Ajusta el tamaño del texto según sea necesario */
+}

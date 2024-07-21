@@ -11,6 +11,8 @@ import ClientTypeProvider from "./providers/client-type-provider.tsx";
 import ServiceProvider from "./providers/service-provider.tsx";
 import { SectionalProvider } from "./hooks/use-sectional.tsx";
 import { LoadingProvider } from "./hooks/use-loading.tsx";
+import { ShiftProvider } from "./hooks/operator/use-shifts.tsx";
+import "./pusher.js";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <LoadingProvider>
@@ -21,7 +23,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <AttentionProfileProvider>
               <ClientTypeProvider>
                 <ClientProvider>
-                  <App />
+                  <ShiftProvider>
+                    <App />
+                  </ShiftProvider>
                 </ClientProvider>
               </ClientTypeProvider>
             </AttentionProfileProvider>

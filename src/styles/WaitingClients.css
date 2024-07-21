@@ -1,0 +1,143 @@
+.generic-component-waiting-clients {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.right-component-waiting-clients {
+  /* background-color: green; */
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.input-buscador {
+  /* background-color: yellow; */
+  border: none;
+  border-bottom: 2px solid rgb(60, 108, 253);
+}
+.number-client-waiting {
+  background-color: rgb(60, 108, 253);
+  height: 25px;
+  width: 25px;
+  padding: 0 1px 1px 0; /*padding right y bottom para solucionar el error de las variables*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 50%;
+}
+
+.visibilidad-waiting-client {
+  display: none;
+}
+
+/* CONTAINER DEL CONTENIDO DEL COMPONENTE */
+.section-waiting-clients { /* section */
+  /* background-color: aqua; */
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto; /* Permitir el scroll vertical */
+  overflow-x: hidden; /* Evitar el scroll horizontal si no es necesario */
+  max-height: 100%;
+}
+.section-waiting-clients::-webkit-scrollbar {
+  width: 4px; /* Ancho del scroll */
+}
+.section-waiting-clients::-webkit-scrollbar-thumb {
+  background-color: rgba(60, 108, 253, 0.6); /* Color del scroll */
+  border-radius: 50px; /* Bordes redondeados */
+}
+.section-waiting-clients::-webkit-scrollbar-track {
+  background-color: lightgrey; /* Color del fondo de la barra de desplazamiento */
+  border-radius: 50px;
+}
+
+/* CONTAINER CON EL INDICE, LOS CLIENTES EN ESPERA Y LOS BOTONES */
+.container-cliente-espera {
+  /* background-color: red; */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid rgb(233, 233, 233);
+  border-left: 3px solid rgb(60, 108, 253);
+  padding: 8px 15px 8px 0px;
+  gap: 7px;
+}
+
+/* INDICE DE TURNO */
+.indice-turno {
+  /* background-color: springgreen; */
+  padding: 1px 10px ;
+}
+.indice-turno p {
+  color: #083a57;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* NOMBRE CLIENTE EN ESPERA */
+.cliente-espera { 
+  /* background-color: yellow; */
+  width: 77%;
+}
+.cliente-espera p {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* BOTONES */
+.container-buttons {
+  width: 23%;
+  /* background-color: tomato; */
+  gap: 12px; /*Espacio entre elementos*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container-buttons button {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 3px 10px;
+  padding-bottom: 7px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.llamar-cliente-pantalla {
+  background: linear-gradient(135deg, rgb(255, 192, 74), orange);
+}
+.llamar-cliente-pantalla:hover {
+  background: linear-gradient(135deg, orange, rgb(255, 192, 74));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mandar-distraidos {
+  background: linear-gradient(135deg, rgb(252, 76, 76), red);
+}
+.mandar-distraidos:hover {
+  background: linear-gradient(135deg, rgb(255, 0, 0), rgb(252, 76, 76));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.subir-cliente {
+  background-color: royalblue;
+  background: linear-gradient(135deg, #00c8ff, #00acdb);
+}
+.subir-cliente:hover {
+  background: linear-gradient(135deg, #00acdb, #00c8ff);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,39 @@
+.service-list {
+  background-color: white;
+  overflow: scroll;
+  height: 100%;
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+}
+
+.generic-component-service-list {
+  height: 75%;
+}
+
+.service-list header {
+  /* background-color: chartreuse;
+   */
+  margin-bottom: 5px;
+}
+.service-list h1 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.service-list main {
+  /* background-color: violet; */
+  margin: 0;
+}
+.service-list ul {
+  /* background-color: red; */
+  list-style-type: none;
+  padding-left: 0;
+}
+.service-list li {
+  display: flex; /* Asegura que el input y el label estén en la misma línea */
+  align-items: center; /* Alinea verticalmente el contenido del li */
+  margin: 7px 0;
+}
+
+.service-list input[type="checkbox"] {
+  margin-right: 5px;
+}

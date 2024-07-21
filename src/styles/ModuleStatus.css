@@ -1,0 +1,128 @@
+.generic-component-module-status {
+  height: 25%;
+  width: 100%;
+  /* display: grid; */
+}
+
+.module-status-content {
+  /* background-color: blue; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.estilo-estado-ausente{
+  background-color: orange;
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 45px;
+  padding: 4px 7px 5px 7px;
+  margin: 0;
+}
+
+.switch { /* Contenedor del switsh */
+  width: 32px;
+  height: 19px;
+  background-color: #ccc;
+  border-radius: 15px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.switch-on { /* color del fondo cuando el switsh esta habilitado */
+  background-color: orange;
+}
+
+.switch-off { /* Color de fondo cuando el switsh esta inavilitado */
+  background-color: #a4a4a4;
+}
+
+.switch-toggle { /* Botón interno del switsh */
+  width: 15px;
+  height: 15px;
+  background-color: white;
+  border-radius: 50%;
+  position: relative; /* Esta alojado al incio del aldo izquierdo del contenedor */
+  top: 2px;
+  left: 2px; /*Distancia del circulo del contenedor*/
+  transition: left 0.3s;
+}
+
+.switch-on .switch-toggle { /* cambia la posición del switsh a la derecha como habilitado */
+  left: 15px; /* Distancia del circulo del contenedor */
+}
+
+
+/* Agrega estilos personalizados para el modal */
+
+/* Estilos personalizados para el modal */
+.module-status-modal .modal-content  {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 75%; /* Puedes ajustar el ancho según tus necesidades */
+  max-width: 600px; /* Máximo ancho */
+  height: auto; /* Ajusta la altura según el contenido */
+  border-radius: 15px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-status-modal-header.modal-header {
+  border: none;
+  padding-bottom: 0;
+
+}
+/* .modal-status-modal-header h1 {
+  text-align: center;
+  color: #555;
+  font-size: 20px;
+  font-weight: bold;
+} */
+
+.module-status-modal-body.modal-body {
+  border: none;
+}
+.module-status-modal-body .form-check { /*Margen de los CheckBox*/
+  margin-bottom: 10px;
+}
+.module-status-modal-body .form-check-input {
+  border: gray 1.5px solid;
+}
+
+
+.module-status-modal-footer.modal-footer {
+  border: none;
+  padding-top: 0;
+}
+
+/* .module-status-modal-footer.modal-footer { 
+  background-color: aqua;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+
+/* .finalizar-ausencia-btn {
+  background-color: #1182c3;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 15px;
+  transition: background-color 0.3s;
+
+}
+
+.finalizar-ausencia-btn:hover {
+  background-color: #127cba;
+} */
+

@@ -1,0 +1,25 @@
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.icon {
+  height: 25px;
+  padding-right: 15px;
+}
+
+.input-field {
+  width: 450px;
+  height: 60px;
+  border-radius: 5px;
+  background-color: #e6ebf1;
+  padding-left: 10px;
+  font-size: 20px;
+}
+
+.input-field::placeholder {
+  color: #47505d;
+  font-size: 20px;
+}
