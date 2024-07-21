@@ -10,7 +10,7 @@ const LoadingPage = () => {
 };
 
 const LoadingContainer = styled.div`
-  z-index: 100;
+  z-index: 100000;
   position: absolute;
   top: 0;
   left: 0;

@@ -30,7 +30,7 @@ export const ConfigureModuleProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [pared, setPared] = useState<boolean>(false);
-  const [checking, setChecking] = useState<boolean>(false);
+  const [checking, setChecking] = useState<boolean>(true);
 
   const { type } = useMyModule();
   const qualificationModuleService = useQualificationModule();
