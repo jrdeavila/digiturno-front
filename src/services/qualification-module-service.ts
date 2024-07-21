@@ -1,10 +1,8 @@
 // This instance use navigator.hid.requestDevice() to request a HID device.
 
-interface QualificationModuleLifecycle {
-  onConnect: (device: HIDDevice) => void;
-  onDisconnect: (device: HIDDevice) => void;
+export interface QualificationModuleLifecycle {
   onError: (error: DOMException) => void;
-  onInputReport: (device: HIDDevice, reportId: number, data: DataView) => void;
+  onQualified: (qualification: number) => void;
 }
 
 export default class QualificationModuleService {
@@ -25,6 +23,7 @@ export default class QualificationModuleService {
 
   public async requestQualificationModule(): Promise<boolean> {
     try {
+      // Request Device
       const devices = await navigator.hid.requestDevice({
         filters: [{ vendorId: 0x461 }],
       });
@@ -43,9 +42,7 @@ export default class QualificationModuleService {
   public async getQualificationModule(): Promise<HIDDevice | undefined> {
     try {
       const devices = await navigator.hid.getDevices();
-      this.qualificationModule = devices.find(
-        (device) => device.vendorId === 0x461
-      );
+      this.qualificationModule = devices[0];
       return this.qualificationModule;
     } catch (error) {
       console.error(error);
@@ -58,21 +55,28 @@ export default class QualificationModuleService {
     return this.qualificationModule !== undefined;
   }
 
-  public connect(lifecycle: QualificationModuleLifecycle): void {
+  public async connect(lifecycle: QualificationModuleLifecycle): Promise<void> {
     if (this.qualificationModule) {
-      this.qualificationModule.addEventListener("connect", () => {
-        lifecycle.onConnect(this.qualificationModule);
-      });
-      this.qualificationModule.addEventListener("disconnect", () => {
-        lifecycle.onDisconnect(this.qualificationModule);
-      });
-      this.qualificationModule.addEventListener("inputreport", (event) => {
-        lifecycle.onInputReport(
-          this.qualificationModule,
-          event.reportId,
-          event.data
-        );
-      });
+      try {
+        await this.qualificationModule.open();
+        this.qualificationModule.oninputreport = (event: {
+          data: DataView;
+        }) => {
+          const { data } = event;
+          const arr = new Int8Array(data.buffer);
+          const option: number = arr[0];
+          lifecycle.onQualified(option);
+        };
+      } catch (error) {
+        lifecycle.onError(error as DOMException);
+      }
+    }
+  }
+
+  public disconnect(): void {
+    if (this.qualificationModule) {
+      this.qualificationModule.removeEventListener("disconnect", () => {});
+      this.qualificationModule.oninputreport = null;
     }
   }
 }

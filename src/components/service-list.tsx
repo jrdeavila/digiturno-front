@@ -4,6 +4,7 @@ import { useServiceResource } from "@/providers/service-provider";
 import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
+import { Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -50,9 +51,7 @@ const ServiceList = () => {
 
   return (
     <div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
+      {
         <ServiceListBox>
           <CardHeader>
             <div className="flex flex-row items-center w-full">
@@ -72,19 +71,25 @@ const ServiceList = () => {
             </div>
           </CardHeader>
           <CardBody>
-            <Listbox
-              aria-label="Select a service"
-              variant="flat"
-              selectionMode="multiple"
-              selectedKeys={selectedServices}
-              onSelectionChange={setSelectedServices}
-            >
-              {filteredServices.map((service) => (
-                <ListboxItem key={service.id} value={service.id}>
-                  {service.name}
-                </ListboxItem>
-              ))}
-            </Listbox>
+            {loading ? (
+              <div className="flex justify-center items-center w-full h-full">
+                <Spinner label="Cargando servicios..." />
+              </div>
+            ) : (
+              <Listbox
+                aria-label="Select a service"
+                variant="flat"
+                selectionMode="multiple"
+                selectedKeys={selectedServices}
+                onSelectionChange={setSelectedServices}
+              >
+                {filteredServices.map((service) => (
+                  <ListboxItem key={service.id} value={service.id}>
+                    {service.name}
+                  </ListboxItem>
+                ))}
+              </Listbox>
+            )}
           </CardBody>
           <CardFooter>
             <div className="flex flex-col">
@@ -99,7 +104,7 @@ const ServiceList = () => {
             </div>
           </CardFooter>
         </ServiceListBox>
-      )}
+      }
     </div>
   );
 };

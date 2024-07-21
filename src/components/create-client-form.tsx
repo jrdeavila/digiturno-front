@@ -15,8 +15,9 @@ type CreateClientFormValues = {
 };
 
 export const CreateClientForm: React.FC<{
+  dni?: string;
   onFinished?: () => void;
-}> = ({ onFinished }) => {
+}> = ({ onFinished, dni }) => {
   const { clientTypes } = useClientTypeResource();
   const {
     createClient,
@@ -27,7 +28,7 @@ export const CreateClientForm: React.FC<{
   } = useClientResource();
   const initialValues: CreateClientFormValues = {
     name: "",
-    dni: "",
+    dni: dni || "",
     clientTypeId: 0,
   };
   const validationSchema = Yup.object<CreateClientFormValues>().shape({

@@ -51,7 +51,6 @@ export const ConfigureModuleProvider: React.FC<{
       );
     },
     (data) => {
-      console.log(type?.useQualification);
       if (type?.useQualification) {
         setPared(data !== undefined);
       } else {
@@ -64,6 +63,20 @@ export const ConfigureModuleProvider: React.FC<{
     () => {},
     [pared, type]
   );
+
+  useEffect(() => {
+    if (pared) {
+      qualificationModuleService.connect({
+        onError: (error) => {
+          console.log(error);
+        },
+        onQualified: (qualification) => {},
+      });
+    }
+    return () => {
+      qualificationModuleService.disconnect();
+    };
+  }, [pared, qualificationModuleService]);
 
   // ==================================================================
 
@@ -95,6 +108,7 @@ export const useConfigureModule = () => {
 interface MyModuleCtxProps {
   myModule: Module | undefined;
   type: ModuleType | undefined;
+  info: MyModuleProps | undefined;
   shouldRequestIp: boolean;
   refreshMyModule: () => void;
   configureModuleInfo: (moduleInfo: MyModuleProps) => void;
@@ -236,6 +250,7 @@ export const MyModuleProvider: React.FC = () => {
     <MyModuleContext.Provider
       value={{
         myModule,
+        info: myModuleInfo,
         refreshMyModule,
         shouldRequestIp,
         configureModuleInfo,

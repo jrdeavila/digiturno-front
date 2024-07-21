@@ -17,7 +17,6 @@ export default class CacheService {
   }
 
   public set(key: string, value: any): void {
-    console.log(`Setting cache key: ${key}`);
     this.cache.set(key, value);
   }
 

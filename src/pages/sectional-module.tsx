@@ -1,4 +1,4 @@
-import SearchOrCreateClient from "@/components/search-client";
+import SearchClient from "@/components/search-client";
 import ServiceList from "@/components/service-list";
 import DefaultLayout from "@/layouts/default";
 import CreateShiftProvider, {
@@ -22,7 +22,7 @@ export default function SectionalModulePage() {
             <ServiceList />
           </div>
           <div className="lg:col-span-1 row-span-1">
-            <SearchOrCreateClient />
+            <SearchClient />
           </div>
           <div className="row-span-1">
             <CurrentActionButton />
@@ -34,11 +34,15 @@ export default function SectionalModulePage() {
 }
 
 const CurrentActionButton = () => {
-  const { createShift, services, client, onCreateClient } = useCreateShift();
+  const { startQualification, services, client, onCreateClient } =
+    useCreateShift();
   return services ? (
     client ? (
-      <Button onClick={createShift} className="w-full bg-primary text-white">
-        RESERVAR TURNO
+      <Button
+        onClick={startQualification}
+        className="w-full bg-primary text-white"
+      >
+        CALIFICAR TURNO
       </Button>
     ) : (
       <Button onClick={onCreateClient} className="w-full bg-primary text-white">
