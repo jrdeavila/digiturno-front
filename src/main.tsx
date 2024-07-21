@@ -9,10 +9,9 @@ import AttentionProfileProvider from "./providers/attention-profile-provider.tsx
 import ClientProvider from "./providers/client-provider.tsx";
 import ClientTypeProvider from "./providers/client-type-provider.tsx";
 import ServiceProvider from "./providers/service-provider.tsx";
-import { MyModuleProvider } from "./hooks/use-my-module.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <MyModuleProvider>
+  <>
     <BrowserRouter>
       <Provider>
         <ServiceProvider>
@@ -27,5 +26,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </Provider>
     </BrowserRouter>
     <NotificationContainer />
-  </MyModuleProvider>
+  </>
 );

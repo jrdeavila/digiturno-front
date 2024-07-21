@@ -1,4 +1,4 @@
-import useMyModule from "@/hooks/use-my-module";
+import useMyModule, { MyModuleProps } from "@/hooks/use-my-module";
 import useSectional from "@/hooks/use-sectional";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -44,12 +44,14 @@ export default function ModuleConfigForm() {
       }}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        configureModuleInfo({
-          ip: values.ip,
-          roomId: values.room_id,
-          sectionalId: values.sectional_id,
-          moduleTypeId: values.module_type_id,
-        });
+        configureModuleInfo(
+          new MyModuleProps(
+            values.ip,
+            values.sectional_id,
+            values.room_id,
+            values.module_type_id
+          )
+        );
       }}
     >
       {({ handleSubmit, getFieldProps, errors }) => (

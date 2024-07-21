@@ -5,6 +5,7 @@ import useSectionalService from "./use-sectional-service";
 import useRoomService from "./use-room-service";
 import { Room } from "@/services/room-service";
 import {
+  faArrowLeftLong,
   faCashRegister,
   faLaptop,
   faTv,
@@ -35,6 +36,11 @@ export default function useSectional() {
       id: 3,
       name: "Pantalla",
       icon: faTv,
+    },
+    {
+      id: 4,
+      name: "Modulo sucursal",
+      icon: faArrowLeftLong,
     },
   ]);
   const [roomsBySectional, setRoomsBySectional] = useState<Room[]>([]);

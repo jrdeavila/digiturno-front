@@ -1,11 +1,15 @@
-export default function delay<T>(
+export default async function delay<T>(
   ms: number,
   before: () => void,
   after: () => void,
   fn: () => Promise<T>
 ): Promise<T> {
   before();
-  const result = fn();
-  setTimeout(after, ms);
+  const result = await new Promise<T>((resolve) => {
+    setTimeout(() => {
+      resolve(fn());
+    }, ms);
+  });
+  after();
   return result;
 }

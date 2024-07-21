@@ -6,7 +6,7 @@ import CreateShiftProvider, {
 } from "@/providers/create-shift-provider";
 import { Button } from "@nextui-org/button";
 
-export default function IndexPage() {
+export default function SectionalModulePage() {
   return (
     <DefaultLayout>
       <CreateShiftProvider>

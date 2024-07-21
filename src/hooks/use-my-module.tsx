@@ -1,8 +1,16 @@
+import LoadingPage from "@/components/loading-page";
 import ModuleConfigPage from "@/pages/module-config";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import delay from "@/utils/delay";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import useAsync from "./use-async";
 import useHttpModuleService, { Module } from "./use-module-service";
-import delay from "@/utils/delay";
 
 interface MyModuleCtxProps {
   myModule: Module | undefined;
@@ -13,16 +21,26 @@ interface MyModuleCtxProps {
 
 const MyModuleContext = createContext<MyModuleCtxProps | undefined>(undefined);
 
-export interface MyModuleProps {
+export class MyModuleProps {
   ip: string;
   roomId: number;
   sectionalId: number;
   moduleTypeId: number;
+
+  constructor(
+    ip: string,
+    roomId: number,
+    sectionalId: number,
+    moduleTypeId: number
+  ) {
+    this.ip = ip;
+    this.roomId = roomId;
+    this.sectionalId = sectionalId;
+    this.moduleTypeId = moduleTypeId;
+  }
 }
 
-export const MyModuleProvider: React.FC<{
-  children: React.ReactNode;
-}> = ({ children }) => {
+export const MyModuleProvider: React.FC = () => {
   const [myModule, setMyModule] = useState<Module>();
   const [loading, setLoading] = useState<boolean>(true);
   const myModuleService = useHttpModuleService();
@@ -74,7 +92,15 @@ export const MyModuleProvider: React.FC<{
     if (!myModuleInfo) {
       const moduleInfo = localStorage.getItem("module-info");
       if (moduleInfo) {
-        setMyModuleInfo(JSON.parse(moduleInfo));
+        const data = JSON.parse(moduleInfo);
+        setMyModuleInfo(
+          new MyModuleProps(
+            data.ip,
+            parseInt(data.roomId),
+            parseInt(data.sectionalId),
+            parseInt(data.moduleTypeId)
+          )
+        );
       } else {
         setShouldRequestIp(true);
       }
@@ -94,6 +120,23 @@ export const MyModuleProvider: React.FC<{
 
   // ==================================================================
 
+  const redirection = useMemo(() => {
+    switch (myModuleInfo?.moduleTypeId) {
+      case 1:
+        return <Navigate to="/caja" />;
+      case 2:
+        return <Navigate to="/recepción" />;
+      case 3:
+        return <Navigate to="/pantalla" />;
+      case 4:
+        return <Navigate to="/modulo-seccional" />;
+      default:
+        return null;
+    }
+  }, [myModuleInfo]);
+
+  // ==================================================================
+
   return (
     <MyModuleContext.Provider
       value={{
@@ -103,8 +146,14 @@ export const MyModuleProvider: React.FC<{
         configureModuleInfo,
       }}
     >
-      {children}
-      {!loading && shouldRequestIp && <ModuleConfigPage />}
+      <Outlet />
+      {loading ? (
+        <LoadingPage />
+      ) : shouldRequestIp ? (
+        <ModuleConfigPage />
+      ) : (
+        redirection
+      )}
     </MyModuleContext.Provider>
   );
 };
