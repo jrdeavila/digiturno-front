@@ -1,3 +1,4 @@
+import useAuth from "@/hooks/use-auth";
 import {
   Button,
   Card,
@@ -10,27 +11,30 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 
 export default function LoginForm() {
+  const { login } = useAuth();
+  // =======================================================
   const validationSchema = Yup.object({
     email: Yup.string()
       .email("El correo electrónico debe ser valido")
       .required("El correo electrónico es requerido"),
     password: Yup.string().required("La contraseña es requerida"),
   });
+  // =======================================================
   return (
     <Formik
       initialValues={{ email: "", password: "" }}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        login(values.email, values.password);
       }}
     >
       {({ handleSubmit, getFieldProps, errors }) => (
-        <Card className="h-full w-full" id="card-login-form">
-          <CardHeader>
-            <span className="text-xl font-bold">INICIAR SESIÓN</span>
-          </CardHeader>
-          <CardBody>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-y-3">
+        <form onSubmit={handleSubmit}>
+          <Card className="h-full w-full" id="card-login-form">
+            <CardHeader>
+              <span className="text-xl font-bold">INICIAR SESIÓN</span>
+            </CardHeader>
+            <CardBody className="flex flex-col gap-y-3">
               <Input
                 {...getFieldProps("email")}
                 type="text"
@@ -47,18 +51,18 @@ export default function LoginForm() {
                 errorMessage={errors.password}
                 isInvalid={!!errors.password}
               />
-            </form>
-          </CardBody>
-          <CardFooter>
-            <Button
-              type="submit"
-              className="bg-primary text-white w-full"
-              isDisabled={!!errors.email || !!errors.password}
-            >
-              ENTRAR
-            </Button>
-          </CardFooter>
-        </Card>
+            </CardBody>
+            <CardFooter>
+              <Button
+                type="submit"
+                className="bg-primary text-white w-full"
+                isDisabled={!!errors.email || !!errors.password}
+              >
+                ENTRAR
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
       )}
     </Formik>
   );

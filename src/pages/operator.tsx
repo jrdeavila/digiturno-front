@@ -60,7 +60,7 @@ const OperatorPage: React.FC = () => {
   return (
     <>
       <div className="operator-view no-select">
-        <OperatorViewHeader estado={""} />
+        <OperatorViewHeader />
         <div className="main-content">
           <div className="left-column">
             <ModuleInfo />

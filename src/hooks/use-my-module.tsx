@@ -70,9 +70,11 @@ export const ConfigureModuleProvider: React.FC<{
     if (pared) {
       qualificationModuleService.connect({
         onError: (error) => {
-          console.log(error);
+          console.error(error);
         },
-        onQualified: (qualification) => {},
+        onQualified: (qualification) => {
+          console.log(qualification);
+        },
       });
     }
     return () => {

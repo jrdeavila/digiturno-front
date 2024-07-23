@@ -1,16 +1,11 @@
 import React from "react";
 import "../styles/OperatorViewHeader.css";
+import useAuth from "@/hooks/use-auth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOut } from "@fortawesome/free-solid-svg-icons";
 
-interface operatorViewHeaderProps {
-  estado: string;
-  // estilo: string;
-  onLogout?: () => void;
-}
-
-const OperatorViewHeader: React.FC<operatorViewHeaderProps> = ({
-  estado,
-  onLogout,
-}) => {
+const OperatorViewHeader: React.FC = () => {
+  const { attendant, logout } = useAuth();
   return (
     <nav className="operator-view-header">
       <div className="section-left">
@@ -23,22 +18,18 @@ const OperatorViewHeader: React.FC<operatorViewHeaderProps> = ({
         </span>
 
         <span className="user-info">
-          {/* <p className="user-name"><strong>Tiziana Valentina Cañate Banderas</strong> te encuentras <span className={estilo}>{estado}</span></p> */}
           <p className="user-name">
-            <strong>Tiziana Valentina Cañate Banderas</strong>
-          </p>
-          <p className="user-time-info">
-            <small>Ultima conexion desde las 5:40 pm - 12.06.2014</small>
+            <strong>{attendant?.name}</strong>
           </p>
         </span>
       </div>
 
       <div className="section-right">
-        <span className="section-right-title">
-          Bienvenido a Tu turno <strong>Operador</strong>
-        </span>
-        <button className="logout-button" onClick={onLogout}>
-          <i className="fas fa-sign-out-alt"></i>
+        <button
+          className="flex flex-row items-center justify-center"
+          onClick={logout}
+        >
+          <FontAwesomeIcon icon={faSignOut} className="mr-2" />
           <span>Cerrar Sesión</span>
         </button>
       </div>

@@ -26,11 +26,9 @@ export const ShiftProvider: React.FC<{
   useEffect(() => {
     echo.connect();
     echo.channel("shifts").listen("ShiftCreated", (shift: Shift) => {
-      console.log(shift);
       setShifts((prevShifts) => [...prevShifts, shift]);
     });
     echo.channel("shifts").listen("ShiftUpdated", (shift: Shift) => {
-      console.log(shift);
       setShifts((prevShifts) => {
         return prevShifts.filter((s) => s !== shift);
       });
