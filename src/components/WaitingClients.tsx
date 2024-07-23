@@ -1,13 +1,18 @@
+import useShifts from "@/hooks/operator/use-shifts";
 import "@fortawesome/free-solid-svg-icons";
+import {
+  faBullhorn,
+  faFrown,
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import "../styles/WaitingClients.css";
 import GenericComponent from "./GenericComponent";
-import { Shift } from "@/services/shift-service";
 
-const WaitingClients: React.FC<{
-  shifts: Shift[];
-}> = ({ shifts }) => {
+const WaitingClients: React.FC = () => {
+  const { shifts } = useShifts();
   return (
     <GenericComponent
       title="Clientes en Espera"
@@ -37,12 +42,11 @@ const WaitingClients: React.FC<{
             {i === 0 && (
               <div className="container-buttons">
                 <button className="llamar-cliente-pantalla">
-                  <i className="fas fa-bullhorn"></i>{" "}
-                  {/* Botón para llamar cliente */}
+                  <FontAwesomeIcon icon={faBullhorn} />
                 </button>
 
                 <button className="mandar-distraidos" onClick={() => {}}>
-                  <i className="fas fa-frown"></i>
+                  <FontAwesomeIcon icon={faFrown} />
                 </button>
 
                 <button
@@ -50,7 +54,7 @@ const WaitingClients: React.FC<{
                   onClick={() => {}}
                   disabled={true}
                 >
-                  <i className="fas fa-upload"></i>
+                  <FontAwesomeIcon icon={faUpload} />
                 </button>
               </div>
             )}

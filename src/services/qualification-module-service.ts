@@ -58,7 +58,7 @@ export default class QualificationModuleService {
   public async connect(lifecycle: QualificationModuleLifecycle): Promise<void> {
     if (this.qualificationModule) {
       try {
-        await this.qualificationModule.open();
+        // await this.qualificationModule.open();
         this.qualificationModule.oninputreport = (event: {
           data: DataView;
         }) => {

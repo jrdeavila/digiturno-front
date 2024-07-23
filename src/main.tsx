@@ -13,6 +13,8 @@ import ClientProvider from "./providers/client-provider.tsx";
 import ClientTypeProvider from "./providers/client-type-provider.tsx";
 import ServiceProvider from "./providers/service-provider.tsx";
 import "./pusher.js";
+import { MyModuleProvider } from "./hooks/use-my-module.tsx";
+import { AuthenticatedProvider } from "./hooks/use-auth.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <LoadingProvider>
@@ -24,7 +26,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <ClientTypeProvider>
                 <ClientProvider>
                   <ShiftProvider>
-                    <App />
+                    <MyModuleProvider>
+                      <AuthenticatedProvider>
+                        <App />
+                      </AuthenticatedProvider>
+                    </MyModuleProvider>
                   </ShiftProvider>
                 </ClientProvider>
               </ClientTypeProvider>

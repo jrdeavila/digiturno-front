@@ -84,10 +84,10 @@ class HttpShiftService {
     return HttpShiftService.instance;
   }
 
-  async getShifts(): Promise<Shift[]> {
+  async getShifts(roomId: number): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
-    }>("/shifts");
+    }>(`/rooms/${roomId}/shifts`);
     const shifts = response.data.data.map((shift) => {
       const client = new Client(
         shift.client.id,
@@ -208,6 +208,72 @@ class HttpShiftService {
     const res = await this.httpClient.post<{
       data: ShiftResponse;
     }>(`/shifts/${shiftId}/transfer`, { qualification, attentionProfileId });
+
+    return new Shift(
+      res.data.data.id,
+      res.data.data.room,
+      res.data.data.attention_profile,
+      new Client(
+        res.data.data.client.id,
+        res.data.data.client.name,
+        res.data.data.client.dni,
+        res.data.data.client.client_type,
+        res.data.data.client.is_deleted
+      ),
+      res.data.data.state,
+      res.data.data.created_at,
+      res.data.data.updated_at
+    );
+  }
+
+  async callClient(shiftId: number): Promise<Shift> {
+    const res = await this.httpClient.post<{
+      data: ShiftResponse;
+    }>(`/shifts/${shiftId}/call`);
+
+    return new Shift(
+      res.data.data.id,
+      res.data.data.room,
+      res.data.data.attention_profile,
+      new Client(
+        res.data.data.client.id,
+        res.data.data.client.name,
+        res.data.data.client.dni,
+        res.data.data.client.client_type,
+        res.data.data.client.is_deleted
+      ),
+      res.data.data.state,
+      res.data.data.created_at,
+      res.data.data.updated_at
+    );
+  }
+
+  async sendToWaiting(shiftId: number): Promise<Shift> {
+    const res = await this.httpClient.post<{
+      data: ShiftResponse;
+    }>(`/shifts/${shiftId}/waiting`);
+
+    return new Shift(
+      res.data.data.id,
+      res.data.data.room,
+      res.data.data.attention_profile,
+      new Client(
+        res.data.data.client.id,
+        res.data.data.client.name,
+        res.data.data.client.dni,
+        res.data.data.client.client_type,
+        res.data.data.client.is_deleted
+      ),
+      res.data.data.state,
+      res.data.data.created_at,
+      res.data.data.updated_at
+    );
+  }
+
+  async attendClient(shiftId: number): Promise<Shift> {
+    const res = await this.httpClient.post<{
+      data: ShiftResponse;
+    }>(`/shifts/${shiftId}/attend`);
 
     return new Shift(
       res.data.data.id,

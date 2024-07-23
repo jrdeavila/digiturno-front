@@ -1,13 +1,12 @@
+import useShifts from "@/hooks/operator/use-shifts";
 import { faArrowCircleLeft } from "@fortawesome/free-solid-svg-icons"; // Importar el ícono faClock
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Importar FontAwesomeIcon
 import React from "react"; // Eliminado useState
 import "../styles/ModuleDistracted.css";
 import GenericComponent from "./GenericComponent";
-import { Shift } from "@/services/shift-service";
 
-const ModuleDistracted: React.FC<{
-  distractedShifts: Shift[];
-}> = ({ distractedShifts }) => {
+const ModuleDistracted: React.FC = () => {
+  const { distractedShifts } = useShifts();
   return (
     <GenericComponent
       title="Distraidos"

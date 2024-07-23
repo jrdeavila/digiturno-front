@@ -1,22 +1,15 @@
 import ConfigureQualificationModulePage from "@/components/configure-qualification-module-page";
+import AttentionProfile from "@/models/attention-profile";
 import ModuleType from "@/models/module-type";
 import ModuleConfigPage from "@/pages/module-config";
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import useQualificationModule from "@/services/use-qualification-module";
 import delay from "@/utils/delay";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import useAsync from "./use-async";
 import useLoading from "./use-loading";
 import useHttpModuleService, { Module } from "./use-module-service";
 import useSectional from "./use-sectional";
-import AttentionProfile from "@/models/attention-profile";
-import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 
 interface ConfigureModuleCtxProps {
   pared: boolean;
@@ -140,7 +133,9 @@ export class MyModuleProps {
   }
 }
 
-export const MyModuleProvider: React.FC = () => {
+export const MyModuleProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [myModule, setMyModule] = useState<Module>();
   const myModuleService = useHttpModuleService();
   const { attentionProfiles } = useAttentionProfileResource();
@@ -245,23 +240,6 @@ export const MyModuleProvider: React.FC = () => {
 
   // ==================================================================
 
-  const redirection = useMemo(() => {
-    switch (myModuleInfo?.moduleTypeId) {
-      case 1:
-        return <Navigate to="/caja" />;
-      case 2:
-        return <Navigate to="/recepción" />;
-      case 3:
-        return <Navigate to="/pantalla" />;
-      case 4:
-        return <Navigate to="/modulo-seccional" />;
-      default:
-        return null;
-    }
-  }, [myModuleInfo]);
-
-  // ==================================================================
-
   return (
     <MyModuleContext.Provider
       value={{
@@ -275,15 +253,18 @@ export const MyModuleProvider: React.FC = () => {
       }}
     >
       <ConfigureModuleProvider>
-        <Outlet />
-        {shouldRequestIp ? <ModuleConfigPage /> : redirection}
+        {shouldRequestIp ? <ModuleConfigPage /> : children}
       </ConfigureModuleProvider>
     </MyModuleContext.Provider>
   );
 };
 
 const useMyModule = () => {
-  return useContext(MyModuleContext) as MyModuleCtxProps;
+  const context = useContext(MyModuleContext);
+  if (!context) {
+    throw new Error("useMyModule must be used within a MyModuleProvider");
+  }
+  return context;
 };
 
 export default useMyModule;

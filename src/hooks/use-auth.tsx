@@ -1,6 +1,5 @@
 import delay from "@/utils/delay";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import useAsync from "./use-async";
 import useAuthenticationService, {
@@ -13,6 +12,7 @@ const AuthCtx = createContext<
       logout: () => void;
       attendant: Attendant | null;
       authenticated: boolean;
+      loading: boolean;
     }
   | undefined
 >({
@@ -20,9 +20,12 @@ const AuthCtx = createContext<
   logout: () => {},
   attendant: null,
   authenticated: false,
+  loading: true,
 });
 
-export const AuthenticatedProvider: React.FC = () => {
+export const AuthenticatedProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [attendant, setAttendant] = useState<Attendant | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,7 +33,6 @@ export const AuthenticatedProvider: React.FC = () => {
   // =======================================================
 
   const authService = useAuthenticationService();
-  const navigator = useNavigate();
 
   // =======================================================
 
@@ -56,13 +58,11 @@ export const AuthenticatedProvider: React.FC = () => {
     async () => {
       if (token) {
         return delay(
-          1000,
+          3000,
           () => {
             setLoading(true);
           },
-          () => {
-            setLoading(false);
-          },
+          () => {},
           () => {
             return authService.profile(token);
           }
@@ -85,12 +85,6 @@ export const AuthenticatedProvider: React.FC = () => {
   );
 
   useEffect(() => {
-    if (attendant) {
-      navigator("/caja");
-    }
-  }, [attendant, navigator]);
-
-  useEffect(() => {
     if (token) localStorage.setItem("token", token);
   }, [token]);
 
@@ -98,7 +92,6 @@ export const AuthenticatedProvider: React.FC = () => {
 
   const handleLogout = () => {
     authService.logout(token!);
-    navigator("/login");
     setToken(null);
     localStorage.removeItem("token");
   };
@@ -115,18 +108,14 @@ export const AuthenticatedProvider: React.FC = () => {
         login: handleLogin,
         logout: handleLogout,
         attendant,
-        authenticated: !!attendant && !loading,
+        authenticated: !!attendant,
+        loading,
       }}
     >
-      <Outlet />
+      {children}
     </AuthCtx.Provider>
   );
 };
-export const Authenticated = () => {
-  const { authenticated } = useAuth();
-  return authenticated ? <Outlet /> : <Navigate to="/login" />;
-};
-
 export default function useAuth() {
   const context = useContext(AuthCtx);
   if (!context) {

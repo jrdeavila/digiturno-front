@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 
 export default function useHttpClient() {
   const onStatusCodeError = (status: number) => {
+    toast.dismiss();
     switch (status) {
       case 401:
         toast.error("No estas autorizado");

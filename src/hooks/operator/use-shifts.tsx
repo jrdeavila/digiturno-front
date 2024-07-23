@@ -1,12 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import useAsync from "../use-async";
 import useEcho from "./use-echo";
 import useHttpShiftService, { Shift } from "./use-http-shifts-service";
-import useAsync from "../use-async";
 
 interface ShiftCtxProps {
   shifts: Shift[];
   distractedShifts: Shift[];
   currentShift?: Shift;
+  sendToDistracted: (shift: Shift) => Promise<void>;
+  sendToWaiting: (shift: Shift) => Promise<void>;
+  callClient: (shift: Shift) => Promise<void>;
+  attendClient: (shift: Shift) => Promise<void>;
 }
 
 const ShiftContext = createContext<ShiftCtxProps | undefined>(undefined);
@@ -22,6 +27,7 @@ export const ShiftProvider: React.FC<{
 
   const echo = useEcho();
   const shiftService = useHttpShiftService();
+  // ==================================================================
 
   useEffect(() => {
     echo.connect();
@@ -55,20 +61,6 @@ export const ShiftProvider: React.FC<{
 
   useAsync<Shift[]>(
     async () => {
-      return shiftService.getShifts();
-    },
-    (shifts) => {
-      setShifts(shifts);
-    },
-    (error) => {
-      console.error(error);
-    },
-    () => {},
-    []
-  );
-
-  useAsync<Shift[]>(
-    async () => {
       return shiftService.getDistractedShifts();
     },
     (shifts) => {
@@ -80,12 +72,40 @@ export const ShiftProvider: React.FC<{
     () => {},
     []
   );
+
+  // ==================================================================
+
+  const sendToDistracted = async (shift: Shift) => {
+    await shiftService.sendToDistracted(shift.id);
+    toast("Cliente enviado a distraídos");
+  };
+
+  const sendToWaiting = async (shift: Shift) => {
+    await shiftService.sendToWaiting(shift.id);
+    toast("Cliente enviado a lista de espera");
+  };
+
+  const callClient = async (shift: Shift) => {
+    await shiftService.callClient(shift.id);
+    toast("Cliente llamado");
+  };
+
+  const attendClient = async (shift: Shift) => {
+    await shiftService.attendClient(shift.id);
+  };
+
+  // ==================================================================
+
   return (
     <ShiftContext.Provider
       value={{
         shifts,
         distractedShifts,
         currentShift,
+        sendToDistracted,
+        sendToWaiting,
+        callClient,
+        attendClient,
       }}
     >
       {children}

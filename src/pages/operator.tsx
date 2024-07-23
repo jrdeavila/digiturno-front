@@ -3,12 +3,11 @@ import ModuleDistracted from "@/components/ModuleDistracted";
 import ModuleInfo from "@/components/ModuleInfo";
 import ModuleStatus from "@/components/ModuleStatus";
 import OperatorViewHeader from "@/components/OperatorViewHeader";
+import ServiceList from "@/components/ServiceList";
 import WaitingClients from "@/components/WaitingClients";
-import useShifts from "@/hooks/operator/use-shifts";
+import "@/styles/OperatorView.css";
 import { createContext } from "react";
 import { Button, Modal } from "react-bootstrap";
-import "@/styles/OperatorView.css";
-import ServiceList from "@/components/ServiceList";
 
 interface Distracted {
   id: number;
@@ -56,7 +55,6 @@ export const TurnoContext = createContext<{
 });
 
 const OperatorPage: React.FC = () => {
-  const { currentShift, shifts, distractedShifts } = useShifts();
   return (
     <>
       <div className="operator-view no-select">
@@ -67,12 +65,12 @@ const OperatorPage: React.FC = () => {
             <ServiceList />
           </div>
           <div className="center-column">
-            <ClientInfo currentShift={currentShift} />
-            <WaitingClients shifts={shifts} />
+            <ClientInfo />
+            <WaitingClients />
           </div>
           <div className="right-column">
             <ModuleStatus />
-            <ModuleDistracted distractedShifts={distractedShifts} />
+            <ModuleDistracted />
           </div>
         </div>
 

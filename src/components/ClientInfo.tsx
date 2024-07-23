@@ -1,12 +1,11 @@
+import useShifts from "@/hooks/operator/use-shifts";
 import React from "react";
 import { Modal } from "react-bootstrap";
 import "../styles/ClientInfo.css";
 import GenericComponent from "./GenericComponent";
-import { Shift } from "@/services/shift-service";
 
-const ClientInfo: React.FC<{
-  currentShift: Shift | undefined;
-}> = ({ currentShift }) => {
+const ClientInfo: React.FC = () => {
+  const { currentShift } = useShifts();
   return currentShift ? (
     <GenericComponent
       title="Cliente en Atención"
