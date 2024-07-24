@@ -6,7 +6,7 @@ import "../styles/ModuleDistracted.css";
 import GenericComponent from "./GenericComponent";
 
 const ModuleDistracted: React.FC = () => {
-  const { distractedShifts } = useShifts();
+  const { distractedShifts, sendToWaiting } = useShifts();
   return (
     <GenericComponent
       title="Distraidos"
@@ -22,9 +22,11 @@ const ModuleDistracted: React.FC = () => {
           <div className="container-module-distracted" key={shift.id}>
             <p className="nombre-cliente-distraido">{shift.client.name}</p>
 
-            <button className="btn-mandar-cliente-a-espera">
+            <button
+              onClick={() => sendToWaiting(shift)}
+              className="btn-mandar-cliente-a-espera"
+            >
               <FontAwesomeIcon icon={faArrowCircleLeft} />{" "}
-              {/* Botón con ícono de esperar */}
             </button>
           </div>
         ))}

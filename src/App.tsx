@@ -11,7 +11,7 @@ import OperatorPage from "./pages/operator";
 import { useMemo } from "react";
 
 const ModuleGuard = () => {
-  const { info } = useMyModule();
+  const { type } = useMyModule();
   const { loading, authenticated } = useAuth();
 
   const render = useMemo(() => {
@@ -26,17 +26,17 @@ const ModuleGuard = () => {
 
     console.log("ModuleGuard -> authenticated");
 
-    switch (info?.moduleTypeId) {
+    switch (type?.id) {
       case 1:
         return <Navigate to="/caja" />;
-      case 2:
-        return <Navigate to="/recepción" />;
       case 3:
-        return <Navigate to="/pantalla" />;
+        return <Navigate to="/recepción" />;
       case 4:
+        return <Navigate to="/pantalla" />;
+      case 2:
         return <Navigate to="/modulo-seccional" />;
     }
-  }, [authenticated, info?.moduleTypeId, loading]);
+  }, [authenticated, type, loading]);
   return (
     <>
       {render}

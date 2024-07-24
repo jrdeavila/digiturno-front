@@ -1,16 +1,12 @@
 import React from "react";
 import "./GenericComponent";
 import GenericComponent from "./GenericComponent";
-import "@/styles/ServiceList.css";
 import useMyModule from "@/hooks/use-my-module";
 
 const ServiceList: React.FC = () => {
   const { attentionProfile } = useMyModule();
   return (
-    <GenericComponent
-      title="Servicios"
-      customClass="generic-component-service-list"
-    >
+    <GenericComponent title="Servicios">
       <ul className="list-disc">
         {attentionProfile?.services.map((service) => (
           <li key={service.id}>

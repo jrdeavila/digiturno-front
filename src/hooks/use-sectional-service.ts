@@ -1,5 +1,5 @@
 import HttpSectionalService from "@/services/sectional-service";
-import useHttpClient from "./use-http-client";
+import useHttpClient from "./operator/use-http-client";
 
 export default function useSectionalService() {
   const httpClient = useHttpClient();

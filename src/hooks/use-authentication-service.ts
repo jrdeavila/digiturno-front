@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import useHttpClient from "./use-http-client";
+import useHttpClient from "./operator/use-http-client";
 
 interface AttendantResponse {
   id: number;

@@ -1,8 +1,8 @@
 import ConfigureQualificationModulePage from "@/components/configure-qualification-module-page";
 import AttentionProfile from "@/models/attention-profile";
-import ModuleType from "@/models/module-type";
 import ModuleConfigPage from "@/pages/module-config";
 import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
+import { ModuleType } from "@/services/module-type-service";
 import useQualificationModule from "@/services/use-qualification-module";
 import delay from "@/utils/delay";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -15,6 +15,8 @@ interface ConfigureModuleCtxProps {
   pared: boolean;
   checking: boolean;
   requestQualificationModule: () => void;
+  onListenQualification: (listener: (qualification: number) => void) => void;
+  removeListener: (listener: (qualification: number) => void) => void;
 }
 
 const ConfigureModuleCtx = createContext<ConfigureModuleCtxProps | undefined>(
@@ -24,8 +26,11 @@ const ConfigureModuleCtx = createContext<ConfigureModuleCtxProps | undefined>(
 export const ConfigureModuleProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [pared, setPared] = useState<boolean>(false);
+  const [deviceConnected, setDeviceConnected] = useState<boolean>(false);
   const [checking, setChecking] = useState<boolean>(true);
+  const [listeners, setListeners] = useState<
+    ((qualification: number) => void)[]
+  >([]);
 
   const { type } = useMyModule();
   const qualificationModuleService = useQualificationModule();
@@ -47,39 +52,49 @@ export const ConfigureModuleProvider: React.FC<{
     },
     (data) => {
       if (type?.useQualification) {
-        setPared(data !== undefined);
+        setDeviceConnected(data !== undefined);
       } else {
-        setPared(true);
+        setDeviceConnected(true);
       }
     },
     (error) => {
       console.error(error);
     },
     () => {},
-    [pared, type]
+    [type, qualificationModuleService]
   );
 
   useEffect(() => {
-    if (pared) {
+    if (deviceConnected) {
       qualificationModuleService.connect({
         onError: (error) => {
           console.error(error);
         },
         onQualified: (qualification) => {
-          console.log(qualification);
+          listeners.forEach((listener) => {
+            listener(qualification);
+          });
         },
       });
     }
     return () => {
       qualificationModuleService.disconnect();
     };
-  }, [pared, qualificationModuleService]);
+  }, [listeners, deviceConnected, qualificationModuleService]);
 
   // ==================================================================
 
   const requestQualificationModule = async () => {
     const res = await qualificationModuleService.requestQualificationModule();
-    setPared(res);
+    setDeviceConnected(res);
+  };
+
+  const onListenQualification = (listener: (qualification: number) => void) => {
+    setListeners((prev) => [...prev, listener]);
+  };
+
+  const removeListener = (listener: (qualification: number) => void) => {
+    setListeners((prev) => prev.filter((l) => l !== listener));
   };
 
   // ==================================================================
@@ -87,13 +102,15 @@ export const ConfigureModuleProvider: React.FC<{
   return (
     <ConfigureModuleCtx.Provider
       value={{
-        pared,
+        pared: deviceConnected,
         checking,
         requestQualificationModule,
+        onListenQualification,
+        removeListener,
       }}
     >
       {children}
-      {!checking && !pared && <ConfigureQualificationModulePage />}
+      {!checking && !deviceConnected && <ConfigureQualificationModulePage />}
     </ConfigureModuleCtx.Provider>
   );
 };
@@ -116,20 +133,9 @@ const MyModuleContext = createContext<MyModuleCtxProps | undefined>(undefined);
 
 export class MyModuleProps {
   ip: string;
-  roomId: number;
-  sectionalId: number;
-  moduleTypeId: number;
 
-  constructor(
-    ip: string,
-    roomId: number,
-    sectionalId: number,
-    moduleTypeId: number
-  ) {
+  constructor(ip: string) {
     this.ip = ip;
-    this.roomId = roomId;
-    this.sectionalId = sectionalId;
-    this.moduleTypeId = moduleTypeId;
   }
 }
 
@@ -197,14 +203,7 @@ export const MyModuleProvider: React.FC<{
       const moduleInfo = localStorage.getItem("module-info");
       if (moduleInfo) {
         const data = JSON.parse(moduleInfo);
-        setMyModuleInfo(
-          new MyModuleProps(
-            data.ip,
-            parseInt(data.roomId),
-            parseInt(data.sectionalId),
-            parseInt(data.moduleTypeId)
-          )
-        );
+        setMyModuleInfo(new MyModuleProps(data.ip));
       } else {
         setShouldRequestIp(true);
       }
@@ -215,13 +214,13 @@ export const MyModuleProvider: React.FC<{
   }, [myModuleInfo]);
 
   useEffect(() => {
-    if (myModuleInfo) {
+    if (myModule) {
       const moduleType = moduleTypes.find(
-        (type) => type.id === myModuleInfo.moduleTypeId
+        (type) => type.id === myModule.moduleTypeId
       );
       setModuleType(moduleType);
     }
-  }, [moduleTypes, myModuleInfo]);
+  }, [moduleTypes, myModule]);
 
   useEffect(() => {
     const attentionProfile = attentionProfiles.find(

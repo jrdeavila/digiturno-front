@@ -12,7 +12,7 @@ import "../styles/WaitingClients.css";
 import GenericComponent from "./GenericComponent";
 
 const WaitingClients: React.FC = () => {
-  const { shifts } = useShifts();
+  const { shifts, attendClient, sendToDistracted, callClient } = useShifts();
   return (
     <GenericComponent
       title="Clientes en Espera"
@@ -41,18 +41,23 @@ const WaitingClients: React.FC = () => {
 
             {i === 0 && (
               <div className="container-buttons">
-                <button className="llamar-cliente-pantalla">
+                <button
+                  onClick={() => callClient(shift)}
+                  className="llamar-cliente-pantalla"
+                >
                   <FontAwesomeIcon icon={faBullhorn} />
                 </button>
 
-                <button className="mandar-distraidos" onClick={() => {}}>
+                <button
+                  onClick={() => sendToDistracted(shift)}
+                  className="mandar-distraidos"
+                >
                   <FontAwesomeIcon icon={faFrown} />
                 </button>
 
                 <button
                   className="subir-cliente"
-                  onClick={() => {}}
-                  disabled={true}
+                  onClick={() => attendClient(shift)}
                 >
                   <FontAwesomeIcon icon={faUpload} />
                 </button>

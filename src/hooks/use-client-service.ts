@@ -1,5 +1,5 @@
 import ClientService from "@/services/client-service";
-import useHttpClient from "./use-http-client";
+import useHttpClient from "./operator/use-http-client";
 
 const useClientService: () => ClientService = () => {
   return new ClientService(useHttpClient());

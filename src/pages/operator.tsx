@@ -5,98 +5,48 @@ import ModuleStatus from "@/components/ModuleStatus";
 import OperatorViewHeader from "@/components/OperatorViewHeader";
 import ServiceList from "@/components/ServiceList";
 import WaitingClients from "@/components/WaitingClients";
-import "@/styles/OperatorView.css";
-import { createContext } from "react";
-import { Button, Modal } from "react-bootstrap";
-
-interface Distracted {
-  id: number;
-  cedula: number;
-  nombre: string;
-  tipoCliente: string;
-  estado: string;
-}
-
-interface Client {
-  //Se definen el tipo de variables que resivira del .json
-  id: number;
-  cedula: number;
-  nombre: string;
-  tipoCliente: string;
-  estado: string;
-}
-
-export const TurnoContext = createContext<{
-  setClienteEnAtencion: (cliente: Client | null) => void;
-  isWaitingClientsDisabled: boolean;
-  setIsWaitingClientsDisabled: (value: boolean) => void;
-  isClientInfoDisabled: boolean;
-  setIsClientInfoDisabled: (value: boolean) => void;
-  isModuleDistractedDisabled: boolean;
-  setIsModuleDistractedDisabled: (value: boolean) => void;
-  estadoModulo: string;
-  setEstadoModulo: (value: string) => void;
-  estiloModulo: string;
-  setEstiloModulo: (value: string) => void;
-  mardarClienteAEspera: (cliente: Distracted) => void;
-}>({
-  setClienteEnAtencion: () => {},
-  isWaitingClientsDisabled: false,
-  setIsWaitingClientsDisabled: () => {},
-  isClientInfoDisabled: true,
-  setIsClientInfoDisabled: () => {},
-  isModuleDistractedDisabled: false,
-  setIsModuleDistractedDisabled: () => {},
-  estadoModulo: "LIBRE",
-  setEstadoModulo: () => {},
-  estiloModulo: "estilo-estado-libre",
-  setEstiloModulo: () => {},
-  mardarClienteAEspera: () => {},
-});
+import useShifts from "@/hooks/operator/use-shifts";
+import styled from "styled-components";
 
 const OperatorPage: React.FC = () => {
+  const { currentShift } = useShifts();
   return (
     <>
-      <div className="operator-view no-select">
-        <OperatorViewHeader />
-        <div className="main-content">
-          <div className="left-column">
+      <OperatorViewHeader />
+      <GridContainer>
+        <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-4 gap-5 w-full h-full">
+          <div className="col-span-1 row-span-1 bg-orange-300 text-white">
             <ModuleInfo />
+          </div>
+          {currentShift ? (
+            <div className="col-span-1 row-span-4 bg-white text-black">
+              <ClientInfo />
+            </div>
+          ) : (
+            <div className="col-span-1 row-span-4 bg-white text-black">
+              <WaitingClients />
+            </div>
+          )}
+          <div className="col-span-1 row-span-1 bg-white text-black">
+            <ModuleStatus />
+          </div>
+
+          <div className="col-span-1 row-span-3 bg-white text-black">
             <ServiceList />
           </div>
-          <div className="center-column">
-            <ClientInfo />
-            <WaitingClients />
-          </div>
-          <div className="right-column">
-            <ModuleStatus />
+          <div className="col-span-1 row-span-3 bg-white text-black">
             <ModuleDistracted />
           </div>
         </div>
-
-        <Modal
-          show={false}
-          onHide={() => {}}
-          backdrop="static"
-          keyboard={false}
-        >
-          <Modal.Header>
-            <Modal.Title>Conectar Dispositivo Calificador</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>
-              Es necesario conectar el dispositivo calificador para continuar.
-            </p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={() => {}}>
-              Conectar
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+      </GridContainer>
     </>
   );
 };
+
+const GridContainer = styled.div`
+  height: calc(100vh - 65pt);
+  padding: 10px;
+  background: linear-gradient(90deg, var(--bg-blue-400), var(--bg-blue-700));
+`;
 
 export default OperatorPage;

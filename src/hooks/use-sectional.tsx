@@ -1,16 +1,11 @@
 import { Room } from "@/services/room-service";
 import { Sectional } from "@/services/sectional-service";
-import {
-  faArrowLeftLong,
-  faCashRegister,
-  faLaptop,
-  faTv,
-} from "@fortawesome/free-solid-svg-icons";
 import React, { useContext, useState } from "react";
 import useAsync from "./use-async";
 import useRoomService from "./use-room-service";
 import useSectionalService from "./use-sectional-service";
-import ModuleType from "@/models/module-type";
+import { ModuleType } from "@/services/module-type-service";
+import useModuleTypeService from "./use-module-type-service";
 
 type SectionalCtxProps = {
   sectionals: Sectional[];
@@ -30,35 +25,11 @@ export const SectionalProvider: React.FC<{
 }> = ({ children }) => {
   const [sectionals, setSectionals] = useState<Sectional[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [moduleTypes] = useState<ModuleType[]>([
-    {
-      id: 1,
-      name: "Caja",
-      icon: faCashRegister,
-      useQualification: true,
-    },
-    {
-      id: 2,
-      name: "Recepción",
-      icon: faLaptop,
-      useQualification: false,
-    },
-    {
-      id: 3,
-      name: "Pantalla",
-      icon: faTv,
-      useQualification: false,
-    },
-    {
-      id: 4,
-      name: "Modulo sucursal",
-      icon: faArrowLeftLong,
-      useQualification: true,
-    },
-  ]);
+  const [moduleTypes, setModuleTypes] = useState<ModuleType[]>([]);
   const [roomsBySectional, setRoomsBySectional] = useState<Room[]>([]);
   const sectionalService = useSectionalService();
   const roomService = useRoomService();
+  const moduleTypeService = useModuleTypeService();
 
   // ==================================================================
 
@@ -82,6 +53,20 @@ export const SectionalProvider: React.FC<{
     },
     (data) => {
       setRooms(data);
+    },
+    (error) => {
+      console.error(error);
+    },
+    () => {},
+    []
+  );
+
+  useAsync<ModuleType[]>(
+    async () => {
+      return moduleTypeService.getModuleTypes();
+    },
+    (data) => {
+      setModuleTypes(data);
     },
     (error) => {
       console.error(error);

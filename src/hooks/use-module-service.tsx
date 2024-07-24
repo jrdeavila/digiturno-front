@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import useHttpClient from "./use-http-client";
+import useHttpClient from "./operator/use-http-client";
 
 export interface Room {
   id: number;
@@ -15,6 +15,7 @@ export interface ModuleResponse {
   status: string;
   enabled: boolean;
   attention_profile_id: number;
+  module_type_id: number;
 }
 
 export class Module {
@@ -26,6 +27,7 @@ export class Module {
   status: string;
   enabled: boolean;
   attentionProfileId: number;
+  moduleTypeId: number;
 
   constructor(
     id: number,
@@ -35,7 +37,8 @@ export class Module {
     type: string,
     status: string,
     enabled: boolean,
-    attentionProfileId: number
+    attentionProfileId: number,
+    module_type_id: number
   ) {
     this.id = id;
     this.name = name;
@@ -45,6 +48,7 @@ export class Module {
     this.status = status;
     this.enabled = enabled;
     this.attentionProfileId = attentionProfileId;
+    this.moduleTypeId = module_type_id;
   }
 }
 
@@ -79,7 +83,8 @@ class HttpModuleService {
       response.data.data.type,
       response.data.data.status,
       response.data.data.enabled,
-      response.data.data.attention_profile_id
+      response.data.data.attention_profile_id,
+      response.data.data.module_type_id
     );
   }
 }

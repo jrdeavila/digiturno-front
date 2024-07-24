@@ -1,59 +1,66 @@
 import useShifts from "@/hooks/operator/use-shifts";
+import { faCheck, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { Modal } from "react-bootstrap";
-import "../styles/ClientInfo.css";
 import GenericComponent from "./GenericComponent";
+import styled from "styled-components";
 
 const ClientInfo: React.FC = () => {
-  const { currentShift } = useShifts();
+  const { currentShift, completeShift, transferShift } = useShifts();
   return currentShift ? (
-    <GenericComponent
-      title="Cliente en Atención"
-      customClass={`generic-component-client-info`}
-    >
-      <section className="section-client-info">
-        <div className="container-texto-y-botones">
-          <div className="container-cedula-cliente">
-            <p>C.C. {"1.003.316.620"}</p>
+    <GenericComponent title="CLIENTE EN ATENCIÓN">
+      <section className="flex flex-col gap-y-3 h-full w-full justify-stretch items-center p-5">
+        <div className="flex flex-col justify-center items-center">
+          <div className="text font-bold">
+            <p>C.C. {currentShift.client.dni}</p>
           </div>
 
-          <p className="name-client-attention">
-            {"Jose Ricardo De Avila Moreno"}
-          </p>
+          <p className="text-2xl font-bold">{currentShift.client.name}</p>
         </div>
 
-        <div className="temporizador">
-          <div className="time-section">
+        <div className="flex-grow"></div>
+
+        <div className="flex flex-row justify-between items-center w-full">
+          <div className="flex flex-col justify-center items-center">
             <p className="text">Hora de Inicio:</p>
-            <p className="time"> {"10:00:20  PM"} </p>
+            <p className="text-3xl font-bold"> {"10:00:20  PM"} </p>
           </div>
 
-          <div className="time-section">
+          <div className="flex flex-col justify-center items-center">
             <p className="text">Tiempo transcurrido:</p>
-            <p className="time"> {"10:30:10 OM"} </p>
+            <p className="text-3xl font-bold"> {"10:30:10 OM"} </p>
           </div>
         </div>
 
-        <div className="botones-client-info">
-          <button className="button attended">
-            <i className="fas fa-check"></i>
-            ATENDIDO
-          </button>
-          <button className="button transfer">
-            <i className="fas fa-exchange-alt"></i>
-            TRANSFERIR
-          </button>
-        </div>
+        <div className="flex-grow"></div>
 
-        <Modal show={false} backdrop="static" keyboard={false}>
-          <Modal.Header>
-            <Modal.Title>Procesando</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Esperando calificación...</Modal.Body>
-        </Modal>
+        <div className="flex flex-row justify-evenly items-center w-full">
+          <ButtonGradient onClick={() => completeShift(currentShift)}>
+            <FontAwesomeIcon icon={faCheck} className="mr-2" />
+            ATENDIDO
+          </ButtonGradient>
+          <ButtonGradient onClick={() => transferShift(currentShift)}>
+            <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+            TRANSFERIR
+          </ButtonGradient>
+        </div>
       </section>
     </GenericComponent>
   ) : null;
 };
 
 export default ClientInfo;
+
+const ButtonGradient = styled.button`
+  background: linear-gradient(90deg, var(--bg-blue-400), var(--bg-blue-300));
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.5rem;
+  &:hover {
+    transform: scale(1.05);
+  }
+`;

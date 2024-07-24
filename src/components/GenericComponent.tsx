@@ -1,29 +1,28 @@
+import { Divider } from "@nextui-org/react";
 import React, { ReactNode } from "react";
-import "../styles/GenericComponent.css";
 
 interface GenericComponentProps {
   title?: string;
   rightComponent?: ReactNode;
   children: React.ReactNode;
-  customClass?: string;
+  textColor?: string;
 }
 
 const GenericComponent: React.FC<GenericComponentProps> = ({
   title,
   rightComponent,
   children,
-  customClass,
+  textColor = "text-inherit",
 }) => {
   return (
-    <div className={`generic-component ${customClass}`}>
-      {" "}
-      {/*el customClass es la clase para modificar las dimencionesde forma espesifica de los componentes*/}
-      <header className="generic-header">
-        <h1>{title}</h1>
-        <div className="right-component">{rightComponent}</div>{" "}
-        {/*Mirar para quitar div*/}
-      </header>
-      <main className="generic-content">{children}</main>
+    <div className="flex flex-col p-3 h-full">
+      <div className="flex flex-row">
+        <h1 className={`text-2xl font-bold ${textColor}`}>{title}</h1>
+        <div className="flex-grow"></div>
+        <div className={textColor}>{rightComponent}</div>
+      </div>
+      <Divider className={`${textColor} my-2`} />
+      <main className="h-full overflow-y-auto">{children}</main>
     </div>
   );
 };

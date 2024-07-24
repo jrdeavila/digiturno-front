@@ -41,6 +41,7 @@ export default class QualificationModuleService {
 
   public async getQualificationModule(): Promise<HIDDevice | undefined> {
     try {
+      console.log(navigator.hid);
       const devices = await navigator.hid.getDevices();
       this.qualificationModule = devices[0];
       return this.qualificationModule;
@@ -58,7 +59,8 @@ export default class QualificationModuleService {
   public async connect(lifecycle: QualificationModuleLifecycle): Promise<void> {
     if (this.qualificationModule) {
       try {
-        // await this.qualificationModule.open();
+        await this.qualificationModule.open();
+        // console.log("Connected to Qualification Module");
         this.qualificationModule.oninputreport = (event: {
           data: DataView;
         }) => {

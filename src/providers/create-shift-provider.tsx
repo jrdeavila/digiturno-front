@@ -1,12 +1,11 @@
 import { CreateClientForm } from "@/components/create-client-form";
-import { timeToQualify } from "@/config/qualification";
+import WaitingClientQualification from "@/components/WaitingClientQualification";
+import useHttpShiftService from "@/hooks/operator/use-http-shifts-service";
 import useMyModule from "@/hooks/use-my-module";
-import useShiftService from "@/hooks/use-shift-service";
 import Client from "@/models/client";
 import Service from "@/models/service";
 import { Modal, ModalContent } from "@nextui-org/modal";
-import { Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useClientTypeResource } from "./client-type-provider";
 
@@ -43,9 +42,9 @@ const CreateShiftProvider: React.FC<{
   const [isQualifying, setIsQualifying] = useState(false);
   const [qualification, setQualification] = useState(0);
 
-  const shiftService = useShiftService();
+  const shiftService = useHttpShiftService();
 
-  const { info } = useMyModule();
+  const { myModule } = useMyModule();
   const { clientTypes } = useClientTypeResource();
 
   // ==============================================================================
@@ -68,7 +67,7 @@ const CreateShiftProvider: React.FC<{
 
   const handleCreateShift = async () => {
     const shift = await shiftService.createShift({
-      room_id: info!.roomId,
+      room_id: myModule!.room.id,
       client: {
         dni: client!.dni,
         name: client!.name,
@@ -80,7 +79,7 @@ const CreateShiftProvider: React.FC<{
       state: "pending",
     });
 
-    await shiftService.qualifyShift(shift.id, qualification);
+    await shiftService.qualifiedShift(shift.id, qualification);
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
   };
@@ -161,37 +160,6 @@ const CreateShiftProvider: React.FC<{
         </ModalContent>
       </Modal>
     </CreateShiftContext.Provider>
-  );
-};
-
-const WaitingClientQualification: React.FC<{
-  onQualified: () => void;
-}> = ({ onQualified }) => {
-  // ==============================================================================
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      onQualified();
-    }, timeToQualify);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [onQualified]);
-
-  // ==============================================================================
-
-  return (
-    <Card>
-      <CardHeader className="flex items-center justify-center">
-        <span className="text-lg font-bold">
-          ESPERANDO CALIFICACIÓN DEL CLIENTE
-        </span>
-      </CardHeader>
-      <CardBody>
-        <div className="flex flex-col gap-3 h-full">
-          <Spinner label="Esperando calificación..." />
-        </div>
-      </CardBody>
-    </Card>
   );
 };
 

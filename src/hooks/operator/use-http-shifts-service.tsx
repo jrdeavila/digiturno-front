@@ -1,6 +1,17 @@
 import { AxiosInstance } from "axios";
 import useHttpClient from "./use-http-client";
 
+export interface CreateShiftRequest {
+  room_id: number;
+  client: {
+    dni: string;
+    name: string;
+    client_type_id: number;
+  };
+  services: number[];
+  state: string;
+}
+
 export interface ClientResponse {
   id: number;
   name: string;
@@ -84,10 +95,13 @@ class HttpShiftService {
     return HttpShiftService.instance;
   }
 
-  async getShifts(roomId: number): Promise<Shift[]> {
+  async getShifts(
+    roomId: number,
+    attentionProfileId: number
+  ): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
-    }>(`/rooms/${roomId}/shifts`);
+    }>(`/rooms/${roomId}/attention_profiles/${attentionProfileId}/shifts`);
     const shifts = response.data.data.map((shift) => {
       const client = new Client(
         shift.client.id,
@@ -109,10 +123,15 @@ class HttpShiftService {
     return shifts;
   }
 
-  async getDistractedShifts(): Promise<Shift[]> {
+  async getDistractedShifts(
+    roomId: number,
+    attentionProfileId: number
+  ): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
-    }>("/shifts/distracted");
+    }>(
+      `/rooms/${roomId}/attention_profiles/${attentionProfileId}/shifts/distracted`
+    );
     const shifts = response.data.data.map((shift) => {
       const client = new Client(
         shift.client.id,
@@ -135,7 +154,7 @@ class HttpShiftService {
   }
 
   async completeShift(shiftId: number): Promise<Shift> {
-    const res = await this.httpClient.post<{
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
     }>(`/shifts/${shiftId}/completed`);
 
@@ -157,7 +176,7 @@ class HttpShiftService {
   }
 
   async sendToDistracted(shiftId: number): Promise<Shift> {
-    const res = await this.httpClient.post<{
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
     }>(`/shifts/${shiftId}/distracted`);
 
@@ -179,7 +198,7 @@ class HttpShiftService {
   }
 
   async qualifiedShift(shiftId: number, qualification: number): Promise<Shift> {
-    const res = await this.httpClient.post<{
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
     }>(`/shifts/${shiftId}/qualified`, { qualification });
 
@@ -205,7 +224,7 @@ class HttpShiftService {
     qualification: number,
     attentionProfileId: number
   ): Promise<Shift> {
-    const res = await this.httpClient.post<{
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
     }>(`/shifts/${shiftId}/transfer`, { qualification, attentionProfileId });
 
@@ -227,7 +246,7 @@ class HttpShiftService {
   }
 
   async callClient(shiftId: number): Promise<Shift> {
-    const res = await this.httpClient.post<{
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
     }>(`/shifts/${shiftId}/call`);
 
@@ -249,9 +268,9 @@ class HttpShiftService {
   }
 
   async sendToWaiting(shiftId: number): Promise<Shift> {
-    const res = await this.httpClient.post<{
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/waiting`);
+    }>(`/shifts/${shiftId}/pending`);
 
     return new Shift(
       res.data.data.id,
@@ -270,10 +289,12 @@ class HttpShiftService {
     );
   }
 
-  async attendClient(shiftId: number): Promise<Shift> {
-    const res = await this.httpClient.post<{
+  async attendClient(shiftId: number, moduleId: number): Promise<Shift> {
+    const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/attend`);
+    }>(`/shifts/${shiftId}/in-progress`, {
+      module_id: moduleId,
+    });
 
     return new Shift(
       res.data.data.id,
@@ -292,10 +313,31 @@ class HttpShiftService {
     );
   }
 
-  async getMyCurrentShift(): Promise<Shift | undefined> {
+  public async createShift(request: CreateShiftRequest): Promise<Shift> {
+    const response = await this.httpClient.post<{
+      data: ShiftResponse;
+    }>("/shifts", request);
+    return new Shift(
+      response.data.data.id,
+      response.data.data.room,
+      response.data.data.attention_profile,
+      new Client(
+        response.data.data.client.id,
+        response.data.data.client.name,
+        response.data.data.client.dni,
+        response.data.data.client.client_type,
+        response.data.data.client.is_deleted
+      ),
+      response.data.data.state,
+      response.data.data.created_at,
+      response.data.data.updated_at
+    );
+  }
+
+  async getMyCurrentShift(moduleId: number): Promise<Shift | undefined> {
     const response = await this.httpClient.get<{
       data: ShiftResponse | null;
-    }>("/shifts/my/current");
+    }>(`/modules/${moduleId}/shifts/current`);
     const shift = response.data.data;
     if (!shift) {
       return undefined;

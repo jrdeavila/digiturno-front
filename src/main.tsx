@@ -25,13 +25,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <AttentionProfileProvider>
               <ClientTypeProvider>
                 <ClientProvider>
-                  <ShiftProvider>
-                    <MyModuleProvider>
+                  <MyModuleProvider>
+                    <ShiftProvider>
                       <AuthenticatedProvider>
                         <App />
                       </AuthenticatedProvider>
-                    </MyModuleProvider>
-                  </ShiftProvider>
+                    </ShiftProvider>
+                  </MyModuleProvider>
                 </ClientProvider>
               </ClientTypeProvider>
             </AttentionProfileProvider>
