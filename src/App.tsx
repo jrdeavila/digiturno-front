@@ -19,18 +19,19 @@ const ModuleGuard = () => {
       console.log("ModuleGuard -> loading");
       return <LoadingPage />;
     }
-    if (!authenticated) {
-      console.log("ModuleGuard -> !authenticated");
-      return <Navigate to="/login" />;
-    }
 
     console.log("ModuleGuard -> authenticated");
 
     switch (type?.id) {
       case 1:
+        if (!authenticated) {
+          console.log("ModuleGuard -> !authenticated");
+          return <Navigate to="/login" />;
+        }
         return <Navigate to="/caja" />;
       case 3:
         return <Navigate to="/recepción" />;
+
       case 4:
         return <Navigate to="/pantalla" />;
       case 2:

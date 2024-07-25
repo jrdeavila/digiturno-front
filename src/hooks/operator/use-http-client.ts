@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { toast } from "react-toastify";
 
-export const host = "192.168.0.202";
-// export const host = "localhost";
+// export const host = "192.168.0.202";
+export const host = "localhost";
 
 const useHttpClient = () => {
   const showError = (statusCode: number) => {

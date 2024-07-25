@@ -80,6 +80,25 @@ export class Shift {
   }
 }
 
+export const shiftResponseToModel = (shiftResponse: ShiftResponse): Shift => {
+  const client = new Client(
+    shiftResponse.client.id,
+    shiftResponse.client.name,
+    shiftResponse.client.dni,
+    shiftResponse.client.client_type,
+    shiftResponse.client.is_deleted
+  );
+  return new Shift(
+    shiftResponse.id,
+    shiftResponse.room,
+    shiftResponse.attention_profile,
+    client,
+    shiftResponse.state,
+    shiftResponse.created_at,
+    shiftResponse.updated_at
+  );
+};
+
 class HttpShiftService {
   private static instance: HttpShiftService;
   private httpClient: AxiosInstance;
@@ -226,7 +245,10 @@ class HttpShiftService {
   ): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/transfer`, { qualification, attentionProfileId });
+    }>(`/shifts/${shiftId}/transfer`, {
+      qualification,
+      attention_profile_id: attentionProfileId,
+    });
 
     return new Shift(
       res.data.data.id,

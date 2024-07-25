@@ -1,12 +1,27 @@
 import useShifts from "@/hooks/operator/use-shifts";
 import { faCheck, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import GenericComponent from "./GenericComponent";
 import styled from "styled-components";
+import { dateFormatter } from "@/utils/date";
 
 const ClientInfo: React.FC = () => {
-  const { currentShift, completeShift, transferShift } = useShifts();
+  const { currentShift, completeShift, onTransfer } = useShifts();
+
+  const renderCreatedDate = useMemo(() => {
+    // 2024-07-25T02:22:30.000000Z
+    const date = currentShift?.createdAt;
+    return <div className="text-4xl font-bold">{dateFormatter(date)}</div>;
+  }, [currentShift]);
+
+  const time = useMemo(() => {
+    const createdAt = currentShift?.createdAt
+      ? new Date(currentShift.createdAt)
+      : new Date();
+    return createdAt;
+  }, [currentShift]);
+
   return currentShift ? (
     <GenericComponent title="CLIENTE EN ATENCIÓN">
       <section className="flex flex-col gap-y-3 h-full w-full justify-stretch items-center p-5">
@@ -23,12 +38,12 @@ const ClientInfo: React.FC = () => {
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex flex-col justify-center items-center">
             <p className="text">Hora de Inicio:</p>
-            <p className="text-3xl font-bold"> {"10:00:20  PM"} </p>
+            {renderCreatedDate}
           </div>
 
           <div className="flex flex-col justify-center items-center">
             <p className="text">Tiempo transcurrido:</p>
-            <p className="text-3xl font-bold"> {"10:30:10 OM"} </p>
+            <TemporaryComponent initial={time} />
           </div>
         </div>
 
@@ -39,7 +54,7 @@ const ClientInfo: React.FC = () => {
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
             ATENDIDO
           </ButtonGradient>
-          <ButtonGradient onClick={() => transferShift(currentShift)}>
+          <ButtonGradient onClick={onTransfer}>
             <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
             TRANSFERIR
           </ButtonGradient>
@@ -47,6 +62,33 @@ const ClientInfo: React.FC = () => {
       </section>
     </GenericComponent>
   ) : null;
+};
+
+const TemporaryComponent: React.FC<{
+  initial: Date;
+}> = ({ initial }) => {
+  const [now, setNow] = useState(new Date());
+
+  // Update time every second
+  // Get the difference between the current time and the initial time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date(new Date().getTime() - initial.getTime()));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [initial]);
+
+  // Render hh:mm:ss
+  return (
+    <div className="text-4xl font-bold">{`${now
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now
+      .getSeconds()
+      .toString()
+      .padStart(2, "0")}`}</div>
+  );
 };
 
 export default ClientInfo;

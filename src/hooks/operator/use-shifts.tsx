@@ -5,7 +5,14 @@ import styled, { keyframes } from "styled-components";
 import useAsync from "../use-async";
 import useMyModule from "../use-my-module";
 import useEcho from "./use-echo";
-import useHttpShiftService, { Shift } from "./use-http-shifts-service";
+import useHttpShiftService, {
+  Shift,
+  ShiftResponse,
+  shiftResponseToModel,
+} from "./use-http-shifts-service";
+import TransferShift from "@/components/TransferShift";
+import { AttentionProfile } from "./use-http-attention-profile-service";
+import useSectional from "../use-sectional";
 
 interface ShiftCtxProps {
   shifts: Shift[];
@@ -16,8 +23,14 @@ interface ShiftCtxProps {
   callClient: (shift: Shift) => Promise<void>;
   attendClient: (shift: Shift) => Promise<void>;
   completeShift: (shift: Shift) => Promise<void>;
-  transferShift: (shift: Shift) => Promise<void>;
+  transferShift: (
+    shift: Shift,
+    qualification: number,
+    attentionProfile: AttentionProfile
+  ) => Promise<void>;
   qualifyShift: (shift: Shift, qualification: number) => Promise<void>;
+  cancelTransfer: () => void;
+  onTransfer: () => void;
 }
 
 const ShiftContext = createContext<ShiftCtxProps | undefined>(undefined);
@@ -29,6 +42,7 @@ export const ShiftProvider: React.FC<{
   const [distractedShifts, setDistractedShifts] = useState<Shift[]>([]);
   const [currentShift, setCurrentShift] = useState<Shift | undefined>();
   const [onQualifying, setOnQualifying] = useState(false);
+  const [onTransferring, setOnTransferring] = useState(false);
 
   // ==================================================================
 
@@ -40,19 +54,30 @@ export const ShiftProvider: React.FC<{
   useEffect(() => {
     echo.connect();
     if (!myModule) return;
-    const shiftChannelName = `rooms.${myModule?.room.id}.attention_profiles.${myModule?.attentionProfileId}.shifts`;
+
+    const shiftChannelName =
+      myModule.moduleTypeId === 1
+        ? `rooms.${myModule?.room.id}.attention_profiles.${myModule?.attentionProfileId}.shifts`
+        : `rooms.${myModule?.room.id}.shifts`;
     const myCurrentShiftChannelName = `modules.${myModule?.id}.current-shift`;
     echo
       .channel(shiftChannelName)
-      .listen(".shift.created", (data: { shift: Shift }) => {
-        setShifts((prevShifts) => [...prevShifts, data.shift]);
+      .listen(".shift.created", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
+        if (shift.state === "pending") {
+          setShifts((prevShifts) => [...prevShifts, shift]);
+        }
+        if (shift.state === "pending-transferred") {
+          setShifts((prevShifts) => [shift, ...prevShifts]);
+        }
       });
     echo
       .channel(shiftChannelName)
-      .listen(".shift.distracted", (data: { shift: Shift }) => {
+      .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
         setDistractedShifts((prevShifts) => {
-          if (!prevShifts.find((shift) => shift.id === data.shift.id)) {
-            return [data.shift, ...prevShifts];
+          if (!prevShifts.find((s) => s.id === shift.id)) {
+            return [shift, ...prevShifts];
           }
           return prevShifts;
         });
@@ -62,61 +87,58 @@ export const ShiftProvider: React.FC<{
       });
     echo
       .channel(shiftChannelName)
-      .listen(".shift.pending", (data: { shift: Shift }) => {
+      .listen(".shift.pending", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
         setShifts((prevShifts) => {
-          if (!prevShifts.find((shift) => shift.id === data.shift.id)) {
-            return [data.shift, ...prevShifts];
+          if (!prevShifts.find((s) => s.id === shift.id)) {
+            return [shift, ...prevShifts];
           }
           return prevShifts;
         });
         setDistractedShifts((prevShifts) =>
-          prevShifts.filter((shift) => shift.id !== data.shift.id)
+          prevShifts.filter((s) => s.id !== shift.id)
         );
       });
     echo
       .channel(shiftChannelName)
-      .listen(".shift.pending-transferred", (data: { shift: Shift }) => {
-        setShifts((prevShifts) => {
-          if (!prevShifts.find((shift) => shift.id === data.shift.id)) {
-            return [data.shift, ...prevShifts];
-          }
-          return prevShifts;
-        });
+      .listen(".shift.transferred", (data: { shift: ShiftResponse }) => {
+        setShifts((prevShifts) =>
+          prevShifts.filter((s) => s.id !== data.shift.id)
+        );
       });
     echo
       .channel(shiftChannelName)
-      .listen(".shift.transferred", (data: { shift: Shift }) => {
+      .listen(".shift.qualified", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
     echo
       .channel(shiftChannelName)
-      .listen(".shift.qualified", (data: { shift: Shift }) => {
-        setShifts((prevShifts) =>
-          prevShifts.filter((shift) => shift.id !== data.shift.id)
-        );
-      });
-    echo
-      .channel(shiftChannelName)
-      .listen(".shift.in-progress", (data: { shift: Shift }) => {
+      .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
     echo
       .channel(myCurrentShiftChannelName)
-      .listen(".shift.in-progress", (data: { shift: Shift }) => {
-        setCurrentShift(data.shift);
+      .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
+        setCurrentShift(shift);
       });
     echo
       .channel(myCurrentShiftChannelName)
-      .listen(".shift.completed", (data: { shift: Shift }) => {
-        setCurrentShift(data.shift);
+      .listen(".shift.completed", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
+        setCurrentShift(shift);
       });
     echo.channel(myCurrentShiftChannelName).listen(".shift.qualified", () => {
       setCurrentShift(undefined);
       toast("El cliente ha calificado su atención");
+    });
+    echo.channel(myCurrentShiftChannelName).listen(".shift.transferred", () => {
+      setCurrentShift(undefined);
+      toast("El cliente ha transferido su turno");
     });
     return () => {
       echo.leave(shiftChannelName);
@@ -127,6 +149,7 @@ export const ShiftProvider: React.FC<{
   useAsync<Shift[]>(
     async () => {
       if (!myModule) return [];
+      if (myModule.moduleTypeId != 1) return [];
       return shiftService.getShifts(
         myModule!.room.id,
         myModule!.attentionProfileId
@@ -145,6 +168,7 @@ export const ShiftProvider: React.FC<{
   useAsync<Shift | undefined>(
     async () => {
       if (!myModule) return undefined;
+      if (myModule.moduleTypeId != 1) return undefined;
       return shiftService.getMyCurrentShift(myModule!.id);
     },
     (shift) => {
@@ -160,6 +184,7 @@ export const ShiftProvider: React.FC<{
   useAsync<Shift[]>(
     async () => {
       if (!myModule) return [];
+      if (myModule.moduleTypeId != 1) return [];
       return shiftService.getDistractedShifts(
         myModule!.room.id,
         myModule!.attentionProfileId
@@ -205,8 +230,26 @@ export const ShiftProvider: React.FC<{
     await shiftService.completeShift(shift.id);
   };
 
-  const transferShift = async (shift: Shift) => {
-    setOnQualifying(false);
+  const onTransfer = async () => {
+    setOnTransferring(true);
+  };
+
+  const cancelTransfer = async () => {
+    setOnTransferring(false);
+  };
+
+  const transferShift = async (
+    shift: Shift,
+    qualification: number,
+    attentionProfile: AttentionProfile
+  ) => {
+    await shiftService.transferredShift(
+      shift.id,
+      qualification,
+      attentionProfile.id
+    );
+    setOnTransferring(false);
+    toast("Turno transferido");
   };
 
   const qualifyShift = async (shift: Shift, qualification: number) => {
@@ -228,25 +271,52 @@ export const ShiftProvider: React.FC<{
         attendClient,
         completeShift,
         transferShift,
+        cancelTransfer,
+        onTransfer,
         qualifyShift,
       }}
     >
       {children}
       {onQualifying && <WaitingQualificationModal />}
+      {onTransferring && <TransferShiftModal />}
     </ShiftContext.Provider>
+  );
+};
+
+const TransferShiftModal: React.FC = () => {
+  const { cancelTransfer, transferShift, currentShift } = useShifts();
+  const [attentionProfile, setAttentionProfile] =
+    useState<AttentionProfile | null>(null);
+  return (
+    <ModalContainer>
+      {attentionProfile ? (
+        <WaitingClientQualification
+          onQualified={(qualification) => {
+            transferShift(currentShift!, qualification, attentionProfile);
+          }}
+        />
+      ) : (
+        <TransferShift
+          onCancel={cancelTransfer}
+          onTransfer={(attentionProfile) => {
+            setAttentionProfile(attentionProfile);
+          }}
+        />
+      )}
+    </ModalContainer>
   );
 };
 
 const WaitingQualificationModal: React.FC = () => {
   const { currentShift, qualifyShift } = useShifts();
   return (
-    <WaitingQualificationModalContainer>
+    <ModalContainer>
       <WaitingClientQualification
         onQualified={(qualification) => {
           qualifyShift(currentShift!, qualification);
         }}
       />
-    </WaitingQualificationModalContainer>
+    </ModalContainer>
   );
 };
 
@@ -261,7 +331,7 @@ const transitionKeyframes = keyframes`
   }
 `;
 
-const WaitingQualificationModalContainer = styled.div`
+const ModalContainer = styled.div`
   z-index: 1000;
   position: fixed;
   top: 0;

@@ -9,7 +9,8 @@ const ServiceList: React.FC = () => {
     <GenericComponent title="Servicios">
       <ul className="list-disc">
         {attentionProfile?.services.map((service) => (
-          <li key={service.id}>
+          <li key={service.id} className="flex flex-row gap-x-3">
+            <input type="checkbox" id={`service${service.id}`} />
             <label htmlFor={`service${service.id}`}>{service.name}</label>
           </li>
         ))}
