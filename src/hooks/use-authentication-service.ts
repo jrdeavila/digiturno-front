@@ -33,28 +33,41 @@ export class Attendant {
 
 class HttpAuthenticationService {
   private static instance: HttpAuthenticationService;
+  public moduleIp: string;
   private httpClient: AxiosInstance;
 
-  private constructor(httpClient: AxiosInstance) {
+  private constructor(httpClient: AxiosInstance, moduleIp: string) {
     this.httpClient = httpClient;
+    this.moduleIp = moduleIp;
   }
 
   public static getInstance(
-    httpClient: AxiosInstance
+    httpClient: AxiosInstance,
+    moduleIp: string
   ): HttpAuthenticationService {
     if (!HttpAuthenticationService.instance) {
       HttpAuthenticationService.instance = new HttpAuthenticationService(
-        httpClient
+        httpClient,
+        moduleIp
       );
     }
 
+    HttpAuthenticationService.instance.moduleIp = moduleIp;
     return HttpAuthenticationService.instance;
   }
 
   public async login(email: string, password: string): Promise<string> {
     const res = await this.httpClient.post<{
       token: string;
-    }>("/attendants/login", { email, password });
+    }>(
+      "/attendants/login",
+      { email, password },
+      {
+        headers: {
+          "X-Module-Ip": this.moduleIp,
+        },
+      }
+    );
     return res.data.token;
   }
 
@@ -65,6 +78,7 @@ class HttpAuthenticationService {
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          "X-Module-Ip": this.moduleIp,
         },
       }
     );
@@ -76,6 +90,7 @@ class HttpAuthenticationService {
     }>("/attendants/profile", {
       headers: {
         Authorization: `Bearer ${token}`,
+        "X-Module-Ip": this.moduleIp,
       },
     });
 
@@ -94,6 +109,7 @@ class HttpAuthenticationService {
     }>("/attendants/refresh", null, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "X-Module-Ip": this.moduleIp,
       },
     });
 
@@ -101,7 +117,10 @@ class HttpAuthenticationService {
   }
 }
 
-export default function useAuthenticationService() {
+export default function useAuthenticationService(moduleIp: string | undefined) {
   const httpClient = useHttpClient();
-  return HttpAuthenticationService.getInstance(httpClient);
+  return HttpAuthenticationService.getInstance(
+    httpClient,
+    moduleIp ?? "0.0.0.0"
+  );
 }

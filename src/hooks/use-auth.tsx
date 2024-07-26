@@ -1,10 +1,11 @@
 import delay from "@/utils/delay";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import useAsync from "./use-async";
 import useAuthenticationService, {
   Attendant,
 } from "./use-authentication-service";
+import useMyModule from "./use-my-module";
 
 const AuthCtx = createContext<
   | {
@@ -29,15 +30,22 @@ export const AuthenticatedProvider: React.FC<{
   const [token, setToken] = useState<string | null>(null);
   const [attendant, setAttendant] = useState<Attendant | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  // =======================================================
+
+  const { myModule } = useMyModule();
 
   // =======================================================
 
-  const authService = useAuthenticationService();
+  const authService = useMemo(
+    () => useAuthenticationService(myModule?.ipAddress),
+    [myModule]
+  );
 
   // =======================================================
 
   useAsync(
     async () => {
+      if (!myModule) return null;
       const token = localStorage.getItem("token");
       if (token) return await authService.refreshToken(token);
       return token;
@@ -51,11 +59,12 @@ export const AuthenticatedProvider: React.FC<{
       });
     },
     () => {},
-    [authService]
+    [authService, myModule]
   );
 
   useAsync<Attendant | null>(
     async () => {
+      if (!myModule) return null;
       if (token) {
         return delay(
           3000,
@@ -81,7 +90,7 @@ export const AuthenticatedProvider: React.FC<{
     },
     () => {},
 
-    [token]
+    [token, myModule]
   );
 
   useEffect(() => {

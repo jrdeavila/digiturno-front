@@ -114,6 +114,53 @@ class HttpShiftService {
     return HttpShiftService.instance;
   }
 
+  async getShiftsByModule(id: number): Promise<Shift[]> {
+    const response = await this.httpClient.get<{
+      data: ShiftResponse[];
+    }>(`/rooms/${id}/shifts`);
+    return response.data.data.map((shift) => {
+      const client = new Client(
+        shift.client.id,
+        shift.client.name,
+        shift.client.dni,
+        shift.client.client_type,
+        shift.client.is_deleted
+      );
+      return new Shift(
+        shift.id,
+        shift.room,
+        shift.attention_profile,
+        client,
+        shift.state,
+        shift.created_at,
+        shift.updated_at
+      );
+    });
+  }
+  async getDistractedShiftsByModule(id: number): Promise<Shift[]> {
+    const response = await this.httpClient.get<{
+      data: ShiftResponse[];
+    }>(`/rooms/${id}/shifts/distracted`);
+    return response.data.data.map((shift) => {
+      const client = new Client(
+        shift.client.id,
+        shift.client.name,
+        shift.client.dni,
+        shift.client.client_type,
+        shift.client.is_deleted
+      );
+      return new Shift(
+        shift.id,
+        shift.room,
+        shift.attention_profile,
+        client,
+        shift.state,
+        shift.created_at,
+        shift.updated_at
+      );
+    });
+  }
+
   async getShifts(
     roomId: number,
     attentionProfileId: number

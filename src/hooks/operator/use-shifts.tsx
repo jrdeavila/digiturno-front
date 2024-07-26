@@ -1,3 +1,4 @@
+import TransferShift from "@/components/TransferShift";
 import WaitingClientQualification from "@/components/WaitingClientQualification";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -5,14 +6,12 @@ import styled, { keyframes } from "styled-components";
 import useAsync from "../use-async";
 import useMyModule from "../use-my-module";
 import useEcho from "./use-echo";
+import { AttentionProfile } from "./use-http-attention-profile-service";
 import useHttpShiftService, {
   Shift,
   ShiftResponse,
   shiftResponseToModel,
 } from "./use-http-shifts-service";
-import TransferShift from "@/components/TransferShift";
-import { AttentionProfile } from "./use-http-attention-profile-service";
-import useSectional from "../use-sectional";
 
 interface ShiftCtxProps {
   shifts: Shift[];
@@ -184,11 +183,12 @@ export const ShiftProvider: React.FC<{
   useAsync<Shift[]>(
     async () => {
       if (!myModule) return [];
-      if (myModule.moduleTypeId != 1) return [];
-      return shiftService.getDistractedShifts(
-        myModule!.room.id,
-        myModule!.attentionProfileId
-      );
+      if (myModule.moduleTypeId == 1)
+        return shiftService.getDistractedShifts(
+          myModule!.room.id,
+          myModule!.attentionProfileId
+        );
+      return shiftService.getDistractedShiftsByModule(myModule!.room.id);
     },
     (shifts) => {
       setDistractedShifts(shifts);

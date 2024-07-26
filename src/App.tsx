@@ -9,6 +9,7 @@ import useAuth from "./hooks/use-auth";
 import useMyModule from "./hooks/use-my-module";
 import OperatorPage from "./pages/operator";
 import { useMemo } from "react";
+import ScreenPage from "./pages/screen";
 
 const ModuleGuard = () => {
   const { type } = useMyModule();
@@ -65,6 +66,7 @@ function App() {
           }
           path="/recepción"
         />
+        <Route element={<ScreenPage />} path="/pantalla" />
         <Route element={<ModuleGuard />} path="/" />
         <Route element={<NotFoundPage />} path="*" />
         <Route element={<LoginPage />} path="/login" />

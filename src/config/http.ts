@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // const host = "192.168.0.202";
-const host = "localhost";
+const host = "192.168.1.9";
+// const host = "localhost";
 
 const httpClient = axios.create({
   baseURL: `http://${host}/api`,
