@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { toast } from "react-toastify";
 
-export const host = "192.168.0.202";
+export const host = "digiturnov2.ccvalledupar.org.co";
 // export const host = "192.168.1.9";
 // export const host = "localhost";
 
@@ -30,7 +30,7 @@ const useHttpClient = () => {
   };
   // =====================================================
   const httpClient: AxiosInstance = axios.create({
-    baseURL: "http://" + host + "/api",
+    baseURL: "https://" + host + "/api",
   });
   httpClient.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
