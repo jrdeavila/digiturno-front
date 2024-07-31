@@ -26,33 +26,25 @@ export default function BodyReception() {
     get<{ data: Perfil[] }>("attention_profiles").then((res) =>
       setPerfiles(res.data)
     );
-    get<{ data: Modulo }>(
-      `modules/ip-address?ip_address=${myModule?.ipAddress}`
-    )
-      .then((res) => {
-        localStorage.setItem("room_id", res.data.room.id.toString());
-      })
-      .then(() => {
-        const sala_id = localStorage.getItem("room_id");
-        if (sala_id)
-          get<{ data: Turno[] }>(
-            `/rooms/${parseInt(sala_id)}/shifts`
-            //`/rooms/${parseInt(sala_id)}/shifts/in-progress`
-            // `/rooms/${parseInt(sala_id)}/shifts/distracted`
-          )
-            .then((res) => {
-              setTurnos(res.data);
-            })
-            .then(() => {
-              get<{ data: Turno[] }>(
-                //`/rooms/${parseInt(sala_id)}/shifts/in-progress`
-                `/rooms/${parseInt(sala_id)}/shifts/distracted`
-              ).then((res) => {
-                setTurnos([...turnos, ...res.data]);
-              });
-            });
-      });
   }, []);
+
+  useEffect(() => {
+    if (!myModule) return;
+    get<{ data: Turno[] }>(
+      `/rooms/${myModule?.room.id}/shifts`
+      //`/rooms/${parseInt(sala_id)}/shifts/in-progress`
+      // `/rooms/${parseInt(sala_id)}/shifts/distracted`
+    ).then((res) => {
+      setTurnos(res.data);
+    });
+
+    get<{ data: Turno[] }>(
+      //`/rooms/${parseInt(sala_id)}/shifts/in-progress`
+      `/rooms/${myModule.room.id}/shifts/distracted`
+    ).then((res) => {
+      setTurnos((prev) => [...prev, ...res.data]);
+    });
+  }, [myModule]);
 
   useEffect(() => {
     if (cedula.length < 8 || cedula.length > 10) {
