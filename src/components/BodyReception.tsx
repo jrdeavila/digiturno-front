@@ -30,20 +30,15 @@ export default function BodyReception() {
 
   useEffect(() => {
     if (!myModule) return;
-    get<{ data: Turno[] }>(
-      `/rooms/${myModule?.room.id}/shifts`
-      //`/rooms/${parseInt(sala_id)}/shifts/in-progress`
-      // `/rooms/${parseInt(sala_id)}/shifts/distracted`
-    ).then((res) => {
+    get<{ data: Turno[] }>(`/rooms/${myModule?.room.id}/shifts`).then((res) => {
       setTurnos(res.data);
     });
 
-    get<{ data: Turno[] }>(
-      //`/rooms/${parseInt(sala_id)}/shifts/in-progress`
-      `/rooms/${myModule.room.id}/shifts/distracted`
-    ).then((res) => {
-      setTurnos((prev) => [...prev, ...res.data]);
-    });
+    get<{ data: Turno[] }>(`/rooms/${myModule.room.id}/shifts/distracted`).then(
+      (res) => {
+        setTurnos((prev) => [...prev, ...res.data]);
+      }
+    );
   }, [myModule]);
 
   useEffect(() => {
