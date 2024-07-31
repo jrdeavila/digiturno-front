@@ -92,10 +92,9 @@ export default function BodyReception() {
     if (!clienteSelected || !radioId) {
       alert("Faltan campos por registrar");
     } else {
-      const sala_id = localStorage.getItem("room_id");
-      sala_id &&
+      myModule &&
         post<{ data: Turno }>("shifts/with-attention-profile", {
-          room_id: parseInt(sala_id),
+          room_id: myModule.room.id,
           attention_profile_id: radioId,
           client: {
             id: clienteSelected.id,
@@ -304,9 +303,7 @@ export default function BodyReception() {
                   value={tipoCliente}
                   onChange={(e) => setTipoCliente(e.target.value)}
                 >
-                  <option value="" selected>
-                    Seleccione una opcion
-                  </option>
+                  <option value={undefined}>Seleccione una opcion</option>
                   <option value="Estandar">Estandar</option>
                   <option value="Preferencial">Preferencial</option>
                   <option value="Tramitador">Tramitador</option>
@@ -351,6 +348,7 @@ export default function BodyReception() {
           <tbody>
             {turnos.map((turno, index) => (
               <tr
+                key={turno.id}
                 style={
                   turno.state == "distracted"
                     ? { backgroundColor: "#ff000090" }
