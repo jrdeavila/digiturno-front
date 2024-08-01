@@ -1,16 +1,16 @@
+import useMyModule from "@/hooks/use-my-module";
 import React from "react";
-import useMyModule from "../../hooks/use-my-module";
 
 const RequestModuleIpLayer: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const { saveIp, shouldRequestIp } = useMyModule();
+  const { configureModuleInfo, shouldRequestIp } = useMyModule();
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSaveIp = () => {
     const ip = inputRef.current?.value;
     if (ip) {
-      saveIp(ip);
+      configureModuleInfo({ ip });
     }
   };
   return (
