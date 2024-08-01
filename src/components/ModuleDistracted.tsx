@@ -15,7 +15,6 @@ const ModuleDistracted: React.FC = () => {
           {distractedShifts.length}
         </div>
       }
-      customClass="generic-component-module-distracted"
     >
       <section className={`section-module-distracted`}>
         {distractedShifts.map((shift) => (
