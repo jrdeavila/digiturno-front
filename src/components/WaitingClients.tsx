@@ -26,7 +26,6 @@ const WaitingClients: React.FC = () => {
           <div className="number-client-waiting">{shifts.length}</div>
         </div>
       }
-      customClass={`generic-component-waiting-clients`}
     >
       <section className="section-waiting-clients">
         {shifts.map((shift, i) => (

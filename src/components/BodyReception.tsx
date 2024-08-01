@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Cliente, Modulo, Perfil, Turno } from "../models/interfaces";
-import { get, post, patch, borrar } from "@/api/http";
+import { borrar, get, patch, post } from "@/api/http";
 import useMyModule from "@/hooks/use-my-module";
 import { useClientTypeResource } from "@/providers/client-type-provider";
+import { useEffect, useState } from "react";
+import { Cliente, Perfil, Turno } from "../models/interfaces";
 
 export default function BodyReception() {
   const [clientes, setClientes] = useState<Cliente[]>([]);

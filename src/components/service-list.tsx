@@ -63,8 +63,6 @@ const ServiceList = () => {
               </div>
               <Input
                 placeholder="Buscar servicios"
-                icon="search"
-                size="small"
                 width="100%"
                 onChange={(e) => handleSearch(e.target.value)}
               />
@@ -81,7 +79,10 @@ const ServiceList = () => {
                 variant="flat"
                 selectionMode="multiple"
                 selectedKeys={selectedServices}
-                onSelectionChange={setSelectedServices}
+                onSelectionChange={(keys) => {
+                  const ids = Array.from(keys).map((key) => key.toString());
+                  setSelectedServices(new Set(ids));
+                }}
               >
                 {filteredServices.map((service) => (
                   <ListboxItem key={service.id} value={service.id}>
