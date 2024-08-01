@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Cliente, Modulo, Perfil, Turno } from "../models/interfaces";
 import { get, post, patch, borrar } from "@/api/http";
 import useMyModule from "@/hooks/use-my-module";
+import { useClientTypeResource } from "@/providers/client-type-provider";
 
 export default function BodyReception() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -19,6 +20,7 @@ export default function BodyReception() {
 
   // ==========================================================================================
   const { myModule } = useMyModule();
+  const { clientTypes } = useClientTypeResource();
   // ==========================================================================================
 
   useEffect(() => {
@@ -80,12 +82,26 @@ export default function BodyReception() {
   }
 
   function cliente2clienteId(tipoCliente: string) {
+    console.log(tipoCliente);
     let tipoClienteId: number;
     if (tipoCliente == "Estandar") tipoClienteId = 3;
     else if (tipoCliente == "Preferencial") tipoClienteId = 2;
     else if (tipoCliente == "Tramitador") tipoClienteId = 1;
     else tipoClienteId = -1;
     return tipoClienteId;
+  }
+  function saveTurno(turno: Turno) {
+    if (turno.client.client_type == "Preferencial") {
+      const preferencials = turnos.filter(
+        (t) => t.client.client_type == "Preferencial"
+      );
+      const normals = turnos.filter(
+        (t) => t.client.client_type !== "Preferencial"
+      );
+      setTurnos([...preferencials, turno, ...normals]);
+    } else {
+      setTurnos([...turnos, turno]);
+    }
   }
 
   function crearTurno() {
@@ -101,13 +117,13 @@ export default function BodyReception() {
             name: clienteSelected.name,
             dni: clienteSelected.dni,
             is_delete: clienteSelected.is_deleted,
-            client_type_id: cliente2clienteId(clienteSelected.client_type),
+            client_type_id: cliente2clienteId(tipoCliente),
           },
         }).then((res) => {
           alert(
             `Turno de ${res.data.client.name} creado con éxito para el perfil ${res.data.attention_profile}`
           );
-          setTurnos([res.data, ...turnos]);
+          saveTurno(res.data);
           limpiar();
         });
     }
@@ -299,14 +315,18 @@ export default function BodyReception() {
                   name="tipoCliente"
                   id="tipoCliente"
                   className="form-select w-100"
-                  // disabled={disabled}
                   value={tipoCliente}
-                  onChange={(e) => setTipoCliente(e.target.value)}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    return setTipoCliente(e.target.value);
+                  }}
                 >
-                  <option value={undefined}>Seleccione una opcion</option>
-                  <option value="Estandar">Estandar</option>
-                  <option value="Preferencial">Preferencial</option>
-                  <option value="Tramitador">Tramitador</option>
+                  <option value="No Seleccionado">Seleccione una opción</option>
+                  {clientTypes.map((clientType) => (
+                    <option value={clientType.name} key={clientType.id}>
+                      {clientType.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="mb-3">

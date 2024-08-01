@@ -51,6 +51,20 @@ export const ShiftProvider: React.FC<{
   // ==================================================================
 
   useEffect(() => {
+    const orderByPreferential = (prevShifts: Shift[], shift: Shift) => {
+      if (shift.client.clientType === "Preferencial") {
+        const preferential = prevShifts.filter(
+          (s) => s.client.clientType === "Preferencial"
+        );
+        const normals = prevShifts.filter(
+          (s) => s.client.clientType !== "Preferencial"
+        );
+        return [...preferential, shift, ...normals];
+      } else {
+        return [...prevShifts, shift];
+      }
+    };
+
     echo.connect();
     if (!myModule) return;
 
@@ -64,7 +78,9 @@ export const ShiftProvider: React.FC<{
       .listen(".shift.created", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
         if (shift.state === "pending") {
-          setShifts((prevShifts) => [...prevShifts, shift]);
+          setShifts((prevShifts) => {
+            return orderByPreferential(prevShifts, shift);
+          });
         }
         if (shift.state === "pending-transferred") {
           setShifts((prevShifts) => [shift, ...prevShifts]);
