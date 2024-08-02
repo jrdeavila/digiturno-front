@@ -1,0 +1,46 @@
+.encabezadoReceptor {
+  background-color: #0a4c98;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 5%;
+  align-items: center;
+  font-family: url("./assets/fonts/Geomanist-Bold.ttf");
+  position: fixed;
+  width: 100%;
+  top: 0;
+}
+.margenbody {
+  margin-top: 100px;
+}
+
+.titulo {
+  font-size: 18px;
+}
+.cuadroReceptor {
+  margin: 45px 5px 40px 0;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 0 10px 10px rgba(211, 211, 211, 0.2);
+}
+.buscarPerfil {
+  width: 100%;
+  background-color: rgb(241, 241, 241);
+}
+.listaPerfil {
+  /* border: 1px solid gray; */
+  margin-bottom: 10px;
+  list-style: none;
+}
+.listaPerfil:hover {
+  box-shadow: 0 0 10px 10px rgba(211, 211, 211, 0.2);
+  background-color: rgb(10, 76, 152, 0.05);
+}
+.perfilSelected {
+  background-color: rgb(10, 76, 152, 0.8);
+}
+.mensaje {
+  color: darkred;
+  font-size: 12px;
+  text-align: center;
+}
