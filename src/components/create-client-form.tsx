@@ -71,6 +71,7 @@ export const CreateClientForm: React.FC<{
             dni: values.dni,
             clientType: clientType.name,
             isDeleted: false,
+            moduleName: currentClient.moduleName,
           },
           clientType
         );
@@ -83,6 +84,7 @@ export const CreateClientForm: React.FC<{
             dni: values.dni,
             clientType: clientType!.name,
             isDeleted: false,
+            moduleName: "",
           },
           clientType!
         );

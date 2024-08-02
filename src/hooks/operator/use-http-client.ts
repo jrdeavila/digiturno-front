@@ -1,7 +1,6 @@
-import axios, { AxiosInstance } from "axios";
+import httpClient from "@/config/http";
 import { toast } from "react-toastify";
 
-export const host = "digiturnov2.ccvalledupar.org.co";
 // export const host = "192.168.1.9";
 // export const host = "localhost";
 
@@ -29,9 +28,9 @@ const useHttpClient = () => {
     });
   };
   // =====================================================
-  const httpClient: AxiosInstance = axios.create({
-    baseURL: "https://" + host + "/api",
-  });
+  // const httpClient: AxiosInstance = axios.create({
+  //   baseURL: "https://" + host + "/api",
+  // });
   httpClient.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {

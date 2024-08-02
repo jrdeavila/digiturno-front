@@ -1,11 +1,9 @@
 import axios from "axios";
 
-// const host = "192.168.0.202";
-const host = "192.168.1.9";
-// const host = "localhost";
+export const host = "digiturnov2.ccvalledupar.org.co";
 
 const httpClient = axios.create({
-  baseURL: `http://${host}/api`,
+  baseURL: `https://${host}/api`,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

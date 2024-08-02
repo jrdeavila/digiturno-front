@@ -72,6 +72,7 @@ export const AuthenticatedProvider: React.FC<{
       setToken(data);
     },
     () => {
+      localStorage.removeItem("token");
       toast("Error al refrescar el token", {
         type: "error",
       });
