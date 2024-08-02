@@ -1,5 +1,6 @@
 import useShifts from "@/hooks/operator/use-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
+import DefaultLayout from "@/layouts/default";
 import {
   faBullhorn,
   faSadCry,
@@ -11,35 +12,20 @@ import styled from "styled-components";
 export default function ScreenPage() {
   return (
     <ScreenClientProvider>
-      <GridScreenContainer>
-        <div className="col-span-1 row-span-1">
-          <ListOfCalledClients />
+      <DefaultLayout className="w-full h-[100vw]">
+        <div className="grid grid-cols-3 grid-rows-1 w-full h-full">
+          <div className="col-span-1 bg-blue-400">
+          </div>
+          <div className="col-span-2 bg-black">
+
+          </div>
         </div>
-        <div className="col-span-1 row-span-1">
-          <ListOfDistractedClients />
-        </div>
-      </GridScreenContainer>
+      </DefaultLayout>
     </ScreenClientProvider>
   );
 }
 
-const GridScreenContainer = styled.div`
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  background-color: var(--bg-blue-500);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-  gap: 20px 20px;
-  padding: 20px;
 
-  .col-span-1 {
-    background-color: var(--bg-blue-300);
-    border-radius: 20px;
-    padding: 20px;
-  }
-`;
 
 const ListOfCalledClients = () => {
   const { clients } = useClient();
