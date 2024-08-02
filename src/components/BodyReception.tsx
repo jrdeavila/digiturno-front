@@ -302,11 +302,16 @@ export default function BodyReception() {
             </div>
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn w-100"
+              style={{
+                backgroundColor: "#00204D",
+                color: "white",
+                fontWeight: "bold",
+              }}
               disabled={disabledBtnTurn}
               onClick={crearTurno}
             >
-              Asignar Turno
+              ASIGNAR TURNO
             </button>
           </div>
         </div>
@@ -369,19 +374,29 @@ export default function BodyReception() {
                 <button
                   type="button"
                   className="btn btn-primary w-100 mb-2"
+                  style={{
+                    backgroundColor: "#00204D",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
                   disabled={disabled}
                   onClick={crearOActualizarCliente}
                 >
                   {mensaje == "Cliente Encontrado"
-                    ? "Editar Cliente"
-                    : "Crear Cliente"}
+                    ? "EDITAR CLIENTE"
+                    : "CREAR CLIENTE"}
                 </button>
                 <button
                   type="button"
-                  className="btn btn-warning w-100"
+                  className="btn w-100"
+                  style={{
+                    backgroundColor: "rgb(248 113 113)",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
                   onClick={limpiar}
                 >
-                  Limpiar
+                  LIMPIAR
                 </button>
               </div>
             </div>
@@ -392,14 +407,14 @@ export default function BodyReception() {
         <h2>Turnos</h2>
         <table className="table table-bordered text-center table-striped">
           <thead>
-            <tr style={{ backgroundColor: "lightcyan" }}>
+            <tr style={{ backgroundColor: "lightcyan", fontWeight: "bold" }}>
               <td>#</td>
-              <td># Documento</td>
-              <td>Nombre usuario</td>
-              <td>Perfil de atención</td>
-              <td>Estado</td>
-              <td>Tipo de usuario</td>
-              <td>Opciones</td>
+              <td># DOCUMENTO</td>
+              <td>NOMBRE USUARIO</td>
+              <td>PERFIL DE ATENCIÓN</td>
+              <td>ESTADO</td>
+              <td>TIPO DE USUARIO</td>
+              <td>OPCIONES</td>
             </tr>
           </thead>
           <tbody>
