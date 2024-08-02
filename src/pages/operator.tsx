@@ -4,15 +4,11 @@ import ModuleInfo from "@/components/ModuleInfo";
 import ServiceList from "@/components/ServiceList";
 import WaitingClients from "@/components/WaitingClients";
 import useShifts from "@/hooks/operator/use-shifts";
-import useAuth from "@/hooks/use-auth";
 import DefaultLayout from "@/layouts/default";
-import { faSignOut } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 
 const OperatorPage: React.FC = () => {
   const { currentShift } = useShifts();
-  const { logout } = useAuth();
   return (
     <DefaultLayout className="">
       <GridContainer>

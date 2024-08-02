@@ -48,22 +48,22 @@ httpClient.interceptors.response.use(
   }
 );
 
-export async function get<T>(endpoint: string): Promise<T> {
-  const response = await httpClient.get<T>(endpoint);
+export async function get<T>(endpoint: string, config: object): Promise<T> {
+  const response = await httpClient.get<T>(endpoint, config);
   return response.data;
 }
 
-export async function post<T>(endpoint: string, data: object): Promise<T> {
-  const response = await httpClient.post<T>(endpoint, data);
+export async function post<T>(endpoint: string, data: object, config: object): Promise<T> {
+  const response = await httpClient.post<T>(endpoint, data, config);
   return response.data;
 }
 
-export async function patch<T>(endpoint: string, data: object): Promise<T> {
-  const response = await httpClient.patch(endpoint, data);
+export async function patch<T>(endpoint: string, data: object, config: object): Promise<T> {
+  const response = await httpClient.patch(endpoint, data, config);
   return response.data;
 }
 
-export async function borrar<T>(endpoint: string): Promise<T> {
-  const response = await httpClient.delete(endpoint);
+export async function borrar<T>(endpoint: string, config: object): Promise<T> {
+  const response = await httpClient.delete(endpoint, config);
   return response.data;
 }

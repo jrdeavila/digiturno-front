@@ -3955,6 +3955,11 @@ react-router@6.25.1:
   dependencies:
     "@remix-run/router" "1.18.0"
 
+react-speakup@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-speakup/-/react-speakup-1.0.0.tgz#f2ab3e24d9c7f7b7c5e75fb7eeedfa0506e27559"
+  integrity sha512-uZlLfBrWcdlw9fC6N5NY14GA8olnXh7DNaWNQya1osBPIE2nd/URv3nc6+yXeIlu55bwdGYSPoyAXEo5znN1hg==
+
 react-style-singleton@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-style-singleton/-/react-style-singleton-2.2.1.tgz#f99e420492b2d8f34d38308ff660b60d0b1205b4"

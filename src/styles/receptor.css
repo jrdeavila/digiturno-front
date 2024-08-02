@@ -3,14 +3,9 @@
   color: white;
   display: flex;
   justify-content: space-between;
-<<<<<<< HEAD
   padding: 20px 5%;
   align-items: center;
   justify-content: center;
-=======
-  padding: 5px 5%;
-  align-items: center;
->>>>>>> a3ac883 (Se agregó el contador de turnos por estado y se anexaron estilos desde el git original)
   font-family: url("./assets/fonts/Geomanist-Bold.ttf");
   position: fixed;
   width: 100%;

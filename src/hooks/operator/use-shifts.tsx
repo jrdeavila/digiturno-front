@@ -12,6 +12,7 @@ import useHttpShiftService, {
   ShiftResponse,
   shiftResponseToModel,
 } from "./use-http-shifts-service";
+import Service from "@/models/service";
 
 interface ShiftCtxProps {
   shifts: Shift[];
@@ -30,6 +31,7 @@ interface ShiftCtxProps {
   qualifyShift: (shift: Shift, qualification: number) => Promise<void>;
   cancelTransfer: () => void;
   onTransfer: () => void;
+  setServices: (services: Service[]) => void;
 }
 
 const ShiftContext = createContext<ShiftCtxProps | undefined>(undefined);
@@ -42,12 +44,20 @@ export const ShiftProvider: React.FC<{
   const [currentShift, setCurrentShift] = useState<Shift | undefined>();
   const [onQualifying, setOnQualifying] = useState(false);
   const [onTransferring, setOnTransferring] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
 
   // ==================================================================
 
   const echo = useEcho();
   const { myModule } = useMyModule();
   const shiftService = useHttpShiftService();
+
+  // ==================================================================
+
+  const handleSetServices = (services: Service[]) => {
+    setServices(services);
+  }
+
   // ==================================================================
 
   useEffect(() => {
@@ -166,7 +176,8 @@ export const ShiftProvider: React.FC<{
       if (myModule.moduleTypeId != 1) return [];
       return shiftService.getShifts(
         myModule!.room.id,
-        myModule!.attentionProfileId
+        myModule!.attentionProfileId,
+        myModule!.ipAddress,
       );
     },
     (shifts) => {
@@ -183,7 +194,7 @@ export const ShiftProvider: React.FC<{
     async () => {
       if (!myModule) return undefined;
       if (myModule.moduleTypeId != 1) return undefined;
-      return shiftService.getMyCurrentShift(myModule!.id);
+      return shiftService.getMyCurrentShift(myModule!.id, myModule!.ipAddress);
     },
     (shift) => {
       setCurrentShift(shift);
@@ -201,9 +212,10 @@ export const ShiftProvider: React.FC<{
       if (myModule.moduleTypeId == 1)
         return shiftService.getDistractedShifts(
           myModule!.room.id,
-          myModule!.attentionProfileId
+          myModule!.attentionProfileId,
+          myModule!.ipAddress
         );
-      return shiftService.getDistractedShiftsByModule(myModule!.room.id);
+      return shiftService.getDistractedShiftsByModule(myModule!.room.id, myModule!.ipAddress);
     },
     (shifts) => {
       setDistractedShifts(shifts);
@@ -222,30 +234,40 @@ export const ShiftProvider: React.FC<{
   // ==================================================================
 
   const sendToDistracted = async (shift: Shift) => {
-    await shiftService.sendToDistracted(shift.id);
+    await shiftService.sendToDistracted(shift.id, myModule!.ipAddress);
     toast("Cliente enviado a distraídos");
   };
 
   const sendToWaiting = async (shift: Shift) => {
-    await shiftService.sendToWaiting(shift.id);
+    await shiftService.sendToWaiting(shift.id, myModule!.ipAddress);
     toast("Cliente enviado a lista de espera");
   };
 
   const callClient = async (shift: Shift) => {
-    await shiftService.callClient(shift.id);
+    await shiftService.callClient(shift.id, myModule!.ipAddress);
     toast("Cliente llamado");
   };
 
   const attendClient = async (shift: Shift) => {
     if (!myModule) return;
-    await shiftService.attendClient(shift.id, myModule!.id);
+
+    await shiftService.attendClient(shift.id, myModule!.id, myModule!.ipAddress);
   };
 
   const completeShift = async (shift: Shift) => {
-    await shiftService.completeShift(shift.id);
+    if (services.length === 0) {
+      toast("Debe seleccionar al menos un servicio", { type: "error" });
+      return;
+    }
+    await shiftService.completeShift(shift.id, myModule!.ipAddress);
+    setServices([]);
   };
 
   const onTransfer = async () => {
+    if (services.length === 0) {
+      toast("Debe seleccionar al menos un servicio", { type: "error" });
+      return;
+    }
     setOnTransferring(true);
   };
 
@@ -258,17 +280,20 @@ export const ShiftProvider: React.FC<{
     qualification: number,
     attentionProfile: AttentionProfile
   ) => {
+
     await shiftService.transferredShift(
       shift.id,
       qualification,
-      attentionProfile.id
+      attentionProfile.id,
+      myModule!.ipAddress
     );
     setOnTransferring(false);
+    setServices([]);
     toast("Turno transferido");
   };
 
   const qualifyShift = async (shift: Shift, qualification: number) => {
-    await shiftService.qualifiedShift(shift.id, qualification);
+    await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
     setOnQualifying(false);
   };
 
@@ -289,6 +314,7 @@ export const ShiftProvider: React.FC<{
         cancelTransfer,
         onTransfer,
         qualifyShift,
+        setServices: handleSetServices,
       }}
     >
       {children}
