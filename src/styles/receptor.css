@@ -3,8 +3,9 @@
   color: white;
   display: flex;
   justify-content: space-between;
-  padding: 5px 5%;
+  padding: 20px 5%;
   align-items: center;
+  justify-content: center;
   font-family: url("./assets/fonts/Geomanist-Bold.ttf");
   position: fixed;
   width: 100%;

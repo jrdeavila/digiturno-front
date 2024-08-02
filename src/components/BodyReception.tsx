@@ -390,9 +390,9 @@ export default function BodyReception() {
       </div>
       <div className="row w-100">
         <h2>Turnos</h2>
-        <table className="table table-bordered text-center">
+        <table className="table table-bordered text-center table-striped">
           <thead>
-            <tr style={{ backgroundColor: "darkblue" }}>
+            <tr style={{ backgroundColor: "lightcyan" }}>
               <td>#</td>
               <td># Documento</td>
               <td>Nombre usuario</td>
