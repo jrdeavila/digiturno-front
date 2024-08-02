@@ -15,7 +15,7 @@ const OperatorPage: React.FC = () => {
   return (
     <GridContainer>
       <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-4 gap-3 w-full h-full">
-        <div className="col-span-1 row-span-2 bg-green-500 text-white">
+        <div className="col-span-1 row-span-2 bg-green-400 text-white">
           <ModuleInfo />
         </div>
         {currentShift ? (
@@ -30,10 +30,10 @@ const OperatorPage: React.FC = () => {
         <div className="col-span-1 row-span-3 bg-gray-500 text-white">
           <ServiceList />
         </div>
-        <div className="col-span-1 row-span-2 bg-blue-500 text-white">
+        <div className="col-span-1 row-span-2 bg-cyan-500 text-white">
           <ModuleDistracted />
         </div>
-        <div className="col-span-1 row-span-1 bg-orange-500 text-white">
+        <div className="col-span-1 row-span-1 bg-red-500 text-white">
 
           <div className="flex flex-row justify-center items-center gap-x-2 h-full w-full cursor-pointer"
             onClick={logout}

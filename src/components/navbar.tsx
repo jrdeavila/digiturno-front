@@ -13,7 +13,7 @@ export const Navbar = () => {
   const { authenticated, logout } = useAuth();
   return (
     <NextUINavbar
-      className="border-b-2 border-blue-700 bg-white h-[100px]"
+      className="bg-white h-[100px] ml-[20px] mt-[20px]"
       maxWidth="xl"
       position="sticky"
     >

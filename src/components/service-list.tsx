@@ -50,63 +50,61 @@ const ServiceList = () => {
   // ==============================================================================
 
   return (
-    <div>
-      {
-        <ServiceListBox>
-          <CardHeader>
-            <div className="flex flex-row items-center w-full">
-              <div className="flex flex-col w-full">
-                <span className="text-xl font-bold">SERVICIOS DISPONIBLES</span>
-                <span className="text-sm text-gray-500">
-                  Seleccione los servicios que desea reservar
-                </span>
-              </div>
-              <Input
-                placeholder="Buscar servicios"
-                width="100%"
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-            </div>
-          </CardHeader>
-          <CardBody>
-            {loading ? (
-              <div className="flex justify-center items-center w-full h-full">
-                <Spinner label="Cargando servicios..." />
-              </div>
-            ) : (
-              <Listbox
-                aria-label="Select a service"
-                variant="flat"
-                selectionMode="multiple"
-                selectedKeys={selectedServices}
-                onSelectionChange={(keys) => {
-                  const ids = Array.from(keys).map((key) => key.toString());
-                  setSelectedServices(new Set(ids));
-                }}
-              >
-                {filteredServices.map((service) => (
-                  <ListboxItem key={service.id} value={service.id}>
-                    {service.name}
-                  </ListboxItem>
-                ))}
-              </Listbox>
-            )}
-          </CardBody>
-          <CardFooter>
-            <div className="flex flex-col">
-              <span className="text-sm text-gray-500">
-                {selectedServices.size} servicios seleccionados
-              </span>
-              <span className="text-xs text-gray-400">
-                {selectedServicesArray
-                  .map((service) => service.name)
-                  .join(", ")}
-              </span>
-            </div>
-          </CardFooter>
-        </ServiceListBox>
-      }
-    </div>
+    <ServiceListBox className="h-full">
+      <CardHeader>
+        <div className="flex flex-row items-center w-full">
+          <div className="flex flex-col w-full">
+            <span className="text-xl font-bold">SERVICIOS DISPONIBLES</span>
+            <span className="text-sm text-gray-500">
+              Seleccione los servicios que desea reservar
+            </span>
+          </div>
+          <Input
+            placeholder="Buscar servicios"
+            width="100%"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+      </CardHeader>
+      <CardBody className="overflow-y-scroll" >
+        {loading ? (
+          <div className="flex justify-center items-center w-full h-full">
+            <Spinner label="Cargando servicios..." />
+          </div>
+        ) : (
+          <Listbox
+            aria-label="Select a service"
+            variant="flat"
+            selectionMode="multiple"
+            selectedKeys={selectedServices}
+            onSelectionChange={(keys) => {
+              const ids = Array.from(keys).map((key) => key.toString());
+              setSelectedServices(new Set(ids));
+            }}
+          >
+            {filteredServices.map((service) => (
+              <ListboxItem key={service.id} value={service.id}>
+                {service.name}
+              </ListboxItem>
+            ))}
+          </Listbox>
+        )}
+      </CardBody>
+      <CardFooter>
+        <div className="flex flex-col">
+          <span className="text-sm text-gray-500">
+            {selectedServices.size} servicios seleccionados
+          </span>
+          <span className="text-xs text-gray-400">
+            {selectedServicesArray
+              .map((service) => service.name)
+              .join(", ")}
+          </span>
+        </div>
+      </CardFooter>
+    </ServiceListBox>
+
+
   );
 };
 
