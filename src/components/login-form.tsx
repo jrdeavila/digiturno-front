@@ -29,8 +29,12 @@ export default function LoginForm() {
       }}
     >
       {({ handleSubmit, getFieldProps, errors }) => (
-        <form onSubmit={handleSubmit}>
-          <Card className="h-full w-full" id="card-login-form">
+        <form onSubmit={handleSubmit} style={{
+          width: "100%",
+          maxWidth: "400px",
+          margin: "auto",
+        }}>
+          <Card>
             <CardHeader>
               <span className="text-xl font-bold">INICIAR SESIÓN</span>
             </CardHeader>
