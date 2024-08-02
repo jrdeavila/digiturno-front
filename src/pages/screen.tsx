@@ -1,4 +1,3 @@
-import LazyVideoPlayer from "@/components/lazy-video-player";
 import useShifts from "@/hooks/operator/use-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
 import DefaultLayout from "@/layouts/default";
@@ -22,15 +21,8 @@ export default function ScreenPage() {
             </div>
           </div>
           <div className="col-span-2 p-4">
-            {true ? (
-              <>
-                <ClientHeader />
-                <ListOfCalledClients />
-              </>
-
-            ) : (
-              <LazyVideoPlayer />
-            )}
+            <ClientHeader />
+            <ListOfCalledClients />
           </div>
         </div>
 
@@ -73,11 +65,8 @@ const ListOfCalledClients = () => {
           >
             <p className="ml-3 text-3xl font-bold">{client.name}</p>
             <div className="flex-grow"></div>
-            <div className="bg-primary h-16 w-16 rounded-r-lg flex justify-center items-center">
-              <FontAwesomeIcon
-                icon={faBullhorn}
-                className="text-3xl text-white"
-              />
+            <div className="bg-primary h-16 w-16 rounded-r-lg flex justify-center items-center text-white text-2xl">
+              {client.moduleName}
             </div>
           </div>
         ))}

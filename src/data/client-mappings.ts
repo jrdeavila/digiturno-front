@@ -35,5 +35,6 @@ export function mapClientResponseToClient(
     dni: clientResponse.dni,
     clientType: clientResponse.client_type,
     isDeleted: clientResponse.is_deleted,
+    moduleName: "",
   };
 }

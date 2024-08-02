@@ -22,12 +22,12 @@ export const CreateShiftContext = React.createContext<{
 }>({
   client: undefined,
   services: undefined,
-  setClient: () => {},
-  setServices: () => {},
-  createShift: () => {},
-  setDniSearched: () => {},
-  setQualification: () => {},
-  startQualification: () => {},
+  setClient: () => { },
+  setServices: () => { },
+  createShift: () => { },
+  setDniSearched: () => { },
+  setQualification: () => { },
+  startQualification: () => { },
 });
 
 export const useCreateShift = () => useContext(CreateShiftContext);
@@ -66,6 +66,10 @@ const CreateShiftProvider: React.FC<{
   };
 
   const handleCreateShift = async () => {
+    if (services === undefined && services!.length == 0) {
+      alert("Debe seleccionar al menos un servicio");
+      return;
+    }
     const shift = await shiftService.createShift({
       room_id: myModule!.room.id,
       client: {
@@ -77,9 +81,9 @@ const CreateShiftProvider: React.FC<{
       },
       services: services!.map((service) => service.id),
       state: "pending",
-    });
+    }, myModule!.ipAddress);
 
-    await shiftService.qualifiedShift(shift.id, qualification);
+    await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
   };

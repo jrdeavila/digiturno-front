@@ -31,19 +31,35 @@ export default function BodyReception() {
   // ==========================================================================================
 
   useEffect(() => {
-    get<{ data: Cliente[] }>("clients").then((res) => setClientes(res.data));
-    get<{ data: Perfil[] }>("attention_profiles").then((res) =>
+    get<{ data: Cliente[] }>("clients", {
+      headers: {
+        "X-Module-Ip": myModule?.ipAddress,
+      },
+    }).then((res) => setClientes(res.data));
+    get<{ data: Perfil[] }>("attention_profiles", {
+      headers: {
+        "X-Module-Ip": myModule?.ipAddress,
+      }
+    }).then((res) =>
       setPerfiles(res.data)
     );
   }, []);
 
   useEffect(() => {
     if (!myModule) return;
-    get<{ data: Turno[] }>(`/rooms/${myModule?.room.id}/shifts`).then((res) => {
+    get<{ data: Turno[] }>(`/rooms/${myModule?.room.id}/shifts`, {
+      headers: {
+        "X-Module-Ip": myModule?.ipAddress
+      }
+    }).then((res) => {
       setTurnos(res.data);
     });
 
-    get<{ data: Turno[] }>(`/rooms/${myModule.room.id}/shifts/distracted`).then(
+    get<{ data: Turno[] }>(`/rooms/${myModule.room.id}/shifts/distracted`, {
+      headers: {
+        "X-Module-Ip": myModule.ipAddress,
+      },
+    }).then(
       (res) => {
         setTurnos((prev) => [...prev, ...res.data]);
       }
@@ -145,7 +161,13 @@ export default function BodyReception() {
             is_delete: clienteSelected.is_deleted,
             client_type_id: cliente2clienteId(tipoCliente),
           },
-        }).then((res) => {
+        },
+          {
+            headers: {
+              "X-Module-Ip": myModule.ipAddress,
+            }
+          },
+        ).then((res) => {
           alert(
             `Turno de ${res.data.client.name} creado con éxito para el perfil ${res.data.attention_profile}`
           );
@@ -161,6 +183,10 @@ export default function BodyReception() {
       dni: cedula,
       client_type_id: getClientTypeId(tipoCliente),
       is_deleted: false,
+    }, {
+      headers: {
+        "X-Module-Ip": myModule?.ipAddress,
+      },
     })
       .then((value) => {
         // Agregar el nuevo módulo a la lista de módulo registradas
@@ -186,6 +212,10 @@ export default function BodyReception() {
       dni: cedula,
       client_type_id: getClientTypeId(tipoCliente),
       is_deleted: false,
+    }, {
+      headers: {
+        "X-Module-Ip": myModule?.ipAddress
+      }
     }).then(() => {
       const clientinternal = clientes;
       const nuevosClientes: Cliente[] = [];
@@ -209,7 +239,11 @@ export default function BodyReception() {
   }
 
   function eliminar(id: number) {
-    borrar(`shifts/${id}`).then(() => {
+    borrar(`shifts/${id}`, {
+      headers: {
+        "X-Module-Ip": myModule?.ipAddress
+      }
+    }).then(() => {
       const turnosActuales = turnos;
       const nuevosTurnos: Turno[] = [];
       turnosActuales.map((turno) => {

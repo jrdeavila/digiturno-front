@@ -6,6 +6,7 @@ import { ClientResponse } from "@/data/client-mappings";
 import useVoice from "./useVoice";
 import { ModuleResponse, moduleResponseToModule } from "./use-module-service";
 import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
+import { ShiftResponse } from "./operator/use-http-shifts-service";
 
 interface ClientContextProps {
   clients: Client[] | undefined;
@@ -23,6 +24,7 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
   const echo = useEcho();
   const { myModule } = useMyModule();
   const voice = useVoice();
+
   const { attentionProfiles } = useAttentionProfileResource();
 
   // ==============================================================================
@@ -32,16 +34,18 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
     echo
       .channel(channel)
       .listen(".client.call", (data: { client: ClientResponse, module: ModuleResponse }) => {
+        const module = moduleResponseToModule(data.module);
         const client = new Client(
           data.client.id,
           data.client.name,
           data.client.dni,
           data.client.client_type,
-          data.client.is_deleted
+          data.client.is_deleted,
+          module.name,
         );
-        const module = moduleResponseToModule(data.module);
         const ap = attentionProfiles.find((ap) => ap.id === module.attentionProfileId);
         voice.speak(`Cliente ${client.name}. ${ap?.name} ${module.name}`);
+
         setClients((prev) => {
           if (prev.find((c) => c.id === client.id)) {
             return prev;
@@ -49,6 +53,14 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
           return [...prev, client];
         });
       });
+
+    echo.channel(`rooms.${myModule?.room.id}.shifts`).listen(".shift.in-progress", (data: {
+      shift: ShiftResponse
+    }) => {
+      setClients((prev) => {
+        return prev.filter((c) => c.id !== data.shift.client.id);
+      })
+    });
 
     return () => {
       echo.leave(channel);
