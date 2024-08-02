@@ -65,7 +65,6 @@ export const ShiftProvider: React.FC<{
       }
     };
 
-    echo.connect();
     if (!myModule) return;
 
     const shiftChannelName =
@@ -176,7 +175,7 @@ export const ShiftProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -192,7 +191,7 @@ export const ShiftProvider: React.FC<{
     (error) => {
       console.log(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -212,7 +211,7 @@ export const ShiftProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 

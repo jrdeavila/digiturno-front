@@ -15,11 +15,22 @@ module.exports = {
       colors: {
         primary: "#0a4c98",
         secondary: "#1182C3"
+      },
+      fontSize: {
+        "vw": "1vw",
+        "2vw": "2vw",
+        "3vw": "3vw",
+        '4vw': '4vw',
+        '5vw': '5vw',
+        '6vw': '6vw',
+        '7vw': '7vw',
       }
     },
   },
   darkMode: "class",
-  plugins: [nextui(), function ({ addBase, theme }) {
+  plugins: [nextui(),
+  require('@tailwindcss/aspect-ratio'),
+  function ({ addBase, theme }) {
     addBase({
       ':root': {
         '--bg-blue-100': theme('colors.blue.100'),

@@ -13,9 +13,9 @@ const ModuleInfo: React.FC = () => {
     >
       <section className="module-info">
         <div className="module">
-          <p className="text-2xl text-white"> {myModule?.name} </p>
-          <p className="text-white"> {myModule?.ipAddress} </p>
-          <p className="text-white font-bold"> {attentionProfile?.name} </p>
+          <p className="text-2xl "> {myModule?.name} </p>
+          <p className=""> {myModule?.ipAddress} </p>
+          <p className="font-bold"> {attentionProfile?.name} </p>
         </div>
       </section>
     </GenericComponent>

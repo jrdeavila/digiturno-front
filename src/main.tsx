@@ -15,30 +15,48 @@ import ServiceProvider from "./providers/service-provider.tsx";
 import "./pusher.js";
 import { MyModuleProvider } from "./hooks/use-my-module.tsx";
 import { AuthenticatedProvider } from "./hooks/use-auth.tsx";
+import { useEffect } from "react";
+import useEcho from "./hooks/operator/use-echo.ts";
 
+
+
+const RootApp = () => {
+  const echo = useEcho();
+  useEffect(() => {
+    echo.connect();
+
+    return () => {
+      echo.disconnect();
+    };
+  }, [])
+  return (
+    <LoadingProvider>
+      <SectionalProvider>
+        <BrowserRouter>
+          <Provider>
+            <ServiceProvider>
+              <AttentionProfileProvider>
+                <ClientTypeProvider>
+                  <ClientProvider>
+                    <MyModuleProvider>
+                      <ShiftProvider>
+                        <AuthenticatedProvider>
+                          <App />
+                        </AuthenticatedProvider>
+                      </ShiftProvider>
+                    </MyModuleProvider>
+                  </ClientProvider>
+                </ClientTypeProvider>
+              </AttentionProfileProvider>
+            </ServiceProvider>
+          </Provider>
+        </BrowserRouter>
+        <NotificationContainer />
+      </SectionalProvider>
+    </LoadingProvider>
+
+  )
+}
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <LoadingProvider>
-    <SectionalProvider>
-      <BrowserRouter>
-        <Provider>
-          <ServiceProvider>
-            <AttentionProfileProvider>
-              <ClientTypeProvider>
-                <ClientProvider>
-                  <MyModuleProvider>
-                    <ShiftProvider>
-                      <AuthenticatedProvider>
-                        <App />
-                      </AuthenticatedProvider>
-                    </ShiftProvider>
-                  </MyModuleProvider>
-                </ClientProvider>
-              </ClientTypeProvider>
-            </AttentionProfileProvider>
-          </ServiceProvider>
-        </Provider>
-      </BrowserRouter>
-      <NotificationContainer />
-    </SectionalProvider>
-  </LoadingProvider>
+  <RootApp />
 );
