@@ -8,6 +8,7 @@ export interface QualificationModuleLifecycle {
 export default class QualificationModuleService {
   private static instance: QualificationModuleService;
   private qualificationModule: HIDDevice | undefined;
+  private isConnected: boolean = false;
 
   private constructor() {
     this.getQualificationModule();
@@ -41,12 +42,10 @@ export default class QualificationModuleService {
 
   public async getQualificationModule(): Promise<HIDDevice | undefined> {
     try {
-      console.log(navigator.hid);
       const devices = await navigator.hid.getDevices();
       this.qualificationModule = devices[0];
       return this.qualificationModule;
     } catch (error) {
-      console.error(error);
       this.qualificationModule = undefined;
       return undefined;
     }
@@ -59,8 +58,10 @@ export default class QualificationModuleService {
   public async connect(lifecycle: QualificationModuleLifecycle): Promise<void> {
     if (this.qualificationModule) {
       try {
-        await this.qualificationModule.open();
-        // console.log("Connected to Qualification Module");
+        if (!this.isConnected) {
+          await this.qualificationModule.open();
+          this.isConnected = true;
+        }
         this.qualificationModule.oninputreport = (event: {
           data: DataView;
         }) => {

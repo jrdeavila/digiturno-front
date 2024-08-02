@@ -1,15 +1,26 @@
 import Echo from "laravel-echo";
 
+declare global {
+  interface Window {
+    Echo: Echo;
+  }
+}
+
+class SingletonEcho {
+  private static instance: Echo;
+  private constructor() { }
+
+  public static getInstance(): Echo {
+    if (!SingletonEcho.instance) {
+      SingletonEcho.instance = window.Echo;
+      console.log("Echo instance created");
+    }
+
+    return SingletonEcho.instance;
+  }
+
+}
+
 export default function useEcho(): Echo {
-  return new Echo({
-    broadcaster: "reverb",
-    key: "jr010ypjfa02d1plefjc",
-    wsHost: "18.189.30.224",
-    transports: ["websocket", "polling"],
-    secure: true,
-    wsPort: 8080,
-    wssPort: 8080,
-    forceTLS: true,
-    enabledTransports: ["ws", "wss"],
-  });
+  return SingletonEcho.getInstance();
 }
