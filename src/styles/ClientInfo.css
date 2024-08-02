@@ -11,7 +11,7 @@
   padding-top: 35px;
   flex-wrap: wrap; /* Permitir que los elementos se ajusten en filas adicionales si es necesario */
   gap: 30px;
-} 
+}
 
 .visibilidad-client-info {
   display: none;
@@ -53,7 +53,7 @@
   display: flex;
   justify-content: center; /*Horizontal*/
   align-items: center; /*Vertical*/
-  gap: 50px; 
+  gap: 50px;
 }
 .button {
   display: flex;
@@ -64,7 +64,7 @@
   border-radius: 8px;
   font-size: 1.2rem; /* 15px */
   font-weight: bold;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   color: white;
@@ -77,7 +77,11 @@
   background: linear-gradient(135deg, #2bd1ff, #0f7bff); /* Gradiente azul */
 }
 .attended:hover {
-  background: linear-gradient(135deg, #0f7bff, #2bd1ff); /* Gradiente invertido */
+  background: linear-gradient(
+    135deg,
+    #0f7bff,
+    #2bd1ff
+  ); /* Gradiente invertido */
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
@@ -85,14 +89,18 @@
   background: linear-gradient(135deg, #0d4769, #107cbb); /* Gradiente rosa */
 }
 .transfer:hover {
-  background: linear-gradient(135deg, #107cbb, #0d4769); /* Gradiente invertido */
+  background: linear-gradient(
+    135deg,
+    #107cbb,
+    #0d4769
+  ); /* Gradiente invertido */
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* CONTAINER PARA MOSTRAR CALIFICACIÓN */
 .calification {
-  display: flex; 
+  display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -108,7 +116,7 @@
 .temporizador {
   /* background-color: tomato; */
   flex: 0.5;
-  font-family: 'Roboto', sans-serif; /* Fuente moderna */
+  font-family: "Roboto", sans-serif; /* Fuente moderna */
   display: flex;
   flex-direction: row;
   align-items: center;

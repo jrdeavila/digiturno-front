@@ -3,6 +3,7 @@ import useMyModule from "@/hooks/use-my-module";
 import { useClientTypeResource } from "@/providers/client-type-provider";
 import { useEffect, useState } from "react";
 import { Cliente, Perfil, Turno } from "../models/interfaces";
+import "@/styles/receptor.css";
 
 export default function BodyReception() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -17,6 +18,12 @@ export default function BodyReception() {
   const [clienteSelected, setClienteSelected] = useState<Cliente | null>(null);
   const [id, setId] = useState<number>(-1);
   const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [conteos, setConteos] = useState<{
+    espera: number;
+    distraidos: number;
+    atendidos: number;
+    transferidos: number;
+  }>({ espera: 0, distraidos: 0, atendidos: 0, transferidos: 0 });
 
   // ==========================================================================================
   const { myModule } = useMyModule();
@@ -71,6 +78,25 @@ export default function BodyReception() {
     if (nombre == "" || radioId == -1) setDisabledBtnTurn(true);
     else setDisabledBtnTurn(false);
   }, [radioId, nombre]);
+
+  useEffect(() => {
+    let contEspera = 0;
+    let contDistraidos = 0;
+    let contAtendidos = 0;
+    let contTransferidos = 0;
+    turnos.map((turno) => {
+      if (turno.state == "pending") contEspera += 1;
+      else if (turno.state == "distracted") contDistraidos += 1;
+      else if (turno.state == "qualified") contAtendidos += 1;
+      else if (turno.state == "transferred") contTransferidos += 1;
+    });
+    setConteos({
+      espera: contEspera,
+      distraidos: contDistraidos,
+      atendidos: contAtendidos,
+      transferidos: contTransferidos,
+    });
+  }, [turnos]);
 
   function crearOActualizarCliente() {
     if (cedula == "" || nombre == "" || tipoCliente == "") {
@@ -204,6 +230,16 @@ export default function BodyReception() {
     setRadioId(-1);
   }
 
+  function diccionario(ingles: string): string {
+    const traductor = {
+      pending: "En espera",
+      distracted: "Distraido",
+      transferred: "Transferido",
+      "in-process": "En Espera",
+    };
+    return traductor[ingles];
+  }
+
   return (
     <div className="container margenbody">
       <div className="row mt-5">
@@ -214,7 +250,7 @@ export default function BodyReception() {
         </p>
       </div>
       <div className="row">
-        <div className="col-8 cuadroPerfiles">
+        <div className="col-8 cuadroReceptor">
           <div className="row d-flex align-items-center justify-content-evenly">
             <div className="col">
               <h4>Perfiles disponibles</h4>
@@ -274,7 +310,7 @@ export default function BodyReception() {
             </button>
           </div>
         </div>
-        <div className="col-3 cuadroPerfiles h-50">
+        <div className="col-3 cuadroReceptor h-50">
           <div className="row d-flex align-items-center justify-content-evenly">
             <div className="col">
               <h4>Buscar cliente</h4>
@@ -356,12 +392,13 @@ export default function BodyReception() {
         <h2>Turnos</h2>
         <table className="table table-bordered text-center">
           <thead>
-            <tr>
+            <tr style={{ backgroundColor: "darkblue" }}>
               <td>#</td>
+              <td># Documento</td>
               <td>Nombre usuario</td>
-              <td>Perfil</td>
-              <td>Sala</td>
+              <td>Perfil de atención</td>
               <td>Estado</td>
+              <td>Tipo de usuario</td>
               <td>Opciones</td>
             </tr>
           </thead>
@@ -376,17 +413,49 @@ export default function BodyReception() {
                 }
               >
                 <td>{index + 1}</td>
+                <td>{turno.client.dni}</td>
                 <td>{turno.client.name}</td>
                 <td>{turno.attention_profile}</td>
-                <td>{turno.room}</td>
-                <td>{turno.state}</td>
-                <td>
-                  <button onClick={() => eliminar(turno.id)}>Eliminar</button>
+                <td>{diccionario(turno.state)}</td>
+                <td>{turno.client.client_type}</td>
+                <td className="d-flex align-items-center justify-content-center">
+                  <span title="Eliminar">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#992B15"
+                      cursor="pointer"
+                      className="icono"
+                      onClick={() => eliminar(turno.id)}
+                    >
+                      <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+                    </svg>
+                  </span>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="row w-50 cuadroReceptor" style={{ margin: "30px 25%" }}>
+        <div className="col-3 text-center">
+          <h2>{conteos.espera}</h2>
+          <h6>En espera</h6>
+        </div>
+        <div className="col-3 text-center">
+          <h2>{conteos.distraidos}</h2>
+          <h6>Distraidos</h6>
+        </div>
+        <div className="col-3 text-center">
+          <h2>{conteos.atendidos}</h2>
+          <h6>Atendidos</h6>
+        </div>
+        <div className="col-3 text-center">
+          <h2>{conteos.transferidos}</h2>
+          <h6>Transferidos</h6>
+        </div>
       </div>
     </div>
   );
