@@ -231,7 +231,7 @@ export default function BodyReception() {
   }
 
   function diccionario(ingles: string): string {
-    const traductor = {
+    const traductor: { [key: string]: string } = {
       pending: "En espera",
       distracted: "Distraido",
       transferred: "Transferido",
