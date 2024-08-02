@@ -1,12 +1,11 @@
 import BodyReception from "@/components/BodyReception";
-import { Navbar } from "@/components/navbar";
+import DefaultLayout from "@/layouts/default";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function ReceptorPage() {
   return (
-    <>
-      <Navbar />
+    <DefaultLayout className="overflow-y-auto pb-10">
       <BodyReception />
-    </>
+    </DefaultLayout>
   );
 }
