@@ -1,4 +1,5 @@
 import backgrond from "@/assets/img/Fondo3.png";
+import logo from "@/assets/img/logo-ccv-colorido.png";
 import styled from "styled-components";
 
 export default function DefaultLayout({
@@ -28,6 +29,7 @@ export default function DefaultLayout({
       <main className={className}>
         {children}
       </main>
+      <img src={logo} alt="logo" className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96" />
     </DefaultBackground>
   );
 }
