@@ -1,31 +1,60 @@
+import LazyVideoPlayer from "@/components/lazy-video-player";
 import useShifts from "@/hooks/operator/use-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
 import DefaultLayout from "@/layouts/default";
 import {
   faBullhorn,
-  faSadCry,
-  faSadTear,
+  faFrown,
+  faSadTear
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import styled from "styled-components";
+
 
 export default function ScreenPage() {
   return (
     <ScreenClientProvider>
       <DefaultLayout className="w-full h-[100vw]">
         <div className="grid grid-cols-3 grid-rows-1 w-full h-full">
-          <div className="col-span-1 bg-blue-400">
+          <div className="col-span-1 p-4">
+            <div className="flex flex-col gap-y-1">
+              <DistractedHeader />
+              <ListOfDistractedClients />
+            </div>
           </div>
-          <div className="col-span-2 bg-black">
+          <div className="col-span-2 p-4">
+            {true ? (
+              <>
+                <ClientHeader />
+                <ListOfCalledClients />
+              </>
 
+            ) : (
+              <LazyVideoPlayer />
+            )}
           </div>
         </div>
+
+
       </DefaultLayout>
     </ScreenClientProvider>
   );
 }
 
+const ClientHeader = () => {
+  return (
+    <div className="flex flex-row gap-x-3 items-center px-3 py-1 rounded-e-lg">
+      <h1 className="text-3xl font-bold text-primary">TURNOS LLAMADOS</h1>
+    </div>
+  )
+}
 
+const DistractedHeader = () => {
+  return (
+    <div className="flex flex-row gap-x-3 items-center bg-primary text-white px-3 py-1 rounded-e-lg">
+      <h1 className="text-3xl font-bold">TURNOS DISTRAIDOS</h1>
+    </div>
+  )
+}
 
 const ListOfCalledClients = () => {
   const { clients } = useClient();
@@ -75,7 +104,7 @@ const ListOfDistractedClients = () => {
             <div className="flex-grow"></div>
             <div className="bg-red-500 h-16 w-16 rounded-r-lg flex justify-center items-center">
               <FontAwesomeIcon
-                icon={faSadCry}
+                icon={faFrown}
                 className="text-3xl text-white"
               />
             </div>
@@ -85,3 +114,5 @@ const ListOfDistractedClients = () => {
     </div>
   );
 };
+
+
