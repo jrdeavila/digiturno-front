@@ -1,8 +1,8 @@
 import useShifts from "@/hooks/operator/use-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
+import { VoiceProvider } from "@/hooks/useVoice";
 import DefaultLayout from "@/layouts/default";
 import {
-  faBullhorn,
   faFrown,
   faSadTear
 } from "@fortawesome/free-solid-svg-icons";
@@ -11,24 +11,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function ScreenPage() {
   return (
-    <ScreenClientProvider>
-      <DefaultLayout className="w-full h-[100vw]">
-        <div className="grid grid-cols-3 grid-rows-1 w-full h-full">
-          <div className="col-span-1 p-4">
-            <div className="flex flex-col gap-y-1">
-              <DistractedHeader />
-              <ListOfDistractedClients />
+    <VoiceProvider>
+      <ScreenClientProvider>
+        <DefaultLayout className="w-full h-[100vw]">
+          <div className="grid grid-cols-3 grid-rows-1 w-full h-full">
+            <div className="col-span-1 p-4">
+              <div className="flex flex-col gap-y-1">
+                <DistractedHeader />
+                <ListOfDistractedClients />
+              </div>
+            </div>
+            <div className="col-span-2 p-4">
+              <ClientHeader />
+              <ListOfCalledClients />
             </div>
           </div>
-          <div className="col-span-2 p-4">
-            <ClientHeader />
-            <ListOfCalledClients />
-          </div>
-        </div>
-
-
-      </DefaultLayout>
-    </ScreenClientProvider>
+        </DefaultLayout>
+      </ScreenClientProvider>
+    </VoiceProvider>
   );
 }
 
@@ -53,10 +53,6 @@ const ListOfCalledClients = () => {
 
   return (
     <div className="p-3">
-      <div className="flex flex-row gap-x-3 items-center text-white">
-        <h1 className="text-3xl font-bold">CLIENTES LLAMADOS</h1>
-        <FontAwesomeIcon icon={faBullhorn} className="text-3xl" />
-      </div>
       <div className="flex flex-col gap-y-3 pt-10">
         {clients?.map((client) => (
           <div
