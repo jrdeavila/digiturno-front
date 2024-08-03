@@ -41,7 +41,7 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         const module = moduleResponseToModule(data.module);
         const ap = attentionProfiles.find((ap) => ap.id === module.attentionProfileId);
-        voice.speak(`Cliente ${client.name}. ${ap?.name}`);
+        voice.speak(`Cliente ${client.name}. ${ap?.name} ${module.name}`);
         setClients((prev) => {
           if (prev.find((c) => c.id === client.id)) {
             return prev;
