@@ -10,11 +10,10 @@ module.exports = {
     "./node_modules/@nextui-org/theme/dist/components/(button|card|code|input|kbd|link|listbox|modal|navbar|pagination|select|skeleton|snippet|toggle|table|ripple|spinner|divider|popover|scroll-shadow|checkbox|spacer).js"
   ],
   theme: {
-    extend: {
-      // Colors
+    extend: { // Colors
       colors: {
-        primary: "#0a4c98",
-        secondary: "#1182C3"
+        primary: "#00204D",
+        secondary: "#0070B3"
       },
       fontSize: {
         "vw": "1vw",

@@ -36,7 +36,7 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
           data.client.client_type,
           data.client.is_deleted
         );
-        voice.speak(`Cliente ${client.name} por favor dirigirse al módulo 3`);
+        voice.speak(`Cliente ${client.name}. Por favor, dirigirse al módulo 3`);
         setClients((prev) => {
           if (prev.find((c) => c.id === client.id)) {
             return prev;
