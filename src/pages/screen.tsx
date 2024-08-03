@@ -1,4 +1,4 @@
-import LazyVideoPlayer from "../assets/videos/JOSÉ FUENTES - CAE - VUE (1).mp4";
+import LazyVideoPlayer from "@/components/lazy-video-player";
 import useShifts from "@/hooks/operator/use-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
 import DefaultLayout from "@/layouts/default";
