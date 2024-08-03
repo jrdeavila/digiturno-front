@@ -1,12 +1,13 @@
 import { AxiosInstance } from "axios";
 import useHttpClient from "./operator/use-http-client";
 
-interface AttendantResponse {
+export interface AttendantResponse {
   id: number;
   name: string;
   email: string;
   dni: string;
   enabled: boolean;
+  status: string;
 }
 
 export class Attendant {
@@ -15,20 +16,36 @@ export class Attendant {
   email: string;
   dni: string;
   enabled: boolean;
+  status: string;
 
   constructor(
     id: number,
     name: string,
     email: string,
     dni: string,
-    enabled: boolean
+    enabled: boolean,
+    status: string
   ) {
     this.id = id;
     this.name = name;
     this.email = email;
     this.dni = dni;
     this.enabled = enabled;
+    this.status = status;
   }
+}
+
+export const attendantResponseToAttendant = (
+  attendantResponse: AttendantResponse
+): Attendant => {
+  return new Attendant(
+    attendantResponse.id,
+    attendantResponse.name,
+    attendantResponse.email,
+    attendantResponse.dni,
+    attendantResponse.enabled,
+    attendantResponse.status
+  );
 }
 
 class HttpAuthenticationService {
@@ -93,14 +110,7 @@ class HttpAuthenticationService {
         "X-Module-Ip": this.moduleIp,
       },
     });
-
-    return new Attendant(
-      res.data.data.id,
-      res.data.data.name,
-      res.data.data.email,
-      res.data.data.dni,
-      res.data.data.enabled
-    );
+    return attendantResponseToAttendant(res.data.data);
   }
 
   public async refreshToken(token: string): Promise<string> {

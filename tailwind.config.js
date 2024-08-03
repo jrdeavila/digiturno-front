@@ -32,6 +32,9 @@ module.exports = {
   function ({ addBase, theme }) {
     addBase({
       ':root': {
+        '--bg-primary': theme('colors.primary'),
+        '--bg-secondary': theme('colors.secondary'),
+
         '--bg-blue-100': theme('colors.blue.100'),
         '--bg-blue-200': theme('colors.blue.200'),
         '--bg-blue-300': theme('colors.blue.300'),

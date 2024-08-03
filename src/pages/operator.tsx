@@ -29,24 +29,11 @@ const OperatorPage: React.FC = () => {
               <WaitingClients />
             </div>
           )}
-          <div className="col-span-1 row-span-3">
+          <div className="col-span-1 row-span-4">
             <ServiceList />
           </div>
           <div className="col-span-1 row-span-2">
             <ModuleDistracted />
-          </div>
-          <div className="col-span-1 row-span-1 ">
-
-            <div className="flex flex-row justify-start items-center gap-x-2 h-full w-full"
-              onClick={logout}
-            >
-              <div className="rounded-lg cursor-pointer bg-red-500 px-4 py-1 flex flex-row justify-center items-center gap-x-2 ">
-                <FontAwesomeIcon icon={faSignOut} className="text-2vw" />
-                <span className="text-2vw font-bold">
-                  SALIR DEL SISTEMA
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </GridContainer>

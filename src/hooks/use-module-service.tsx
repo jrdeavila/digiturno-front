@@ -52,6 +52,20 @@ export class Module {
   }
 }
 
+export const moduleResponseToModule = (moduleResponse: ModuleResponse): Module => {
+  return new Module(
+    moduleResponse.id,
+    moduleResponse.name,
+    moduleResponse.ip_address,
+    moduleResponse.room,
+    moduleResponse.type,
+    moduleResponse.status,
+    moduleResponse.enabled,
+    moduleResponse.attention_profile_id,
+    moduleResponse.module_type_id
+  );
+}
+
 class HttpModuleService {
   private static instance: HttpModuleService;
   private httpClient: AxiosInstance;
