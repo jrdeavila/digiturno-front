@@ -1,4 +1,4 @@
-import LazyVideoPlayer from "@/components/lazy-video-player";
+import LazyVideoPlayer from "../assets/videos/JOSÉ FUENTES - CAE - VUE (1).mp4";
 import useShifts from "@/hooks/operator/use-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
 import DefaultLayout from "@/layouts/default";
@@ -61,10 +61,10 @@ const ListOfCalledClients = () => {
 
   return (
     <div className="p-3">
-      <div className="flex flex-row gap-x-3 items-center text-white">
+      {/* <div className="flex flex-row gap-x-3 items-center text-white">
         <h1 className="text-3xl font-bold">CLIENTES LLAMADOS</h1>
         <FontAwesomeIcon icon={faBullhorn} className="text-3xl" />
-      </div>
+      </div> */}
       <div className="flex flex-col gap-y-3 pt-10">
         {clients?.map((client) => (
           <div
@@ -90,10 +90,10 @@ const ListOfDistractedClients = () => {
   const { distractedShifts } = useShifts();
   return (
     <div className="p-3">
-      <div className="flex flex-row gap-x-3 items-center text-white">
+      {/* <div className="flex flex-row gap-x-3 items-center text-white">
         <h1 className="text-3xl font-bold">CLIENTES DISTRAÍDOS</h1>
         <FontAwesomeIcon icon={faSadTear} className="text-3xl" />
-      </div>
+      </div> */}
       <div className="flex flex-col gap-y-3 pt-10">
         {distractedShifts.map((shift) => (
           <div

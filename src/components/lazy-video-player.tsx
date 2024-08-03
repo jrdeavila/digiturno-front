@@ -16,7 +16,7 @@ const LazyVideoPlayer: React.FC = () => {
         });
       },
       {
-        threshold: 0.25, // Ajusta este valor según tus necesidades
+        threshold: 0.25, 
       }
     );
 

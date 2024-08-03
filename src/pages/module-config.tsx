@@ -30,8 +30,9 @@ const ModuleConfigFormContainer = styled.div`
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   #module-config-form {
-    width: 40rem;
-    height: 30rem;
+    width: 28rem;
+    height: 20rem !important;
+    padding: 0.7rem;
     animation: ${moduleConfigFormKeyframes} 1s forwards;
   }
 `;
