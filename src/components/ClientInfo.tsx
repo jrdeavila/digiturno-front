@@ -16,11 +16,8 @@ const ClientInfo: React.FC = () => {
   }, [currentShift]);
 
   const time = useMemo(() => {
-    const createdAt = currentShift?.createdAt
-      ? new Date(currentShift.createdAt)
-      : new Date();
-    return createdAt;
-  }, [currentShift]);
+    return new Date();
+  }, []);
 
   return currentShift ? (
     <GenericComponent title="CLIENTE EN ATENCIÓN">
@@ -49,7 +46,7 @@ const ClientInfo: React.FC = () => {
 
         <div className="flex-grow"></div>
 
-        <div className="flex flex-row justify-evenly items-center w-full">
+        <div className="flex flex-row justify-stretch gap-x-3 flex-wrap items-center w-full">
           <ButtonGradient onClick={() => completeShift(currentShift)}>
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
             ATENDIDO
@@ -79,22 +76,20 @@ const TemporaryComponent: React.FC<{
     return () => clearInterval(interval);
   }, [initial]);
 
-  // Render hh:mm:ss
+  // Render mm:ss
   return (
     <div className="text-4xl font-bold">{`${now
-      .getHours()
+      .getMinutes()
       .toString()
-      .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now
-      .getSeconds()
-      .toString()
-      .padStart(2, "0")}`}</div>
+      .padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`}</div>
+
   );
 };
 
 export default ClientInfo;
 
 const ButtonGradient = styled.button`
-  background: linear-gradient(90deg, var(--bg-blue-400), var(--bg-blue-300));
+  background-color: var(--bg-primary);
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 5px;

@@ -8,8 +8,9 @@ import delay from "@/utils/delay";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import useAsync from "./use-async";
 import useLoading from "./use-loading";
-import useHttpModuleService, { Module } from "./use-module-service";
+import useHttpModuleService, { Module, ModuleResponse, moduleResponseToModule } from "./use-module-service";
 import useSectional from "./use-sectional";
+import useEcho from "./operator/use-echo";
 
 interface ConfigureModuleCtxProps {
   pared: boolean;
@@ -60,7 +61,7 @@ export const ConfigureModuleProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [type, qualificationModuleService]
   );
 
@@ -159,6 +160,8 @@ export const MyModuleProvider: React.FC<{
   const { moduleTypes } = useSectional();
   const { setLoading } = useLoading();
 
+  const echo = useEcho();
+
   // ==================================================================
 
   const configureModuleInfo = (moduleInfo: MyModuleProps) => {
@@ -166,6 +169,36 @@ export const MyModuleProvider: React.FC<{
   };
 
   // ==================================================================
+
+
+  useEffect(() => {
+    if (!moduleType) {
+      return;
+    }
+    if (moduleType.useQualification) {
+
+      echo.connect();
+    }
+
+    return () => {
+      if (moduleType.useQualification) {
+        echo.disconnect();
+      }
+    };
+  }, [moduleType])
+
+
+  useEffect(() => {
+    if (myModule) {
+      echo.channel(`modules.${myModule.id}`).listen(".module.updated", (data: { module: ModuleResponse }) => {
+        const moduleUpdated = moduleResponseToModule(data.module);
+        setMyModule(moduleUpdated);
+      });
+    }
+    return () => {
+      echo.leave("modules." + myModule?.id);
+    };
+  }, [myModule])
 
   useAsync<Module | undefined>(
     async () => {
@@ -192,7 +225,7 @@ export const MyModuleProvider: React.FC<{
       console.error(error);
       setShouldRequestIp(true);
     },
-    () => {},
+    () => { },
     [myModuleInfo]
   );
 

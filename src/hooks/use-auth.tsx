@@ -4,21 +4,24 @@ import { toast } from "react-toastify";
 import useAsync from "./use-async";
 import useAuthenticationService, {
   Attendant,
+  AttendantResponse,
+  attendantResponseToAttendant,
 } from "./use-authentication-service";
 import useMyModule from "./use-my-module";
+import useEcho from "./operator/use-echo";
 
 const AuthCtx = createContext<
   | {
-      login: (email: string, password: string) => void;
-      logout: () => void;
-      attendant: Attendant | null;
-      authenticated: boolean;
-      loading: boolean;
-    }
+    login: (email: string, password: string) => void;
+    logout: () => void;
+    attendant: Attendant | null;
+    authenticated: boolean;
+    loading: boolean;
+  }
   | undefined
 >({
-  login: () => {},
-  logout: () => {},
+  login: () => { },
+  logout: () => { },
   attendant: null,
   authenticated: false,
   loading: true,
@@ -34,6 +37,8 @@ export const AuthenticatedProvider: React.FC<{
 
   const { myModule } = useMyModule();
 
+  const echo = useEcho();
+
   // =======================================================
 
   const authService = useMemo(
@@ -42,6 +47,19 @@ export const AuthenticatedProvider: React.FC<{
   );
 
   // =======================================================
+
+  useEffect(() => {
+    echo.channel(`attendants.${attendant?.id}`)
+      .listen(".attendant.updated", (data: {
+        attendant: AttendantResponse;
+      }) => {
+        const updatedAttendant = attendantResponseToAttendant(data.attendant);
+        setAttendant(updatedAttendant);
+      });
+    return () => {
+      echo.leaveChannel(`attendants.${attendant?.id}`);
+    }
+  }, [attendant]);
 
   useAsync(
     async () => {
@@ -58,7 +76,7 @@ export const AuthenticatedProvider: React.FC<{
         type: "error",
       });
     },
-    () => {},
+    () => { },
     [authService, myModule]
   );
 
@@ -71,7 +89,7 @@ export const AuthenticatedProvider: React.FC<{
           () => {
             setLoading(true);
           },
-          () => {},
+          () => { },
           () => {
             return authService.profile(token);
           }
@@ -88,7 +106,7 @@ export const AuthenticatedProvider: React.FC<{
         type: "error",
       });
     },
-    () => {},
+    () => { },
 
     [token, myModule]
   );

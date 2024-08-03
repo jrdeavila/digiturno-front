@@ -16,7 +16,7 @@ const GenericComponent: React.FC<GenericComponentProps> = ({
 }) => {
   return (
     <div className="flex flex-col p-3 h-full">
-      <div className="flex flex-row">
+      <div className="flex flex-row items-center">
         <h1 className={`text-2xl font-bold ${textColor}`}>{title}</h1>
         <div className="flex-grow"></div>
         <div className={textColor}>{rightComponent}</div>
