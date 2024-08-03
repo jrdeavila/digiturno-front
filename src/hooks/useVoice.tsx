@@ -1,40 +1,58 @@
-import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useSpeechSynthesis } from "react-speech-kit";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
-export default function useVoice() {
-  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [loaded, setLoaded] = useState(false);
+const VoiceCtx = createContext<{ speak: (text: string) => void } | undefined>(undefined);
+
+export const VoiceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [queue, setQueue] = useState<string[]>([]);
+  const { speak: speakSynthesis, speaking, supported, voices } = useSpeechSynthesis();
+
+  const mxVoice = voices.find((v: { lang: string; default: boolean; }) => v.lang === "es-MX" && !v.default);
+
+
+  const handleSpeak = useCallback(() => {
+    if (!supported) {
+      toast.error("Tu navegador no soporta la síntesis de voz");
+      return;
+    }
+
+    if (!speaking && queue.length > 0) {
+      const [text, ...rest] = queue;
+      speakSynthesis({
+        text,
+        voice: mxVoice,
+
+      });
+      setQueue(rest);
+    }
+  }, [queue, speaking]);
 
   useEffect(() => {
-    loadVoices();
-
-    return () => {
-      const synth = window.speechSynthesis;
-      synth.cancel();
-    }
-  }, []);
-
-  const loadVoices = async () => {
-    const synth = window.speechSynthesis;
-    const voices = synth.getVoices();
-    setVoices(voices);
-
-
-    const voice = voices.find((v) => v.lang === "es-ES");
-    if (voice) {
-      setLoaded(true);
-      setVoice(voice);
-    }
-  }
+    handleSpeak();
+  }, [queue, handleSpeak]);
 
   const speak = (text: string) => {
-    if (!loaded) toast.error("No se ha cargado la voz");
-    const synth = window.speechSynthesis;
-    const utterThis = new SpeechSynthesisUtterance(text);
-    utterThis.voice = voice;
-    synth.speak(utterThis);
+    setQueue((prev) => [...prev, text]);
   };
 
-  return { voices, voice, speak };
+
+  return (
+    <VoiceCtx.Provider value={{ speak }}>
+      {children}
+    </VoiceCtx.Provider>
+
+  )
 }
+
+
+
+
+export default function useVoice() {
+  const ctx = useContext(VoiceCtx);
+  if (!ctx) {
+    throw new Error("useVoice must be used within a VoiceProvider");
+  }
+  return ctx;
+}
+
