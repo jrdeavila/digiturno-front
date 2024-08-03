@@ -2101,6 +2101,11 @@
     "@types/node" "*"
     "@types/responselike" "^1.0.0"
 
+"@types/dom-speech-recognition@*":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@types/dom-speech-recognition/-/dom-speech-recognition-0.0.4.tgz#3ac5eddfbaa0dacf7eca3d8979ef4f3e519d8e19"
+  integrity sha512-zf2GwV/G6TdaLwpLDcGTIkHnXf8JEf/viMux+khqKQKDa8/8BAUtXXZS563GnvJ4Fg0PBLGAaFf2GekEVSZ6GQ==
+
 "@types/estree@1.0.5":
   version "1.0.5"
   resolved "https://registry.npmjs.org/@types/estree/-/estree-1.0.5.tgz"
@@ -2157,7 +2162,18 @@
   dependencies:
     "@types/react" "*"
 
+<<<<<<< HEAD
 "@types/react@*", "@types/react@^16.8.0 || ^17.0.0 || ^18.0.0", "@types/react@^16.9.0 || ^17.0.0 || ^18.0.0", "@types/react@^18.3.3":
+=======
+"@types/react-speech-recognition@^3.9.5":
+  version "3.9.5"
+  resolved "https://registry.yarnpkg.com/@types/react-speech-recognition/-/react-speech-recognition-3.9.5.tgz#7ef421e11c0d8827192022385ba58511235c6729"
+  integrity sha512-m3Sg3Xtj/YcEUu+nLPGwI6oq1wcSblsuyAmXgBfW6Nprfmtl+A+kH4ruPzzFKnFkq6WmmRxdsLvt0nLRAAJtBw==
+  dependencies:
+    "@types/dom-speech-recognition" "*"
+
+"@types/react@*", "@types/react@^18.3.3":
+>>>>>>> b5ea542 (refactor: Remove unused Logo component and commented code)
   version "18.3.3"
   resolved "https://registry.npmjs.org/@types/react/-/react-18.3.3.tgz"
   integrity sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==
@@ -3755,6 +3771,11 @@ react-speakup@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-speakup/-/react-speakup-1.0.0.tgz#f2ab3e24d9c7f7b7c5e75fb7eeedfa0506e27559"
   integrity sha512-uZlLfBrWcdlw9fC6N5NY14GA8olnXh7DNaWNQya1osBPIE2nd/URv3nc6+yXeIlu55bwdGYSPoyAXEo5znN1hg==
+
+react-speech-kit@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/react-speech-kit/-/react-speech-kit-3.0.1.tgz#8bd936adfe064be1c5a07e2992dfdfd772e80d14"
+  integrity sha512-MXNOciISanhmnxpHJkBOev3M3NPDpW1T7nTc/eGw5pO9cXpoUccRxZkmr/IlpTPbPEneDNeTmbwri/YweyctZg==
 
 react-style-singleton@^2.2.1:
   version "2.2.1"
