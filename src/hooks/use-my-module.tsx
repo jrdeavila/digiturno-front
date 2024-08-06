@@ -128,6 +128,7 @@ interface MyModuleCtxProps {
   shouldRequestIp: boolean;
   refreshMyModule: () => void;
   configureModuleInfo: (moduleInfo: MyModuleProps) => void;
+  clearModuleInfo: () => void;
 }
 
 const MyModuleContext = createContext<MyModuleCtxProps | undefined>(undefined);
@@ -270,6 +271,11 @@ export const MyModuleProvider: React.FC<{
     });
   };
 
+  const clearModuleInfo = () => {
+    setMyModuleInfo(undefined);
+    localStorage.removeItem("module-info");
+  }
+
   // ==================================================================
 
   return (
@@ -282,6 +288,7 @@ export const MyModuleProvider: React.FC<{
         shouldRequestIp,
         configureModuleInfo,
         type: moduleType,
+        clearModuleInfo,
       }}
     >
       <ConfigureModuleProvider>
