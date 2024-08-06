@@ -62,6 +62,9 @@ export const ShiftProvider: React.FC<{
 
   useEffect(() => {
     const orderByPreferential = (prevShifts: Shift[], shift: Shift) => {
+      if (prevShifts.find((s) => s.id === shift.id)) {
+        return prevShifts;
+      }
       if (shift.client.clientType === "Preferencial") {
         const preferential = prevShifts.filter(
           (s) => s.client.clientType === "Preferencial"
@@ -77,78 +80,105 @@ export const ShiftProvider: React.FC<{
 
     if (!myModule) return;
 
-    const shiftChannelName =
-      myModule.moduleTypeId === 1
-        ? `rooms.${myModule?.room.id}.attention_profiles.${myModule?.attentionProfileId}.shifts`
-        : `rooms.${myModule?.room.id}.shifts`;
+    const roomShiftChannelName = `rooms.${myModule?.room.id}.shifts`;
+    const myModuleShiftChannelName = `modules.${myModule?.id}.shifts`;
     const myCurrentShiftChannelName = `modules.${myModule?.id}.current-shift`;
-    echo
-      .channel(shiftChannelName)
-      .listen(".shift.created", (data: { shift: ShiftResponse }) => {
-        const shift = shiftResponseToModel(data.shift);
-        if (shift.state === "pending") {
-          setShifts((prevShifts) => {
-            return orderByPreferential(prevShifts, shift);
-          });
+
+    // ======================================== ROOM CHANNEL ========================================
+
+    echo.channel(roomShiftChannelName).listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
+      const shift = shiftResponseToModel(data.shift);
+      setDistractedShifts((prevShifts) => {
+        if (!prevShifts.find((s) => s.id === shift.id)) {
+          return [shift, ...prevShifts];
         }
-        if (shift.state === "pending-transferred") {
-          setShifts((prevShifts) => [shift, ...prevShifts]);
-        }
+        return prevShifts;
       });
-    echo
-      .channel(shiftChannelName)
+      setShifts((prevShifts) =>
+        prevShifts.filter((s) => s.id !== shift.id)
+      );
+    });
+
+    echo.channel(roomShiftChannelName).listen(".shift.pending", (data: { shift: ShiftResponse }) => {
+      const shift = shiftResponseToModel(data.shift);
+      setShifts((prevShifts) => orderByPreferential(prevShifts, shift));
+      setDistractedShifts((prevShifts) =>
+        prevShifts.filter((s) => s.id !== shift.id)
+      );
+    });
+
+    // ======================================== MODULE CHANNEL ========================================
+
+    echo.
+      channel(myModuleShiftChannelName)
       .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
+        setShifts((prevShifts) =>
+          prevShifts.filter((s) => s.id !== shift.id)
+        );
         setDistractedShifts((prevShifts) => {
           if (!prevShifts.find((s) => s.id === shift.id)) {
             return [shift, ...prevShifts];
           }
           return prevShifts;
         });
-        setShifts((prevShifts) =>
-          prevShifts.filter((shift) => shift.id !== data.shift.id)
-        );
+
       });
+
     echo
-      .channel(shiftChannelName)
+      .channel(myModuleShiftChannelName)
       .listen(".shift.pending", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
-        setShifts((prevShifts) => {
-          if (!prevShifts.find((s) => s.id === shift.id)) {
-            return [shift, ...prevShifts];
-          }
-          return prevShifts;
-        });
+        setShifts((prevShifts) => orderByPreferential(prevShifts, shift));
         setDistractedShifts((prevShifts) =>
           prevShifts.filter((s) => s.id !== shift.id)
         );
       });
+
+    echo.channel(myModuleShiftChannelName).listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
+      const shift = shiftResponseToModel(data.shift);
+      setDistractedShifts((prevShifts) => {
+        if (!prevShifts.find((s) => s.id === shift.id)) {
+          return [shift, ...prevShifts];
+        }
+        return prevShifts;
+      });
+      setShifts((prevShifts) =>
+        prevShifts.filter((s) => s.id !== shift.id)
+      );
+    });
+
+
     echo
-      .channel(shiftChannelName)
+      .channel(myModuleShiftChannelName)
       .listen(".shift.transferred", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((s) => s.id !== data.shift.id)
         );
       });
     echo
-      .channel(shiftChannelName)
+      .channel(myModuleShiftChannelName)
       .listen(".shift.qualified", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
+
     echo
-      .channel(shiftChannelName)
+      .channel(myModuleShiftChannelName)
       .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
-    echo.channel(shiftChannelName).listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
+    echo.channel(myModuleShiftChannelName).listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
       setShifts((prevShifts) =>
         prevShifts.filter((shift) => shift.id !== data.shift.id)
       );
     });
+
+
+    // ======================================== CURRENT SHIFT CHANNEL ========================================
     echo
       .channel(myCurrentShiftChannelName)
       .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
@@ -169,9 +199,12 @@ export const ShiftProvider: React.FC<{
       setCurrentShift(undefined);
       toast("El cliente ha transferido su turno");
     });
+    echo.channel(myCurrentShiftChannelName).listen(".shift.deleted", () => {
+      setCurrentShift(undefined);
+    });
 
     return () => {
-      echo.leave(shiftChannelName);
+      echo.leave(myModuleShiftChannelName);
       echo.leave(myCurrentShiftChannelName);
     };
   }, [myModule]);
@@ -181,8 +214,6 @@ export const ShiftProvider: React.FC<{
       if (!myModule) return [];
       if (myModule.moduleTypeId != 1) return [];
       return shiftService.getShifts(
-        myModule!.room.id,
-        myModule!.attentionProfileId,
         myModule!.ipAddress,
       );
     },
@@ -200,7 +231,7 @@ export const ShiftProvider: React.FC<{
     async () => {
       if (!myModule) return undefined;
       if (myModule.moduleTypeId != 1) return undefined;
-      return shiftService.getMyCurrentShift(myModule!.id, myModule!.ipAddress);
+      return shiftService.getMyCurrentShift(myModule!.ipAddress);
     },
     (shift) => {
       setCurrentShift(shift);

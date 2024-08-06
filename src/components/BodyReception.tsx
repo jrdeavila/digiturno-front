@@ -67,7 +67,7 @@ export default function BodyReception() {
   }, [myModule]);
 
   useEffect(() => {
-    if (cedula.length < 8 || cedula.length > 10) {
+    if (cedula.length == 0) {
       setMensaje("La cédula debe tener entre 8 y 10 números");
       setNombre("");
       setTipoCliente("");
@@ -276,13 +276,6 @@ export default function BodyReception() {
 
   return (
     <div className="container margenbody">
-      <div className="row mt-5">
-        <h2>Reservar Turno</h2>
-        <p className="fs-5">
-          Bienvenido a nuestro sistema de reserva de turnos. Por favor
-          seleccione el tipo de perfil que desea reservar
-        </p>
-      </div>
       <div className="row">
         <div className="col-8 cuadroReceptor">
           <div className="row d-flex align-items-center justify-content-evenly">
