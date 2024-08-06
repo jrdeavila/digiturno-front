@@ -43,7 +43,6 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
           data.client.is_deleted,
           module.name,
         );
-        const ap = attentionProfiles.find((ap) => ap.id === module.attentionProfileId);
         voice.speak(`${client.name}. modulo ${module.name}`);
 
         setClients((prev) => {
@@ -54,7 +53,37 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       });
 
+    echo.channel(`rooms.${myModule?.room.id}.shifts`).listen(".shift.pending-transferred", (data: {
+      shift: ShiftResponse
+    }) => {
+      setClients((prev) => {
+        return prev.filter((c) => c.id !== data.shift.client.id);
+      })
+    });
+
+    echo.channel(`rooms.${myModule?.room.id}.shifts`).listen(".shift.pending", (data: {
+      shift: ShiftResponse
+    }) => {
+      setClients((prev) => {
+        return prev.filter((c) => c.id !== data.shift.client.id);
+      })
+    });
+
     echo.channel(`rooms.${myModule?.room.id}.shifts`).listen(".shift.in-progress", (data: {
+      shift: ShiftResponse
+    }) => {
+      setClients((prev) => {
+        return prev.filter((c) => c.id !== data.shift.client.id);
+      })
+    });
+    echo.channel(`rooms.${myModule?.room.id}.shifts`).listen(".shift.deleted", (data: {
+      shift: ShiftResponse
+    }) => {
+      setClients((prev) => {
+        return prev.filter((c) => c.id !== data.shift.client.id);
+      })
+    });
+    echo.channel(`rooms.${myModule?.room.id}.shifts`).listen(".shift.distracted", (data: {
       shift: ShiftResponse
     }) => {
       setClients((prev) => {

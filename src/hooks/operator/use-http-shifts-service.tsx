@@ -170,13 +170,11 @@ class HttpShiftService {
   }
 
   async getShifts(
-    roomId: number,
-    attentionProfileId: number,
     moduleIp: string,
   ): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
-    }>(`/rooms/${roomId}/attention_profiles/${attentionProfileId}/shifts`, {
+    }>(`/modules/shifts`, {
       headers: {
         "X-Module-Ip": moduleIp
       }
@@ -456,10 +454,10 @@ class HttpShiftService {
     );
   }
 
-  async getMyCurrentShift(moduleId: number, moduleIp: string): Promise<Shift | undefined> {
+  async getMyCurrentShift(moduleIp: string): Promise<Shift | undefined> {
     const response = await this.httpClient.get<{
       data: ShiftResponse | null;
-    }>(`/modules/${moduleId}/shifts/current`, {
+    }>(`/modules/shifts/current`, {
       headers: {
         "X-Module-Ip": moduleIp
       }
