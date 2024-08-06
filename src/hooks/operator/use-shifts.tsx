@@ -144,6 +144,11 @@ export const ShiftProvider: React.FC<{
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
+    echo.channel(shiftChannelName).listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
+      setShifts((prevShifts) =>
+        prevShifts.filter((shift) => shift.id !== data.shift.id)
+      );
+    });
     echo
       .channel(myCurrentShiftChannelName)
       .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
@@ -164,6 +169,7 @@ export const ShiftProvider: React.FC<{
       setCurrentShift(undefined);
       toast("El cliente ha transferido su turno");
     });
+
     return () => {
       echo.leave(shiftChannelName);
       echo.leave(myCurrentShiftChannelName);
@@ -273,6 +279,7 @@ export const ShiftProvider: React.FC<{
 
   const cancelTransfer = async () => {
     setOnTransferring(false);
+    setServices([]);
   };
 
   const transferShift = async (
