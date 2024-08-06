@@ -1,5 +1,9 @@
 import backgrond from "@/assets/img/Fondo3.png";
 import logo from "@/assets/img/logo-ccv-colorido.png";
+import useMyModule from "@/hooks/use-my-module";
+import { faCog, faDesktop } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Listbox, ListboxItem, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import styled from "styled-components";
 
 export default function DefaultLayout({
@@ -30,9 +34,61 @@ export default function DefaultLayout({
         {children}
       </main>
       <img src={logo} alt="logo" className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96" />
+      <Settings />
+
     </DefaultBackground>
   );
 }
+
+const Settings = () => {
+  const { clearModuleInfo } = useMyModule();
+  return (
+    <Popover>
+      <PopoverTrigger>
+        <SettingButton>
+          <FontAwesomeIcon icon={faCog} size="2x" />
+        </SettingButton>
+      </PopoverTrigger>
+      <PopoverContent>
+        <Listbox>
+          <ListboxItem key="1">
+            <div className="cursor-pointer" onClick={clearModuleInfo}>
+              <FontAwesomeIcon icon={faDesktop} className="mr-1" />
+              <span>
+                Borrar configuración del modulo
+              </span>
+            </div>
+
+          </ListboxItem>
+
+        </Listbox>
+      </PopoverContent>
+    </Popover>
+
+  )
+}
+
+const SettingButton = styled.div`
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: #19255a;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  margin: 1rem;
+  z-index: 1000;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #0070B3;
+  }
+`
 
 const DynamicVerticalBar = styled.div`
 
