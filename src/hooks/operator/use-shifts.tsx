@@ -148,7 +148,6 @@ export const ShiftProvider: React.FC<{
       );
     });
 
-
     echo
       .channel(myModuleShiftChannelName)
       .listen(".shift.transferred", (data: { shift: ShiftResponse }) => {
@@ -179,6 +178,7 @@ export const ShiftProvider: React.FC<{
 
 
     // ======================================== CURRENT SHIFT CHANNEL ========================================
+
     echo
       .channel(myCurrentShiftChannelName)
       .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
