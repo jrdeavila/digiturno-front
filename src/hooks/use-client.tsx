@@ -1,12 +1,11 @@
+import { ClientResponse } from "@/data/client-mappings";
 import Client from "@/models/client";
 import { createContext, useContext, useEffect, useState } from "react";
 import useEcho from "./operator/use-echo";
-import useMyModule from "./use-my-module";
-import { ClientResponse } from "@/data/client-mappings";
-import useVoice from "./useVoice";
-import { ModuleResponse, moduleResponseToModule } from "./use-module-service";
-import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import { ShiftResponse } from "./operator/use-http-shifts-service";
+import { ModuleResponse, moduleResponseToModule } from "./use-module-service";
+import useMyModule from "./use-my-module";
+import useVoice from "./useVoice";
 
 interface ClientContextProps {
   clients: Client[] | undefined;
@@ -25,7 +24,6 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
   const { myModule } = useMyModule();
   const voice = useVoice();
 
-  const { attentionProfiles } = useAttentionProfileResource();
 
   // ==============================================================================
 
