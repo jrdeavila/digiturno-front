@@ -3,12 +3,12 @@ import ModuleDistracted from "@/components/ModuleDistracted";
 import ModuleInfo from "@/components/ModuleInfo";
 import ServiceList from "@/components/ServiceList";
 import WaitingClients from "@/components/WaitingClients";
-import useShifts from "@/hooks/operator/use-shifts";
+import useModuleShifts from "@/hooks/operator/use-module-shifts";
 import DefaultLayout from "@/layouts/default";
 import styled from "styled-components";
 
 const OperatorPage: React.FC = () => {
-  const { currentShift } = useShifts();
+  const { currentShift } = useModuleShifts();
   return (
     <DefaultLayout className="">
       <GridContainer>

@@ -9,7 +9,8 @@ import { useEffect } from "react";
 import * as Yup from "yup";
 
 type CreateClientFormValues = {
-  name: string;
+  firstName: string;
+  lastName: string;
   dni: string;
   clientTypeId: number;
 };
@@ -27,15 +28,15 @@ export const CreateClientForm: React.FC<{
     clients,
   } = useClientResource();
   const initialValues: CreateClientFormValues = {
-    name: "",
+    firstName: "",
+    lastName: "",
     dni: dni || "",
     clientTypeId: 0,
   };
   const validationSchema = Yup.object<CreateClientFormValues>().shape({
-    name: Yup.string().required("El nombre es requerido"),
+    firstName: Yup.string().required("El nombre es requerido"),
+    lastName: Yup.string().required("El apellido es requerido"),
     dni: Yup.number()
-      .min(10000000, "El documento debe tener mas de 8 dígitos")
-      .max(99999999999, "El documento debe tener menos de 10 dígitos")
       .required("El documento es requerido"),
     clientTypeId: Yup.number()
       .min(1, "El tipo de cliente es requerido")
@@ -67,7 +68,7 @@ export const CreateClientForm: React.FC<{
         updateClient(
           {
             id: currentClient.id,
-            name: values.name,
+            name: `${values.firstName} ${values.lastName}`,
             dni: values.dni,
             clientType: clientType.name,
             isDeleted: false,
@@ -80,7 +81,7 @@ export const CreateClientForm: React.FC<{
         createClient(
           {
             id: 0,
-            name: values.name,
+            name: `${values.firstName} ${values.lastName}`,
             dni: values.dni,
             clientType: clientType!.name,
             isDeleted: false,
@@ -98,7 +99,8 @@ export const CreateClientForm: React.FC<{
   useEffect(() => {
     if (currentClient && clientTypes.length > 0) {
       formik.setValues({
-        name: currentClient.name,
+        firstName: currentClient.name,
+        lastName: "",
         dni: currentClient.dni,
         clientTypeId:
           clientTypes.find(
@@ -126,13 +128,22 @@ export const CreateClientForm: React.FC<{
         <form onSubmit={formik.handleSubmit}>
           <div className="flex flex-col gap-y-2">
             <Input
-              label="Nombre"
+              label="Nombres"
               name="name"
-              value={formik.values.name}
-              onChange={formik.handleChange("name")}
+              value={formik.values.firstName}
+              onChange={formik.handleChange("firstName")}
               onBlur={formik.handleBlur}
-              isInvalid={!!formik.errors.name}
-              errorMessage={formik.errors.name}
+              isInvalid={!!formik.errors.firstName}
+              errorMessage={formik.errors.firstName}
+            />
+            <Input
+              label="Apellidos"
+              name="lastName"
+              value={formik.values.lastName}
+              onChange={formik.handleChange("lastName")}
+              onBlur={formik.handleBlur}
+              isInvalid={!!formik.errors.lastName}
+              errorMessage={formik.errors.lastName}
             />
             <Input
               label="DNI"
