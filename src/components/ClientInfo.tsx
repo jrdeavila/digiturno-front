@@ -1,13 +1,13 @@
-import useShifts from "@/hooks/operator/use-shifts";
 import { faCheck, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useMemo, useState } from "react";
 import GenericComponent from "./GenericComponent";
 import styled from "styled-components";
 import { dateFormatter } from "@/utils/date";
+import useModuleShifts from "@/hooks/operator/use-module-shifts";
 
 const ClientInfo: React.FC = () => {
-  const { currentShift, completeShift, onTransfer } = useShifts();
+  const { currentShift, completeShift, onTransfer } = useModuleShifts();
 
   const renderCreatedDate = useMemo(() => {
     // 2024-07-25T02:22:30.000000Z

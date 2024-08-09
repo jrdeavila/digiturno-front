@@ -12,9 +12,6 @@ export default class ClientTypeService {
     const response = await this.httpClient.get<{ data: ClientType[] }>(
       "/client_types"
     );
-    const clientTypes = response.data.data.map(
-      (clientType) => new ClientType(clientType.id, clientType.name)
-    );
-    return clientTypes;
+    return response.data.data;
   }
 }

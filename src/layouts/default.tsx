@@ -14,7 +14,7 @@ export default function DefaultLayout({
   className?: string;
 }) {
   return (
-    <DefaultBackground className="relative flex flex-col h-screen">
+    <DefaultBackground className="relative flex flex-col h-screen pt-[20px] pl-[20px] pb-[40px]">
       <DynamicHorizontalBar>
         <div id="bar">
           <div id="f1"></div>

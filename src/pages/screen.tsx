@@ -1,4 +1,5 @@
-import useShifts from "@/hooks/operator/use-shifts";
+import { Shift } from "@/hooks/operator/use-http-shifts-service";
+import useScreenShifts from "@/hooks/operator/use-screen-shifts";
 import useClient, { ScreenClientProvider } from "@/hooks/use-client";
 import { VoiceProvider } from "@/hooks/useVoice";
 import DefaultLayout from "@/layouts/default";
@@ -7,6 +8,7 @@ import {
   faSadTear
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
 
 
 export default function ScreenPage() {
@@ -79,7 +81,15 @@ const ListOfCalledClients = () => {
 };
 
 const ListOfDistractedClients = () => {
-  const { distractedShifts } = useShifts();
+  const { shifts } = useScreenShifts();
+  const [distractedShifts, setDistractedShifts] = useState<Shift[]>([]);
+
+  useEffect(() => {
+    const distractedShifts = shifts.filter((shift) => shift.state === "distracted");
+    setDistractedShifts(distractedShifts);
+  }, [shifts]);
+
+
   return (
     <div className="p-3">
       {/* <div className="flex flex-row gap-x-3 items-center text-white">
