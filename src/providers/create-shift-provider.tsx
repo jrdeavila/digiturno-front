@@ -8,6 +8,7 @@ import { Modal, ModalContent } from "@nextui-org/modal";
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useClientTypeResource } from "./client-type-provider";
+import AttentionProfile from "@/models/attention-profile";
 
 export const CreateShiftContext = React.createContext<{
   client: Client | undefined;
@@ -18,6 +19,8 @@ export const CreateShiftContext = React.createContext<{
   onCreateClient?: () => void;
   setDniSearched: (dni: string) => void;
   setQualification: (qualification: number) => void;
+  setAttentionProfile: (attentionProfile: AttentionProfile) => void;
+  createShiftWithAttentionProfile: () => void;
   startQualification: () => void;
 }>({
   client: undefined,
@@ -28,6 +31,8 @@ export const CreateShiftContext = React.createContext<{
   setDniSearched: () => { },
   setQualification: () => { },
   startQualification: () => { },
+  setAttentionProfile: () => { },
+  createShiftWithAttentionProfile: () => { },
 });
 
 export const useCreateShift = () => useContext(CreateShiftContext);
@@ -41,6 +46,7 @@ const CreateShiftProvider: React.FC<{
   const [dniSearched, setDniSearched] = useState("");
   const [isQualifying, setIsQualifying] = useState(false);
   const [qualification, setQualification] = useState(0);
+  const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
 
   const shiftService = useHttpShiftService();
 
@@ -64,6 +70,35 @@ const CreateShiftProvider: React.FC<{
     }
     setIsQualifying(true);
   };
+
+  const handleCreateShiftWithAttentionProfile = async () => {
+    if (attentionProfile === undefined) {
+      toast("Debe seleccionar un perfil de atención", { type: "error" });
+      return;
+    }
+
+    if (!client) {
+      toast("Debe seleccionar un cliente", { type: "error" });
+      return;
+    }
+
+
+    await shiftService.createShiftWithAttentionProfile({
+      room_id: myModule!.room.id,
+      client: {
+        dni: client!.dni,
+        name: client!.name,
+        client_type_id: clientTypes.filter(
+          (clientType) => clientType.slug === client!.clientType
+        )[0].id,
+      },
+      attention_profile_id: attentionProfile!.id,
+      state: "pending",
+    }, myModule!.ipAddress);
+
+    toast("Turno creado exitosamente", { type: "success" });
+    clearShift();
+  }
 
   const handleCreateShift = async () => {
     if (services === undefined && services!.length == 0) {
@@ -116,6 +151,10 @@ const CreateShiftProvider: React.FC<{
     setDniSearched(dni);
   };
 
+  const handleSetAttention = (attentionProfile: AttentionProfile) => {
+    setAttentionProfile(attentionProfile);
+  }
+
   // ==============================================================================
 
   return (
@@ -130,6 +169,8 @@ const CreateShiftProvider: React.FC<{
         setDniSearched: handleSetDniSearched,
         setQualification: handleSetQualification,
         startQualification: handleStartQualification,
+        setAttentionProfile: handleSetAttention,
+        createShiftWithAttentionProfile: handleCreateShiftWithAttentionProfile,
       }}
     >
       {children}

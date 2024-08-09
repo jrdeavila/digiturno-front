@@ -1,10 +1,10 @@
-import useShifts from "@/hooks/operator/use-shifts";
 import useMyModule from "@/hooks/use-my-module";
 import Service from "@/models/service";
 import { Switch } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import "./GenericComponent";
 import GenericComponent from "./GenericComponent";
+import useModuleShifts from "@/hooks/operator/use-module-shifts";
 
 const ServiceList: React.FC = () => {
 
@@ -13,13 +13,13 @@ const ServiceList: React.FC = () => {
   // ==============================================================================
 
   const { attentionProfile } = useMyModule();
-  const { setServices } = useShifts();
+  const { setServices } = useModuleShifts();
 
   // ==============================================================================
 
   useEffect(() => {
     if (currentServices) {
-      setServices(currentServices);
+      setServices && setServices(currentServices);
     }
   }, [currentServices])
 

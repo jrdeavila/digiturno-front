@@ -27,10 +27,48 @@ const useHttpClient = () => {
       progress: undefined,
     });
   };
-  // =====================================================
-  // const httpClient: AxiosInstance = axios.create({
-  //   baseURL: "https://" + host + "/api",
-  // });
+
+  const showMessageError = (errors: any, statusCode: number) => {
+    const errorMessageMapping: any = {
+      client_has_pending_shift: "El cliente tiene un turno pendiente",
+      email_not_found: "Correo no encontrado",
+      email_invalid: "Correo inválido",
+      email_required: "Correo requerido",
+      password_required: "Contraseña requerida",
+      password_invalid: "Contraseña inválida",
+      invalid_credentials: "Contraseña o correo incorrectos",
+      expired_token: "La sesión ha expirado",
+    }
+    if (statusCode !== 422 && statusCode !== 403 && statusCode !== 401 && statusCode !== 400) {
+      showError(statusCode);
+      return;
+    }
+    if (statusCode === 403 || statusCode === 401) {
+      toast.error(errorMessageMapping[errors.message] || `${statusCode}: Error desconocido`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+
+    }
+    const messages = Object.values(errors).map((values: any) => values.map((e: any) => errorMessageMapping[e] || "422: Error desconocido")).join(", ");
+    toast.error(messages, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
+  };
+
   httpClient.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -43,11 +81,8 @@ const useHttpClient = () => {
       return response;
     },
     (error) => {
-      if (error.response) {
-        showError(error.response.status);
-      } else {
-        showError(0);
-      }
+      toast.dismiss();
+      showMessageError(error.response.data, error.response.status);
       return Promise.reject(error);
     }
   );

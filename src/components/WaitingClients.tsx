@@ -1,4 +1,3 @@
-import useShifts from "@/hooks/operator/use-shifts";
 import "@fortawesome/free-solid-svg-icons";
 import {
   faBullhorn,
@@ -10,9 +9,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import "../styles/WaitingClients.css";
 import GenericComponent from "./GenericComponent";
+import useModuleShifts from "@/hooks/operator/use-module-shifts";
 
 const WaitingClients: React.FC = () => {
-  const { shifts, attendClient, sendToDistracted, callClient } = useShifts();
+  const { shifts, attendClient, sendToDistracted, callClient } = useModuleShifts();
   return (
     <GenericComponent
       title="Clientes en Espera"

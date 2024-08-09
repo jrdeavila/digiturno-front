@@ -100,6 +100,9 @@ export const shiftResponseToModel = (shiftResponse: ShiftResponse): Shift => {
 };
 
 class HttpShiftService {
+
+
+
   private static instance: HttpShiftService;
   private httpClient: AxiosInstance;
 
@@ -107,11 +110,54 @@ class HttpShiftService {
     this.httpClient = httpClient;
   }
 
+
+
   static getInstance(httpClient: AxiosInstance) {
     if (!HttpShiftService.instance) {
       HttpShiftService.instance = new HttpShiftService(httpClient);
     }
     return HttpShiftService.instance;
+  }
+
+  public async getShiftsByRoom(
+    roomId: number,
+    ipAddress: string,
+  ): Promise<Shift[]> {
+    const response = await this.httpClient.get<{
+      data: ShiftResponse[];
+    }>(`/rooms/${roomId}/shifts`, {
+      headers: {
+        "X-Module-Ip": ipAddress
+      }
+    });
+    return response.data.data.map((shift) => {
+      const client = new Client(
+        shift.client.id,
+        shift.client.name,
+        shift.client.dni,
+        shift.client.client_type,
+        shift.client.is_deleted
+      );
+      return new Shift(
+        shift.id,
+        shift.room,
+        shift.attention_profile,
+        client,
+        shift.state,
+        shift.created_at,
+        shift.updated_at
+      );
+    });
+  }
+
+  async createShiftWithAttentionProfile(arg0: { room_id: number; client: { dni: string; name: string; client_type_id: number; }; state: string; attention_profile_id: number; }, ipAddress: string): Promise<Shift> {
+
+    const response = await this.httpClient.post<{ data: ShiftResponse }>("/shifts/with-attention-profile", arg0, {
+      headers: {
+        "X-Module-Ip": ipAddress
+      }
+    });
+    return shiftResponseToModel(response.data.data);
   }
 
   async getShiftsByModule(id: number, moduleIp: string): Promise<Shift[]> {
@@ -482,6 +528,14 @@ class HttpShiftService {
       shift.created_at,
       shift.updated_at
     );
+  }
+
+  public async deleteShift(id: number, ipAddress: string): Promise<void> {
+    await this.httpClient.delete(`/shifts/${id}`, {
+      headers: {
+        "X-Module-Ip": ipAddress
+      }
+    });
   }
 }
 
