@@ -101,16 +101,12 @@ export const shiftResponseToModel = (shiftResponse: ShiftResponse): Shift => {
 
 class HttpShiftService {
 
-
-
   private static instance: HttpShiftService;
   private httpClient: AxiosInstance;
 
   private constructor(httpClient: AxiosInstance) {
     this.httpClient = httpClient;
   }
-
-
 
   static getInstance(httpClient: AxiosInstance) {
     if (!HttpShiftService.instance) {

@@ -5,11 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useMemo } from "react";
 import GenericComponent from "./GenericComponent";
 import { Button } from "@nextui-org/react";
+import { useAbsence } from "@/providers/absence-provider";
 
 const ModuleInfo: React.FC = () => {
   const { myModule, attentionProfile } = useMyModule();
   const { logout } = useAuth();
   const { attendant } = useAuth();
+  const { openModal, backToWork } = useAbsence();
   // =======================================================
 
   const moduleStatus = useMemo(() => {
@@ -117,11 +119,24 @@ const ModuleInfo: React.FC = () => {
             </div>
           </Button>
 
-          <Button className="bg-red-700 text-white font-bold">
-            <FontAwesomeIcon icon={faToilet} />
-            <span> AUSENTARSE </span>
+          {
+            attendant?.status === "absent" ? (
+              <Button
+                onClick={() => backToWork(attendant)}
+                className="bg-green-700 text-white font-bold">
+                <FontAwesomeIcon icon={faToilet} />
+                <span> VOLVER A TRABAJAR </span>
+              </Button>
+            ) : (
+              <Button
+                onClick={openModal}
+                className="bg-red-700 text-white font-bold">
+                <FontAwesomeIcon icon={faToilet} />
+                <span> AUSENTARSE </span>
 
-          </Button>
+              </Button>
+            )
+          }
 
         </div>
       </div>
