@@ -5,34 +5,38 @@ import ServiceList from "@/components/ServiceList";
 import WaitingClients from "@/components/WaitingClients";
 import useModuleShifts from "@/hooks/operator/use-module-shifts";
 import DefaultLayout from "@/layouts/default";
+import AbsenceProvider from "@/providers/absence-provider";
 import styled from "styled-components";
+
 
 const OperatorPage: React.FC = () => {
   const { currentShift } = useModuleShifts();
   return (
     <DefaultLayout className="">
-      <GridContainer>
-        <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-4 gap-3 w-full h-full">
-          <div className="col-span-1 row-span-2">
-            <ModuleInfo />
-          </div>
-          {currentShift ? (
-            <div className="col-span-1 row-span-4">
-              <ClientInfo />
+      <AbsenceProvider>
+        <GridContainer>
+          <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-4 gap-3 w-full h-full">
+            <div className="col-span-1 row-span-2">
+              <ModuleInfo />
             </div>
-          ) : (
+            {currentShift ? (
+              <div className="col-span-1 row-span-4">
+                <ClientInfo />
+              </div>
+            ) : (
+              <div className="col-span-1 row-span-4">
+                <WaitingClients />
+              </div>
+            )}
             <div className="col-span-1 row-span-4">
-              <WaitingClients />
+              <ServiceList />
             </div>
-          )}
-          <div className="col-span-1 row-span-4">
-            <ServiceList />
+            <div className="col-span-1 row-span-2">
+              <ModuleDistracted />
+            </div>
           </div>
-          <div className="col-span-1 row-span-2">
-            <ModuleDistracted />
-          </div>
-        </div>
-      </GridContainer>
+        </GridContainer>
+      </AbsenceProvider>
 
     </DefaultLayout>
   );
