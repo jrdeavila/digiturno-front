@@ -45,7 +45,7 @@ const ClientHeader = () => {
 const DistractedHeader = () => {
   return (
     <div className="flex flex-row gap-x-3 items-center bg-primary text-white px-3 py-1 rounded-e-lg">
-      <h1 className="text-3xl font-bold">TURNOS DISTRAIDOS</h1>
+      <h1 className="text-3xl font-bold">TURNOS DISTRAÍDOS</h1>
     </div>
   )
 }
