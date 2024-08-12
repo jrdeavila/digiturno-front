@@ -13,7 +13,7 @@ const ServiceList: React.FC = () => {
   // ==============================================================================
 
   const { attentionProfile } = useMyModule();
-  const { setServices } = useModuleShifts();
+  const { setServices, services } = useModuleShifts();
 
   // ==============================================================================
 
@@ -22,6 +22,10 @@ const ServiceList: React.FC = () => {
       setServices && setServices(currentServices);
     }
   }, [currentServices])
+
+  useEffect(() => {
+    setCurrentServices(services);
+  }, [services])
 
   // ==============================================================================
 
