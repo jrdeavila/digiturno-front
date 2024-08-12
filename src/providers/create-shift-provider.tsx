@@ -9,6 +9,7 @@ import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useClientTypeResource } from "./client-type-provider";
 import AttentionProfile from "@/models/attention-profile";
+import { useClientResource } from "./client-provider";
 
 export const CreateShiftContext = React.createContext<{
   client: Client | undefined;
@@ -52,6 +53,7 @@ const CreateShiftProvider: React.FC<{
 
   const { myModule } = useMyModule();
   const { clientTypes } = useClientTypeResource();
+  const { refreshClients } = useClientResource();
 
   // ==============================================================================
 
@@ -98,6 +100,7 @@ const CreateShiftProvider: React.FC<{
 
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
+    refreshClients();
   }
 
   const handleCreateShift = async () => {
@@ -121,6 +124,7 @@ const CreateShiftProvider: React.FC<{
     await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
+    refreshClients();
   };
 
   const clearShift = () => {
