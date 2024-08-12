@@ -60,7 +60,7 @@ const SearchClientForm = () => {
       setClient({
         dni: values.dni,
         name: values.name,
-        clientType: clientTypes.find((clientType) => clientType.id === values.client_type_id)?.slug || "",
+        clientType: clientTypes.find((clientType) => clientType.id === values.client_type_id)?.slug || "standard",
         isDeleted: false,
         id: 0,
         moduleName: "",
@@ -71,7 +71,7 @@ const SearchClientForm = () => {
       setClient({
         dni: values.dni,
         name: values.name,
-        clientType: clientTypes.find((clientType) => clientType.id === values.client_type_id)?.slug || "",
+        clientType: clientTypes.find((clientType) => clientType.id === values.client_type_id)?.slug || "standard",
         isDeleted: false,
         id: 0,
         moduleName: "",
