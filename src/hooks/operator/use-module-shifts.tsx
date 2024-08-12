@@ -28,6 +28,7 @@ interface ModuleShiftCtxProps {
   cancelTransfer: () => void;
   onTransfer: () => void;
   setServices?: (services: Service[]) => void;
+  services: Service[];
 }
 
 const ModuleShiftContext = createContext<ModuleShiftCtxProps | undefined>(
@@ -268,8 +269,8 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
 
   const attendClient = async (shift: Shift) => {
     if (!myModule) return;
-
     await shiftService.attendClient(shift.id, myModule!.id, myModule!.ipAddress);
+    setServices([]);
   };
 
   const completeShift = async (shift: Shift) => {
@@ -337,6 +338,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
         cancelTransfer,
         onTransfer,
         setServices: (services) => setServices(services),
+        services,
       }}
     >
       {children}
