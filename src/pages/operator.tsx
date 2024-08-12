@@ -19,21 +19,28 @@ const OperatorPage: React.FC = () => {
             <div className="col-span-1 row-span-2">
               <ModuleInfo />
             </div>
-            {currentShift ? (
-              <div className="col-span-1 row-span-4">
-                <ClientInfo />
-              </div>
-            ) : (
-              <div className="col-span-1 row-span-4">
+            <div className="col-span-1 row-span-4 flex flex-col gap-y-1">
+              {currentShift && (
+                <div className="h-full">
+                  <ClientInfo />
+                </div>
+              )}
+              <div className="h-full">
+
                 <WaitingClients />
               </div>
-            )}
+            </div>
+
             <div className="col-span-1 row-span-4">
               <ServiceList />
             </div>
+
             <div className="col-span-1 row-span-2">
               <ModuleDistracted />
             </div>
+            {/* <div className="col-span-1 row-span-3">
+              <WaitingClients />
+            </div> */}
           </div>
         </GridContainer>
       </AbsenceProvider>
