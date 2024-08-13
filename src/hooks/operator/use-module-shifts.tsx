@@ -315,6 +315,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
   const qualifyShift = async (shift: Shift, qualification: number) => {
     await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
     setOnQualifying(false);
+    setServices([]);
   };
 
 
