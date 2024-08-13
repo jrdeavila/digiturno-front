@@ -94,7 +94,7 @@ const ShiftInfo = () => {
       <div className="flex flex-row items-center justify-between w-full">
         <div className="flex flex-col items-center justify-between">
           <h2 className="text-sm font-bold">Pendientes</h2>
-          <p className="text-2xl">{shifts.filter(shift => shift.state === 'pending' || shift.state === 'transferred'
+          <p className="text-2xl">{shifts.filter(shift => shift.state === 'pending' || shift.state === 'pending-transferred'
           ).length}</p>
         </div>
         <div className="flex flex-col items-center justify-center">
