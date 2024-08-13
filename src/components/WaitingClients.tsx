@@ -38,30 +38,28 @@ const WaitingClients: React.FC = () => {
               <p>{shift.client.name}</p>
             </div>
 
-            {i === 0 && (
-              <div className="container-buttons">
-                <button
-                  onClick={() => callClient(shift)}
-                  className="llamar-cliente-pantalla"
-                >
-                  <FontAwesomeIcon icon={faBullhorn} />
-                </button>
+            <div className="container-buttons">
+              <button
+                onClick={() => callClient(shift)}
+                className="llamar-cliente-pantalla"
+              >
+                <FontAwesomeIcon icon={faBullhorn} />
+              </button>
 
-                <button
-                  onClick={() => sendToDistracted(shift)}
-                  className="mandar-distraidos"
-                >
-                  <FontAwesomeIcon icon={faFrown} />
-                </button>
+              <button
+                onClick={() => sendToDistracted(shift)}
+                className="mandar-distraidos"
+              >
+                <FontAwesomeIcon icon={faFrown} />
+              </button>
 
-                <button
-                  className="subir-cliente"
-                  onClick={() => attendClient(shift)}
-                >
-                  <FontAwesomeIcon icon={faUpload} />
-                </button>
-              </div>
-            )}
+              <button
+                className="subir-cliente"
+                onClick={() => attendClient(shift)}
+              >
+                <FontAwesomeIcon icon={faUpload} />
+              </button>
+            </div>
           </div>
         ))}
       </section>

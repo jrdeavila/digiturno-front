@@ -81,7 +81,7 @@ const ShiftList = () => {
           faPerson
         } />
         <span>
-          En progreso
+          En atención
         </span>
       </div>,
 
@@ -107,7 +107,7 @@ const ShiftList = () => {
           faPerson
         } />
         <span>
-          Distracted
+          Distraído
         </span>
       </div>,
 
