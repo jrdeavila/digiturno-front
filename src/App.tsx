@@ -25,6 +25,8 @@ const ModuleGuard = () => {
     console.log("ModuleGuard -> authenticated");
 
     switch (type?.id) {
+      case 2:
+        return <Navigate to="/modulo-seccional" />;
       case 1:
         if (!authenticated) {
           console.log("ModuleGuard -> !authenticated");
@@ -36,8 +38,7 @@ const ModuleGuard = () => {
 
       case 4:
         return <Navigate to="/pantalla" />;
-      case 2:
-        return <Navigate to="/modulo-seccional" />;
+
     }
   }, [authenticated, type, loading]);
   return (
