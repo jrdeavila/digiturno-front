@@ -33,7 +33,8 @@ export default function DefaultLayout({
       <main className={className}>
         {children}
       </main>
-      <img src={logo} alt="logo" className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96" />
+      <img
+        src={logo} alt="logo" className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96" />
       <Settings />
 
     </DefaultBackground>

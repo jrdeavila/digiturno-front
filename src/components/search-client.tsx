@@ -51,18 +51,24 @@ export default function SearchClient() {
           />
 
           {client ? (
-            <div className="bg-gray-100 rounded-lg px-3 py-2">
+            <div className="bg-gray-100 rounded-lg px-3 py-2 w-full">
               <span className="text-gray-500">Cliente encontrado:</span>
               <p className="text-sm text-gray-600 text-ellipsis font-bold">
                 {client.name}
               </p>
-              <div className="flex flex-row items-center gap-x-1">
+              <div className="flex flex-row items-center w-full">
                 <span className="text-sm font-bold">Cédula:</span>
                 <p className="text-sm text-gray-600">{client.dni}</p>
               </div>
-              <div className="flex flex-row items-center gap-x-1">
+              <div className="flex flex-row items-center w-full">
                 <span className="text-sm font-bold">Tipo:</span>
-                <p className="text-sm text-gray-600">{client.clientType}</p>
+                <p className="text-sm text-gray-600">{
+                  {
+                    preferential: "Preferencial",
+                    processor: "Tramitador",
+                    standard: "Estándar",
+                  }[client.clientType]
+                }</p>
               </div>
             </div>
           ) : firstSearch ? undefined : isSearching ? (

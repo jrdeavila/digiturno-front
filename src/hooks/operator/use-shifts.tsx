@@ -38,8 +38,8 @@ export const ShiftProvider: React.FC<{
     )
   }
 
-  return <ModuleShiftProvider>
+  return <>
     {children}
-  </ModuleShiftProvider>
+  </>
 
 };

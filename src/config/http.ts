@@ -1,10 +1,10 @@
 import axios from "axios";
 
-// export const host = "digiturnov2.ccvalledupar.org.co";
-const host = "localhost"
+export const host = "digiturnov2.ccvalledupar.org.co";
+// const host = "localhost"
 
 const httpClient = axios.create({
-  baseURL: `http://${host}/api`,
+  baseURL: `https://${host}/api`,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
