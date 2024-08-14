@@ -114,7 +114,7 @@ const CreateShiftProvider: React.FC<{
         dni: client!.dni,
         name: client!.name,
         client_type_id: clientTypes.filter(
-          (clientType) => clientType.name === client!.clientType
+          (clientType) => clientType.slug === client!.clientType
         )[0].id,
       },
       services: services!.map((service) => service.id),
@@ -122,6 +122,8 @@ const CreateShiftProvider: React.FC<{
     }, myModule!.ipAddress);
 
     await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
+    setServices([])
+    setClient(undefined);
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
     refreshClients();
@@ -200,7 +202,8 @@ const CreateShiftProvider: React.FC<{
         <ModalContent>
           {(onClose) => (
             <WaitingClientQualification
-              onQualified={() => {
+              onQualified={(qualification: number) => {
+                setQualification(qualification);
                 handleCreateShift();
                 onClose();
               }}
