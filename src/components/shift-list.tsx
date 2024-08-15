@@ -155,9 +155,18 @@ const ShiftList = () => {
             </span>
           </div>;
         case 'attentionProfile':
-          return shift.attentionProfile;
-        case 'state':
-          return renderState(shift);
+          return <div className="flex flex-col gap-y-1 ">
+            <span>{shift.attentionProfile}</span>
+            <span>{shift.module ?? "No Asignado"}</span>
+
+          </div>;
+        case 'state': {
+          const dateCreatedAt = new Date(shift.createdAt);
+          return <div className="flex flex-col gap-y-1">
+            {renderState(shift)}
+            <TimeClockAnimation createdAt={dateCreatedAt} />
+          </div>
+        }
         case 'cancel':
           return <button onClick={() => cancelShift(shift)}>
             <div className="flex flex-row gap-x-2 items-center">
@@ -219,6 +228,26 @@ const ShiftList = () => {
       </TableBody>
     </Table>
   )
+}
+
+const TimeClockAnimation = ({ createdAt }: { createdAt: Date }) => {
+  const [time, setTime] = useState<string>("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = now.getTime() - createdAt.getTime();
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      setTime(`${hours}h ${minutes % 60}m ${seconds % 60}s`);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [createdAt])
+
+  return <span>{time}</span>
+
 }
 
 

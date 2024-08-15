@@ -28,6 +28,7 @@ export interface ShiftResponse {
   state: string;
   created_at: string;
   updated_at: string;
+  module?: string;
 }
 
 export class Client {
@@ -57,6 +58,7 @@ export class Shift {
   room: string;
   attentionProfile: string;
   client: Client;
+  module: string | undefined;
   state: string;
   createdAt: string;
   updatedAt: string;
@@ -68,7 +70,8 @@ export class Shift {
     client: Client,
     state: string,
     createdAt: string,
-    updatedAt: string
+    updatedAt: string,
+    module: string | undefined,
   ) {
     this.id = id;
     this.room = room;
@@ -77,6 +80,7 @@ export class Shift {
     this.state = state;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.module = module;
   }
 }
 
@@ -95,7 +99,8 @@ export const shiftResponseToModel = (shiftResponse: ShiftResponse): Shift => {
     client,
     shiftResponse.state,
     shiftResponse.created_at,
-    shiftResponse.updated_at
+    shiftResponse.updated_at,
+    shiftResponse.module,
   );
 };
 
@@ -127,21 +132,8 @@ class HttpShiftService {
       }
     });
     return response.data.data.map((shift) => {
-      const client = new Client(
-        shift.client.id,
-        shift.client.name,
-        shift.client.dni,
-        shift.client.client_type,
-        shift.client.is_deleted
-      );
-      return new Shift(
-        shift.id,
-        shift.room,
-        shift.attention_profile,
-        client,
-        shift.state,
-        shift.created_at,
-        shift.updated_at
+      return shiftResponseToModel(
+        shift
       );
     });
   }
@@ -165,22 +157,7 @@ class HttpShiftService {
       }
     });
     return response.data.data.map((shift) => {
-      const client = new Client(
-        shift.client.id,
-        shift.client.name,
-        shift.client.dni,
-        shift.client.client_type,
-        shift.client.is_deleted
-      );
-      return new Shift(
-        shift.id,
-        shift.room,
-        shift.attention_profile,
-        client,
-        shift.state,
-        shift.created_at,
-        shift.updated_at
-      );
+      return shiftResponseToModel(shift)
     });
   }
   async getDistractedShiftsByModule(id: number, moduleIp: string): Promise<Shift[]> {
@@ -192,22 +169,7 @@ class HttpShiftService {
       }
     });
     return response.data.data.map((shift) => {
-      const client = new Client(
-        shift.client.id,
-        shift.client.name,
-        shift.client.dni,
-        shift.client.client_type,
-        shift.client.is_deleted
-      );
-      return new Shift(
-        shift.id,
-        shift.room,
-        shift.attention_profile,
-        client,
-        shift.state,
-        shift.created_at,
-        shift.updated_at
-      );
+      return shiftResponseToModel(shift)
     });
   }
 
@@ -222,22 +184,7 @@ class HttpShiftService {
       }
     });
     const shifts = response.data.data.map((shift) => {
-      const client = new Client(
-        shift.client.id,
-        shift.client.name,
-        shift.client.dni,
-        shift.client.client_type,
-        shift.client.is_deleted
-      );
-      return new Shift(
-        shift.id,
-        shift.room,
-        shift.attention_profile,
-        client,
-        shift.state,
-        shift.created_at,
-        shift.updated_at
-      );
+      return shiftResponseToModel(shift);
     });
     return shifts;
   }
@@ -257,22 +204,7 @@ class HttpShiftService {
     }
     );
     const shifts = response.data.data.map((shift) => {
-      const client = new Client(
-        shift.client.id,
-        shift.client.name,
-        shift.client.dni,
-        shift.client.client_type,
-        shift.client.is_deleted
-      );
-      return new Shift(
-        shift.id,
-        shift.room,
-        shift.attention_profile,
-        client,
-        shift.state,
-        shift.created_at,
-        shift.updated_at
-      );
+      return shiftResponseToModel(shift)
     });
     return shifts;
   }
@@ -286,21 +218,7 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data)
   }
 
   async sendToDistracted(shiftId: number, moduleIp: string): Promise<Shift> {
@@ -312,21 +230,7 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data)
   }
 
   async qualifiedShift(shiftId: number, qualification: number, moduleIp: string): Promise<Shift> {
@@ -338,21 +242,7 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data);
   }
 
   async transferredShift(
@@ -372,21 +262,8 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data)
+
   }
 
   async callClient(shiftId: number,
@@ -400,21 +277,7 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data)
   }
 
   async sendToWaiting(shiftId: number, moduleIp: string): Promise<Shift> {
@@ -426,21 +289,7 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data)
   }
 
   async attendClient(shiftId: number, moduleId: number, moduleIp: string): Promise<Shift> {
@@ -454,21 +303,7 @@ class HttpShiftService {
       }
     });
 
-    return new Shift(
-      res.data.data.id,
-      res.data.data.room,
-      res.data.data.attention_profile,
-      new Client(
-        res.data.data.client.id,
-        res.data.data.client.name,
-        res.data.data.client.dni,
-        res.data.data.client.client_type,
-        res.data.data.client.is_deleted
-      ),
-      res.data.data.state,
-      res.data.data.created_at,
-      res.data.data.updated_at
-    );
+    return shiftResponseToModel(res.data.data)
   }
 
   public async createShift(request: CreateShiftRequest, moduleIp: string): Promise<Shift> {
@@ -479,21 +314,7 @@ class HttpShiftService {
         "X-Module-Ip": moduleIp
       }
     });
-    return new Shift(
-      response.data.data.id,
-      response.data.data.room,
-      response.data.data.attention_profile,
-      new Client(
-        response.data.data.client.id,
-        response.data.data.client.name,
-        response.data.data.client.dni,
-        response.data.data.client.client_type,
-        response.data.data.client.is_deleted
-      ),
-      response.data.data.state,
-      response.data.data.created_at,
-      response.data.data.updated_at
-    );
+    return shiftResponseToModel(response.data.data)
   }
 
   async getMyCurrentShift(moduleIp: string): Promise<Shift | undefined> {
@@ -508,22 +329,10 @@ class HttpShiftService {
     if (!shift) {
       return undefined;
     }
-    const client = new Client(
-      shift.client.id,
-      shift.client.name,
-      shift.client.dni,
-      shift.client.client_type,
-      shift.client.is_deleted
-    );
-    return new Shift(
-      shift.id,
-      shift.room,
-      shift.attention_profile,
-      client,
-      shift.state,
-      shift.created_at,
-      shift.updated_at
-    );
+    return shiftResponseToModel(
+      shift
+    )
+
   }
 
   public async deleteShift(id: number, ipAddress: string): Promise<void> {
