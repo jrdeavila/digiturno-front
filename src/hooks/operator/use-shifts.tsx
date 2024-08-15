@@ -3,6 +3,7 @@ import useMyModule from "../use-my-module";
 import { ModuleShiftProvider } from "./use-module-shifts";
 import { ReceptorShiftsProvider } from "./use-receptor-shifts";
 import { ScreenShiftsProvider } from "./use-screen-shifts";
+import { Navigate } from "react-router-dom";
 
 export const ShiftProvider: React.FC<{
   children: React.ReactNode;
@@ -38,8 +39,6 @@ export const ShiftProvider: React.FC<{
     )
   }
 
-  return <>
-    {children}
-  </>
+  return <Navigate to="/" />
 
 };

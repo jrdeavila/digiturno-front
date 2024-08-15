@@ -4,26 +4,23 @@ import LoginPage from "@/pages/login";
 import NotFoundPage from "@/pages/not-found";
 import SectionalModulePage from "@/pages/sectional-module";
 import UsersPage from "@/pages/users";
+import { useEffect, useMemo } from "react";
 import LoadingPage from "./components/loading-page";
 import useAuth from "./hooks/use-auth";
 import useMyModule from "./hooks/use-my-module";
 import OperatorPage from "./pages/operator";
-import { useMemo } from "react";
-import ScreenPage from "./pages/screen";
 import ReceptorPage from "./pages/receptor";
+import ScreenPage from "./pages/screen";
 
 const ModuleGuard = () => {
   const { type } = useMyModule();
   const { loading, authenticated } = useAuth();
 
   const render = useMemo(() => {
+
     if (loading) {
-      console.log("ModuleGuard -> loading");
       return <LoadingPage />;
     }
-
-    console.log("ModuleGuard -> authenticated");
-
     switch (type?.id) {
       case 2:
         return <Navigate to="/modulo-seccional" />;
@@ -50,6 +47,12 @@ const ModuleGuard = () => {
 };
 
 function App() {
+  useEffect(() => {
+    window.addEventListener("beforeunload", (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    });
+  }, [])
   return (
     <Routes>
       <Route element={<ModuleGuard />}>

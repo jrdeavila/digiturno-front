@@ -12,8 +12,7 @@ const ShiftList = () => {
   const [filterShifts, setFilterShifts] = useState<Shift[]>([]);
 
   useEffect(() => {
-    setFilterShifts(shifts.filter(shift => shift.state !== "completed" && shift.state !== "canceled" && shift.state !== "qualified" && shift.state !== "transferred"));
-    // setFilterShifts(shifts);
+    setFilterShifts(shifts.filter(shift => shift.state == "pending" || shift.state == "pending-transferred"));
   }, [shifts])
 
   const columns = [

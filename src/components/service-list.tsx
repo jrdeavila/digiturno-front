@@ -3,22 +3,18 @@ import { useCreateShift } from "@/providers/create-shift-provider";
 import { useServiceResource } from "@/providers/service-provider";
 import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
 
 const ServiceList = () => {
   const { services, loading } = useServiceResource();
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
-  const [selectedServices, setSelectedServices] = useState<Set<string>>(
-    new Set<string>()
-  );
-  const [selectedServicesArray, setSelectedServicesArray] = useState<Service[]>(
-    []
-  );
 
-  const { setServices } = useCreateShift();
+
+
+  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
+
+  const { setServices, services: savedSelectedServices } = useCreateShift();
 
   // ==============================================================================
 
@@ -27,16 +23,17 @@ const ServiceList = () => {
   }, [services]);
 
   useEffect(() => {
-    const selectedServicesArray = services.filter((service) =>
-      selectedServices.has(service.id.toString())
-    );
-
-    setSelectedServicesArray(selectedServicesArray);
-  }, [selectedServices, services]);
+    if (selectedServices.length > 0) {
+      setServices(selectedServices);
+    }
+  }, [selectedServices, setServices]);
 
   useEffect(() => {
-    setServices(selectedServicesArray);
-  }, [selectedServicesArray, setServices]);
+    console.log(savedSelectedServices);
+    if ((savedSelectedServices?.length ?? 0) <= 0) {
+      setSelectedServices([]);
+    }
+  }, [savedSelectedServices]);
 
   // ==============================================================================
 
@@ -50,7 +47,10 @@ const ServiceList = () => {
   // ==============================================================================
 
   return (
-    <ServiceListBox className="h-full">
+    <Card classNames={{
+      base: 'w-full h-full bg-transparent rounded-none shadow-none',
+      body: "h-full",
+    }}>
       <CardHeader>
         <div className="flex flex-row items-center w-full">
           <div className="flex flex-col w-full">
@@ -72,45 +72,45 @@ const ServiceList = () => {
             <Spinner label="Cargando servicios..." />
           </div>
         ) : (
-          <Listbox
-            aria-label="Select a service"
-            variant="flat"
-            selectionMode="multiple"
-            selectedKeys={selectedServices}
-            onSelectionChange={(keys) => {
-              const ids = Array.from(keys).map((key) => key.toString());
-              setSelectedServices(new Set(ids));
-            }}
-          >
+          <div className="grid lg:grid-cols-2 gap-2">
             {filteredServices.map((service) => (
-              <ListboxItem key={service.id} value={service.id}>
-                {service.name}
-              </ListboxItem>
+              <div
+                key={service.id}
+                className={`flex flex-row items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-primary-200 ${selectedServices.includes(service) && "bg-primary-400 text-white"
+                  }`}
+                onClick={() => {
+                  if (selectedServices.includes(service)) {
+                    setSelectedServices((prev) =>
+                      prev.filter((prevService) => prevService !== service)
+                    );
+                  } else {
+                    setSelectedServices((prev) => [...prev, service]);
+                  }
+                }}
+              >
+                <span>{service.name}</span>
+              </div>
             ))}
-          </Listbox>
+          </div>
         )}
       </CardBody>
       <CardFooter>
         <div className="flex flex-col">
           <span className="text-sm text-gray-500">
-            {selectedServices.size} servicios seleccionados
+            {selectedServices.length} servicios seleccionados
           </span>
           <span className="text-xs text-gray-400">
-            {selectedServicesArray
+            {selectedServices
               .map((service) => service.name)
               .join(", ")}
           </span>
         </div>
       </CardFooter>
-    </ServiceListBox>
+    </Card>
 
 
   );
 };
 
-const ServiceListBox = styled(Card)`
-  padding: 1rem;
-  height: 500px;
-  overflow-y: auto;
-`;
+
 export default ServiceList;
