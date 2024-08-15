@@ -65,7 +65,7 @@ const CreateShiftButton = () => {
     startQualification,
   } = useCreateShift();
   return (
-    <button onClick={startQualification} className="w-full bg-primary text-white rounded-lg py-2">Crear turno</button>
+    <button onClick={startQualification} className="w-full bg-primary text-white rounded-lg py-2"> Terminar y calificar</button>
   )
 }
 
