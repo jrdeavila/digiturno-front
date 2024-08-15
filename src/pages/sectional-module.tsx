@@ -1,60 +1,71 @@
-import SearchClient from "@/components/search-client";
+import SearchClientForm from "@/components/search-client-form";
 import ServiceList from "@/components/service-list";
 import DefaultLayout from "@/layouts/default";
-import CreateShiftProvider, {
-  useCreateShift,
-} from "@/providers/create-shift-provider";
-import { Button } from "@nextui-org/button";
+import CreateShiftProvider, { useCreateShift } from "@/providers/create-shift-provider";
 
 export default function SectionalModulePage() {
   return (
-    <DefaultLayout className='h-[calc(100vh-80px)] pt-10'>
-      <div className="container mx-auto h-full relative">
+    <DefaultLayout className="overflow-y-auto pb-10 h-full w-full">
+      <CreateShiftProvider>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
 
-        <CreateShiftProvider>
-          <div className="grid grid-cols-1 grid-row-4 lg:grid-cols-5 gap-3 h-full">
-            <div className="lg:col-span-5 row-span-1 ">
-              <h1 className="text-3xl font-bold">Reservar turno</h1>
-              <p className="text-lg">
-                Bienvenido a nuestro sistema de reserva de turnos. Por favor,
-                seleccione el tipo de servicio que desea reservar.
-              </p>
-            </div>
-            <div className="lg:col-span-3 row-span-3 ">
-              <ServiceList />
-            </div>
-            <div className="lg:col-span-2 row-span-3 ">
-              <SearchClient />
-            </div>
-            <div className="row-span-1 lg:col-span-5 ">
-              <CurrentActionButton />
-            </div>
+          <div className="col-span-1 row-span-3">
+            <SearchClientForm />
           </div>
-        </CreateShiftProvider>
-      </div>
-    </DefaultLayout>
+          <div className="col-span-3 row-span-4">
+            <ServiceList />
+          </div>
+
+
+          <div className="col-span-1 row-span-2 p-2">
+            <div className="flex flex-col gap-y-2">
+              <CreateShiftButton />
+              <ClearServicesButton />
+              <CancelShiftButton />
+            </div>
+
+          </div>
+
+        </div>
+      </CreateShiftProvider>
+    </DefaultLayout >
   );
 }
 
-const CurrentActionButton = () => {
-  const { startQualification, services, client, onCreateClient } =
-    useCreateShift();
-  return services ? (
-    client ? (
-      <Button
-        onClick={startQualification}
-        className="w-full bg-primary text-white"
-      >
-        CALIFICAR TURNO
-      </Button>
-    ) : (
-      <Button
-        style={{
-          backgroundColor: "#19255a"
-        }}
-        onClick={onCreateClient} className="w-full text-white text-xl">
-        CREAR CLIENTE
-      </Button>
-    )
-  ) : null;
-};
+const CancelShiftButton = () => {
+
+  const {
+    setServices,
+    setClient,
+  } = useCreateShift();
+
+  const cancelShift = () => {
+    setServices([]);
+    setClient(undefined);
+  }
+  return (
+    <button onClick={cancelShift} className="w-full bg-red-500 text-white rounded-lg py-2">Cancelar turno</button>
+  )
+}
+
+const ClearServicesButton = () => {
+  const {
+    setServices,
+  } = useCreateShift();
+  const clearServices = () => {
+    setServices([]);
+  }
+  return (
+    <button onClick={clearServices} className="w-full bg-primary text-white rounded-lg py-2">Limpiar servicios</button>
+  )
+}
+
+const CreateShiftButton = () => {
+  const {
+    startQualification,
+  } = useCreateShift();
+  return (
+    <button onClick={startQualification} className="w-full bg-primary text-white rounded-lg py-2">Crear turno</button>
+  )
+}
+

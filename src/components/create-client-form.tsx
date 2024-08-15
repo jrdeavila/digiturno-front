@@ -49,7 +49,7 @@ export const CreateClientForm: React.FC<{
     validate: (values) => {
       const errors: Partial<CreateClientFormValues> = {};
 
-      let client = clients.find((client) => client.dni === values.dni);
+      const client = clients.find((client) => client.dni === values.dni);
       if (client && client.id !== currentClient?.id) {
         errors.dni = "El DNI ya se encuentra registrado";
       }
@@ -188,7 +188,7 @@ export const CreateClientForm: React.FC<{
               }
               <Button color="primary" type="submit" className="mt-5">
                 <span className="font-bold">
-                  {!!currentClient ? "ACTUALIZAR" : "CREAR CLIENTE"}
+                  {currentClient ? "ACTUALIZAR" : "CREAR CLIENTE"}
                 </span>
               </Button>
             </div>

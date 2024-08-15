@@ -108,6 +108,10 @@ const CreateShiftProvider: React.FC<{
       alert("Debe seleccionar al menos un servicio");
       return;
     }
+    if (client === undefined) {
+      alert("Debe seleccionar un cliente");
+      return;
+    }
     const shift = await shiftService.createShift({
       room_id: myModule!.room.id,
       client: {
