@@ -23,6 +23,14 @@ export const ShiftProvider: React.FC<{
     )
   }
 
+  if (myModule?.moduleTypeId === 2) {
+    return (
+      <>
+        {children}
+      </>
+    )
+  }
+
   if (myModule?.moduleTypeId === 3) {
     return (
       <ReceptorShiftsProvider
