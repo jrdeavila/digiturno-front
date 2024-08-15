@@ -75,7 +75,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
 
     if (!myModule) return;
 
-    const roomShiftChannelName = `rooms.${myModule?.room.id}.shifts`;
+    const roomShiftChannelName = `rooms.${myModule?.room.id}.attention_profiles.${myModule?.attentionProfileId}.shifts`;
     const myModuleShiftChannelName = `modules.${myModule?.id}.shifts`;
     const myCurrentShiftChannelName = `modules.${myModule?.id}.current-shift`;
 

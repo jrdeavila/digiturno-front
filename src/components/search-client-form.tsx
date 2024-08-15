@@ -3,7 +3,7 @@ import { useClientTypeResource } from "@/providers/client-type-provider";
 import { useCreateShift } from "@/providers/create-shift-provider";
 import { Input, Select, SelectItem } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import { useEffect } from "react";
 import * as Yup from "yup";
 
@@ -11,8 +11,6 @@ const SearchClientForm = () => {
   const { clients } = useClientResource();
   const { setClient, client } = useCreateShift();
   const { clientTypes } = useClientTypeResource();
-
-
 
 
 
@@ -48,7 +46,7 @@ const SearchClientForm = () => {
   // ==================================================================================================================
 
   const {
-    handleChange, values, errors, handleSubmit, setValues
+    handleChange, values, errors, handleSubmit, setValues, resetForm,
   } = useFormik({
     initialValues: {
       dni: "",
@@ -83,14 +81,10 @@ const SearchClientForm = () => {
 
   useEffect(() => {
     if (!client) {
-      setValues({
-        dni: "",
-        name: "",
-        client_type_id: 1,
-      })
+      resetForm();
     }
 
-  }, [client])
+  }, [client, resetForm])
 
   // ==================================================================================================================
 
