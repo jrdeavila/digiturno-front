@@ -9,9 +9,11 @@ import styled from "styled-components";
 export default function DefaultLayout({
   children,
   className = "container mx-auto max-w-7xl px-6 flex-grow pt-16",
+  showLogo = true,
 }: {
   children: React.ReactNode;
   className?: string;
+  showLogo?: boolean;
 }) {
   return (
     <DefaultBackground className="relative flex flex-col h-screen pt-[20px] pl-[20px] pb-[40px]">
@@ -33,8 +35,12 @@ export default function DefaultLayout({
       <main className={className}>
         {children}
       </main>
-      <img
-        src={logo} alt="logo" className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96" />
+      {
+        showLogo && (
+          <img
+            src={logo} alt="logo" className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96" />
+        )
+      }
       <Settings />
 
     </DefaultBackground>
