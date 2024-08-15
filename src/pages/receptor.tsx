@@ -9,7 +9,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function ReceptorPage() {
   return (
-    <DefaultLayout className="overflow-y-auto pb-10 h-full w-full">
+    <DefaultLayout
+      showLogo={false}
+      className="overflow-y-auto pb-10 h-full w-full">
       <CreateShiftProvider>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
 
