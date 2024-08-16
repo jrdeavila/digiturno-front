@@ -5,15 +5,30 @@ import React, { useEffect, useState } from "react";
 import "./GenericComponent";
 import GenericComponent from "./GenericComponent";
 import useModuleShifts from "@/hooks/operator/use-module-shifts";
+import AttentionProfile from "@/models/attention-profile";
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 
 const ServiceList: React.FC = () => {
 
   const [currentServices, setCurrentServices] = useState<Service[] | undefined>(undefined);
+  const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
 
   // ==============================================================================
 
-  const { attentionProfile } = useMyModule();
+  const { myModule } = useMyModule();
   const { setServices, services } = useModuleShifts();
+  const { attentionProfiles } = useAttentionProfileResource();
+
+  // ==============================================================================
+
+  useEffect(() => {
+    const ap = attentionProfiles.find((ap) => ap.id === myModule?.attentionProfileId);
+    if (ap) {
+      setAttentionProfile(ap);
+    }
+
+  }, [attentionProfiles, myModule]);
+
 
   // ==============================================================================
 

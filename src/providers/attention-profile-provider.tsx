@@ -41,7 +41,9 @@ const AttentionProfileProvider: React.FC<{
       if (!myModule) return [];
       return await attentionProfileService.getAll(myModule.ipAddress);
     },
-    (data) => setAttentionProfiles(data),
+    (data) => {
+      return setAttentionProfiles(data);
+    },
     (error) => console.error(error),
     undefined,
     [myModule]
