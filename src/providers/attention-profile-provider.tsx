@@ -1,5 +1,6 @@
 import useAsync from "@/hooks/use-async";
 import useAttentionProfileService from "@/hooks/use-attention-profile-service";
+import useMyModule from "@/hooks/use-my-module";
 import AttentionProfile from "@/models/attention-profile";
 import { createContext, useContext, useState } from "react";
 
@@ -10,7 +11,7 @@ const AttentionProfileContext = createContext<{
 }>({
   attentionProfiles: [],
   loading: false,
-  refreshAttentionProfiles: async () => {},
+  refreshAttentionProfiles: async () => { },
 });
 
 export const useAttentionProfileResource = () => {
@@ -29,25 +30,28 @@ const AttentionProfileProvider: React.FC<{
   >([]);
 
   const [loading] = useState<boolean>(false);
+  const { myModule } = useMyModule();
 
   const attentionProfileService = useAttentionProfileService();
 
   // ==============================================================================
 
   useAsync<AttentionProfile[]>(
-    () => {
-      return attentionProfileService.getAll();
+    async () => {
+      if (!myModule) return [];
+      return await attentionProfileService.getAll(myModule.ipAddress);
     },
     (data) => setAttentionProfiles(data),
     (error) => console.error(error),
     undefined,
-    []
+    [myModule]
   );
 
   // ==============================================================================
 
   const refreshAttentionProfiles = async () => {
-    const attentionProfiles = await attentionProfileService.getAll();
+    if (!myModule) return;
+    const attentionProfiles = await attentionProfileService.getAll(myModule.ipAddress);
     setAttentionProfiles(attentionProfiles);
   };
 

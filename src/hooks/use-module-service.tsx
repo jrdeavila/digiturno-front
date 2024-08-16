@@ -88,6 +88,9 @@ class HttpModuleService {
       params: {
         ip_address: ipAddress,
       },
+      headers: {
+        'X-Module-Ip': ipAddress
+      }
     });
     return new Module(
       response.data.data.id,
@@ -100,6 +103,17 @@ class HttpModuleService {
       response.data.data.attention_profile_id,
       response.data.data.module_type_id
     );
+  }
+
+  async getModules(ipAddress: string): Promise<Module[]> {
+    const response = await this.httpClient.get<{
+      data: ModuleResponse[];
+    }>("/modules", {
+      headers: {
+        'X-Module-Ip': ipAddress
+      }
+    });
+    return response.data.data.map(moduleResponseToModule);
   }
 }
 
