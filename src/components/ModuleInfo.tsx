@@ -2,16 +2,35 @@ import useAuth from "@/hooks/use-auth";
 import useMyModule from "@/hooks/use-my-module";
 import { faDesktop, faPerson, faSignOut, faToilet } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import GenericComponent from "./GenericComponent";
 import { Button } from "@nextui-org/react";
 import { useAbsence } from "@/providers/absence-provider";
+import AttentionProfile from "@/models/attention-profile";
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 
 const ModuleInfo: React.FC = () => {
-  const { myModule, attentionProfile } = useMyModule();
+  const { myModule } = useMyModule();
   const { logout } = useAuth();
   const { attendant } = useAuth();
   const { openModal, backToWork } = useAbsence();
+  const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
+
+  // =======================================================
+
+  const { attentionProfiles } = useAttentionProfileResource();
+
+  // =======================================================
+
+  useEffect(() => {
+    const ap = attentionProfiles.find((ap) => ap.id === myModule?.attentionProfileId);
+    if (ap) {
+      setAttentionProfile(ap);
+    }
+
+  }, [attentionProfiles, myModule]);
+
+
   // =======================================================
 
   const moduleStatus = useMemo(() => {

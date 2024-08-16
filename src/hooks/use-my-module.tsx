@@ -1,7 +1,5 @@
 import ConfigureQualificationModulePage from "@/components/configure-qualification-module-page";
-import AttentionProfile from "@/models/attention-profile";
 import ModuleConfigPage from "@/pages/module-config";
-import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import { ModuleType } from "@/services/module-type-service";
 import useQualificationModule from "@/services/use-qualification-module";
 import delay from "@/utils/delay";
@@ -122,7 +120,6 @@ export const useConfigureModule = () => {
 
 interface MyModuleCtxProps {
   myModule: Module | undefined;
-  attentionProfile: AttentionProfile | undefined;
   type: ModuleType | undefined;
   info: MyModuleProps | undefined;
   shouldRequestIp: boolean;
@@ -146,7 +143,6 @@ export const MyModuleProvider: React.FC<{
 }> = ({ children }) => {
   const [myModule, setMyModule] = useState<Module>();
   const myModuleService = useHttpModuleService();
-  const { attentionProfiles } = useAttentionProfileResource();
   const [myModuleInfo, setMyModuleInfo] = useState<MyModuleProps | undefined>(
     undefined
   );
@@ -154,9 +150,7 @@ export const MyModuleProvider: React.FC<{
   const [moduleType, setModuleType] = useState<ModuleType | undefined>(
     undefined
   );
-  const [attentionProfile, setAttentionProfile] = useState<
-    AttentionProfile | undefined
-  >();
+
 
   const { moduleTypes } = useSectional();
   const { setLoading } = useLoading();
@@ -256,12 +250,8 @@ export const MyModuleProvider: React.FC<{
     }
   }, [moduleTypes, myModule]);
 
-  useEffect(() => {
-    const attentionProfile = attentionProfiles.find(
-      (profile) => profile.id === myModule?.attentionProfileId
-    );
-    setAttentionProfile(attentionProfile);
-  }, [attentionProfiles, myModule]);
+
+
 
   // ==================================================================
 
@@ -282,7 +272,6 @@ export const MyModuleProvider: React.FC<{
     <MyModuleContext.Provider
       value={{
         myModule,
-        attentionProfile,
         info: myModuleInfo,
         refreshMyModule,
         shouldRequestIp,
