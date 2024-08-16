@@ -26,19 +26,19 @@ const RootApp = () => {
         <BrowserRouter>
           <Provider>
             <ServiceProvider>
-              <AttentionProfileProvider>
-                <ClientTypeProvider>
-                  <ClientProvider>
-                    <MyModuleProvider>
+              <ClientTypeProvider>
+                <ClientProvider>
+                  <MyModuleProvider>
+                    <AttentionProfileProvider>
                       <ShiftProvider>
                         <AuthenticatedProvider>
                           <App />
                         </AuthenticatedProvider>
                       </ShiftProvider>
-                    </MyModuleProvider>
-                  </ClientProvider>
-                </ClientTypeProvider>
-              </AttentionProfileProvider>
+                    </AttentionProfileProvider>
+                  </MyModuleProvider>
+                </ClientProvider>
+              </ClientTypeProvider>
             </ServiceProvider>
           </Provider>
         </BrowserRouter>

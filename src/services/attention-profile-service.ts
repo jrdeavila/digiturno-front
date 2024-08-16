@@ -12,10 +12,14 @@ export default class AttentionProfileService {
     this.httpClient = httpClient;
   }
 
-  async getAll(): Promise<AttentionProfile[]> {
+  async getAll(ipAddress: string): Promise<AttentionProfile[]> {
     const response = await this.httpClient.get<{
       data: AttentionProfileResponse[];
-    }>("/attention_profiles");
+    }>("/attention_profiles", {
+      headers: {
+        "X-Module-Ip": ipAddress,
+      }
+    });
     const attentionProfiles = response.data.data.map(mapAttentionProfile);
     return attentionProfiles;
   }
