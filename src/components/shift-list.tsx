@@ -1,8 +1,8 @@
 import { Shift } from "@/hooks/operator/use-http-shifts-service";
 import useReceptorShifts from "@/hooks/operator/use-receptor-shifts";
-import { faCancel, faPaperPlane, faPerson, faUsersSlash } from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faCog, faPaperPlane, faPerson, faUsersSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { Button, Popover, PopoverContent, PopoverTrigger, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useCallback, useEffect, useState } from "react";
 
@@ -33,8 +33,8 @@ const ShiftList = () => {
       title: "Estado",
     },
     {
-      key: "cancel",
-      title: "Cancelar",
+      key: "actions",
+      title: "Acciones",
     }
   ]
 
@@ -167,15 +167,60 @@ const ShiftList = () => {
             <TimeClockAnimation createdAt={dateCreatedAt} />
           </div>
         }
-        case 'cancel':
-          return <button onClick={() => cancelShift(shift)}>
-            <div className="flex flex-row gap-x-2 items-center">
-              <FontAwesomeIcon icon={faCancel} color="red" />
-              <span>
-                Cancelar
-              </span>
-            </div>
-          </button>
+        case 'actions':
+          return <Popover>
+            <PopoverTrigger>
+              <Button>
+                <div className="flex flex-row items-center gap-x-1">
+                  <span>Acciones</span>
+                  <FontAwesomeIcon icon={faCog} />
+                </div>
+              </Button>
+
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="w-full flex flex-col gap-y-1">
+                {
+                  [
+                    {
+                      label: "Cancelar",
+                      onClick: () => cancelShift(shift),
+                      icon: faCancel,
+                      color: "text-red-500",
+                    },
+                    {
+                      label: "Transferir a otra sala",
+                      onClick: () => { },
+                      icon: faPaperPlane,
+                      color: "text-blue-500",
+                    },
+                    {
+                      label: "Transferir a otro módulo",
+                      onClick: () => { },
+                      icon: faPaperPlane,
+                      color: "text-blue-500",
+                    },
+                    {
+                      label: "Modificar",
+                      onClick: () => { },
+                      icon: faCog,
+                      color: "text-orange-500",
+                    }
+
+                  ].map((action) => (
+                    <div key={action.label} onClick={action.onClick} className="w-full hover:bg-gray-300 rounded-lg px-4 py-3 cursor-pointer select-none">
+                      <div className="flex flex-row gap-x-1 items-center w-full">
+                        <FontAwesomeIcon icon={action.icon} className={action.color} />
+                        <span className={action.color}>
+                          {action.label}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </PopoverContent>
+          </Popover>
         default:
           return null
       }
