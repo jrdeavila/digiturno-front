@@ -8,6 +8,7 @@ import { useAttentionProfileResource } from "@/providers/attention-profile-provi
 import CreateShiftProvider, { useCreateShift } from "@/providers/create-shift-provider";
 import { faDesktop } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Divider } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styled from "styled-components";
 
@@ -67,10 +68,16 @@ const AttentionProfileShiftInfo = () => {
       <div className="flex flex-col gap-y-2 w-full overflow-y-auto px-2">
         {attentionProfiles.map((attentionProfile) => (
           <div className="flex flex-col" key={attentionProfile.id}>
+            <Divider
+              className="w-full"
+            />
             <div key={attentionProfile.id} className="flex flex-row items-center justify-between gap-x-2 w-full">
-              <span>{attentionProfile.name}</span>
+              <span className="font-bold">{attentionProfile.name}</span>
               <CountIndicatorTarget >{shifts.filter(shift => shift.attentionProfile === attentionProfile.name).length}</CountIndicatorTarget>
             </div>
+            <Divider
+              className="w-full"
+            />
             <div className="flex flex-col">
               {modules.filter(module => module.attentionProfileId === attentionProfile.id).map(
                 module => (
