@@ -4,8 +4,7 @@ import useClient, { ScreenClientProvider } from "@/hooks/use-client";
 import { VoiceProvider } from "@/hooks/useVoice";
 import DefaultLayout from "@/layouts/default";
 import {
-  faFrown,
-  faSadTear
+  faFrown
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
@@ -55,13 +54,10 @@ const ListOfCalledClients = () => {
 
   return (
     <div className="p-3">
-<<<<<<< HEAD
       {/* <div className="flex flex-row gap-x-3 items-center text-white">
         <h1 className="text-3xl font-bold">CLIENTES LLAMADOS</h1>
         <FontAwesomeIcon icon={faBullhorn} className="text-3xl" />
       </div> */}
-=======
->>>>>>> b5ea542 (refactor: Remove unused Logo component and commented code)
       <div className="flex flex-col gap-y-3 pt-10">
         {clients?.map((client) => (
           <div
