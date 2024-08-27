@@ -4,6 +4,7 @@ import useHttpClient from "./operator/use-http-client";
 export interface Room {
   id: number;
   name: string;
+  branch_id: number;
 }
 
 export interface ModuleResponse {
