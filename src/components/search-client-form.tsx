@@ -12,8 +12,6 @@ const SearchClientForm = () => {
   const { setClient, client } = useCreateShift();
   const { clientTypes } = useClientTypeResource();
 
-
-
   // ==================================================================================================================
 
   const validationScheme = Yup.object().shape({
@@ -24,58 +22,67 @@ const SearchClientForm = () => {
 
   // ==================================================================================================================
 
-  const handleSearchClient = (dni: string, onFound: (values: {
+  const handleSearchClient = (
     dni: string,
-    name: string,
-    client_type_id: number
-  }) => void) => {
+    onFound: (values: {
+      dni: string;
+      name: string;
+      client_type_id: number;
+    }) => void
+  ) => {
     const client = clients.find((client) => client.dni === dni);
     if (client) {
       setClient(client);
       onFound({
         dni: client.dni,
         name: client.name,
-        client_type_id: clientTypes.find((clientType) => clientType.slug == client.clientType)?.id || 0,
+        client_type_id:
+          clientTypes.find((clientType) => clientType.slug == client.clientType)
+            ?.id || 0,
       });
     } else {
       return;
     }
-
-  }
+  };
 
   // ==================================================================================================================
 
-  const {
-    handleChange, values, errors, handleSubmit, setValues, resetForm,
-  } = useFormik({
-    initialValues: {
-      dni: "",
-      name: "",
-      client_type_id: 1,
-    },
-    validationSchema: validationScheme,
-    validate: (values) => {
-      setClient({
-        dni: values.dni,
-        name: values.name,
-        clientType: clientTypes.find((clientType) => clientType.id === values.client_type_id)?.slug || "standard",
-        isDeleted: false,
-        id: 0,
-        moduleName: "",
-      })
-      return {};
-    },
-    onSubmit: (values) => {
-      setClient({
-        dni: values.dni,
-        name: values.name,
-        clientType: clientTypes.find((clientType) => clientType.id === values.client_type_id)?.slug || "standard",
-        isDeleted: false,
-        id: 0,
-        moduleName: "",
-      })
-    }
-  })
+  const { handleChange, values, errors, handleSubmit, setValues, resetForm } =
+    useFormik({
+      initialValues: {
+        dni: "",
+        name: "",
+        client_type_id: 1,
+      },
+      validationSchema: validationScheme,
+      validate: (values) => {
+        setClient({
+          dni: values.dni,
+          name: values.name,
+          clientType:
+            clientTypes.find(
+              (clientType) => clientType.id === values.client_type_id
+            )?.slug || "standard",
+          isDeleted: false,
+          id: 0,
+          moduleName: "",
+        });
+        return {};
+      },
+      onSubmit: (values) => {
+        setClient({
+          dni: values.dni,
+          name: values.name,
+          clientType:
+            clientTypes.find(
+              (clientType) => clientType.id === values.client_type_id
+            )?.slug || "standard",
+          isDeleted: false,
+          id: 0,
+          moduleName: "",
+        });
+      },
+    });
 
   // ==================================================================================================================
 
@@ -83,29 +90,37 @@ const SearchClientForm = () => {
     if (!client) {
       resetForm();
     }
-
-  }, [client, resetForm])
+  }, [client, resetForm]);
 
   // ==================================================================================================================
 
-
   return (
-
     <form className="flex flex-row gap-x-3 w-full">
       <div className="flex flex-col p-4 gap-y-2 w-full h-full">
         <div className="flex flex-row gap-x-3">
-          <Input name="cc" placeholder="Cédula del cliente" label="Cédula" value={values.dni} onChange={(e) => {
-            handleChange("dni")(e);
-            handleSearchClient(e.target.value, (values) => {
-              setValues(values);
-            })
-
-          }}
+          <Input
+            name="cc"
+            placeholder="Cédula del cliente"
+            label="Cédula"
+            value={values.dni}
+            onChange={(e) => {
+              handleChange("dni")(e);
+              handleSearchClient(e.target.value, (values) => {
+                setValues(values);
+              });
+            }}
             errorMessage={errors.dni}
             isInvalid={!!errors.dni}
           />
-          <Input name="name" placeholder="Nombre del cliente" label="Nombre" value={values.name} onChange={handleChange("name")}
-
+          <Input
+            onInput={(e) => {
+              e.currentTarget.value = e.currentTarget.value.toUpperCase();
+            }}
+            name="name"
+            placeholder="Nombre del cliente"
+            label="Nombre"
+            value={values.name}
+            onChange={handleChange("name")}
             errorMessage={errors.name}
             isInvalid={!!errors.name}
           />
@@ -128,17 +143,9 @@ const SearchClientForm = () => {
             </SelectItem>
           ))}
         </Select>
-
       </div>
-
     </form>
-
-
-
-
-
-
-  )
-}
+  );
+};
 
 export default SearchClientForm;

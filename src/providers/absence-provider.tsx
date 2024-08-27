@@ -1,4 +1,3 @@
-import useModuleShifts from "@/hooks/operator/use-module-shifts";
 import useAbsenceService from "@/hooks/use-absence-service";
 import useAsync from "@/hooks/use-async";
 import useAuth from "@/hooks/use-auth";
@@ -28,7 +27,6 @@ const AbsenceProvider: React.FC<{
 
   // ================================================================
 
-
   useAsync<Absence[]>(
     async () => {
       return absenceService.getAbsences();
@@ -41,51 +39,46 @@ const AbsenceProvider: React.FC<{
     },
     undefined,
     []
-  )
+  );
 
   // ================================================================
-
 
   const handleOpenModal = () => {
     setShowModal(true);
-  }
+  };
 
   const handleCloseModal = () => {
     setShowModal(false);
-  }
+  };
 
-
-  const handleCreateAbsence = async (absence: Absence, attendant: Attendant) => {
+  const handleCreateAbsence = async (
+    absence: Absence,
+    attendant: Attendant
+  ) => {
     await absenceService.createAbsence(absence.id, attendant.id);
     setShowModal(false);
-  }
-
+  };
 
   const handleBackToWork = async (attendant: Attendant) => {
     await absenceService.backToWork(attendant.id);
-  }
-
-
-
+  };
 
   // ================================================================
   return (
-    <AbsenceCtx.Provider value={{
-      absences,
-      openModal: handleOpenModal,
-      closeModal: handleCloseModal,
-      createAbsence: handleCreateAbsence,
-      backToWork: handleBackToWork,
-    }}>
+    <AbsenceCtx.Provider
+      value={{
+        absences,
+        openModal: handleOpenModal,
+        closeModal: handleCloseModal,
+        createAbsence: handleCreateAbsence,
+        backToWork: handleBackToWork,
+      }}
+    >
       {children}
-      {
-        showModal && (
-          <AbsenceModal />
-        )
-      }
+      {showModal && <AbsenceModal />}
     </AbsenceCtx.Provider>
-  )
-}
+  );
+};
 
 export const useAbsence = () => {
   const ctx = useContext(AbsenceCtx);
@@ -93,7 +86,7 @@ export const useAbsence = () => {
     throw new Error("useAbsence must be used within AbsenceProvider");
   }
   return ctx;
-}
+};
 
 const AbsenceModal: React.FC = () => {
   const { absences, closeModal, createAbsence } = useAbsence();
@@ -103,57 +96,55 @@ const AbsenceModal: React.FC = () => {
   // ================================================================
 
   const handleSelectAbsence = (absenceId: number) => {
-    setSelectedAbsence(absences.find(absence => absence.id === absenceId) || null);
-  }
+    setSelectedAbsence(
+      absences.find((absence) => absence.id === absenceId) || null
+    );
+  };
 
   const handleCreateAbsence = () => {
     if (selectedAbsence && attendant) {
       createAbsence(selectedAbsence, attendant);
     }
-  }
+  };
 
   const handleCancel = () => {
     closeModal();
-  }
-
+  };
 
   // ================================================================
-
-
-
 
   return (
     <ModalContainer>
       <div id="waiting-qualification-card" className="bg-white p-4 rounded-lg">
-        <h1 className="text-xl font-bold">
-          Motivos de ausencia
-        </h1>
+        <h1 className="text-xl font-bold">Motivos de ausencia</h1>
         <ul>
-          {
-            absences.map((absence) => (
-              <li key={absence.id} className="flex flex-row items-center gap-x-2">
-                <input type="radio" name="absence" value={absence.id}
-                  onChange={() => handleSelectAbsence(absence.id)}
-                />
-                <label> {absence.name} </label>
-              </li>
-            ))
-          }
+          {absences.map((absence) => (
+            <li key={absence.id} className="flex flex-row items-center gap-x-2">
+              <input
+                type="radio"
+                name="absence"
+                value={absence.id}
+                onChange={() => handleSelectAbsence(absence.id)}
+              />
+              <label> {absence.name} </label>
+            </li>
+          ))}
         </ul>
         <div className="flex flex-row justify-end">
           <button
             onClick={handleCreateAbsence}
-            className="bg-red-700 text-white px-4 py-2 rounded-lg">
+            className="bg-red-700 text-white px-4 py-2 rounded-lg"
+          >
             Aceptar
           </button>
           <button
             onClick={handleCancel}
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg">
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+          >
             Cancelar
           </button>
         </div>
       </div>
-
     </ModalContainer>
   );
 };
@@ -186,4 +177,4 @@ const ModalContainer = styled.div`
   }
 `;
 
-export default AbsenceProvider; 
+export default AbsenceProvider;
