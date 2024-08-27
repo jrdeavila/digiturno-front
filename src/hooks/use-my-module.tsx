@@ -6,9 +6,16 @@ import delay from "@/utils/delay";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import useAsync from "./use-async";
 import useLoading from "./use-loading";
-import useHttpModuleService, { Module, ModuleResponse, moduleResponseToModule } from "./use-module-service";
+import useHttpModuleService, {
+  Module,
+  ModuleResponse,
+  moduleResponseToModule,
+} from "./use-module-service";
 import useSectional from "./use-sectional";
 import useEcho from "./operator/use-echo";
+import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConfigureModuleCtxProps {
   pared: boolean;
@@ -59,7 +66,7 @@ export const ConfigureModuleProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => { },
+    () => {},
     [type, qualificationModuleService]
   );
 
@@ -151,7 +158,6 @@ export const MyModuleProvider: React.FC<{
     undefined
   );
 
-
   const { moduleTypes } = useSectional();
   const { setLoading } = useLoading();
 
@@ -165,13 +171,11 @@ export const MyModuleProvider: React.FC<{
 
   // ==================================================================
 
-
   useEffect(() => {
     if (!moduleType) {
       return;
     }
     if (moduleType.useQualification) {
-
       echo.connect();
     }
 
@@ -180,20 +184,21 @@ export const MyModuleProvider: React.FC<{
         echo.disconnect();
       }
     };
-  }, [moduleType])
-
+  }, [moduleType]);
 
   useEffect(() => {
     if (myModule) {
-      echo.channel(`modules.${myModule.id}`).listen(".module.updated", (data: { module: ModuleResponse }) => {
-        const moduleUpdated = moduleResponseToModule(data.module);
-        setMyModule(moduleUpdated);
-      });
+      echo
+        .channel(`modules.${myModule.id}`)
+        .listen(".module.updated", (data: { module: ModuleResponse }) => {
+          const moduleUpdated = moduleResponseToModule(data.module);
+          setMyModule(moduleUpdated);
+        });
     }
     return () => {
       echo.leave("modules." + myModule?.id);
     };
-  }, [myModule])
+  }, [myModule]);
 
   useAsync<Module | undefined>(
     async () => {
@@ -220,7 +225,7 @@ export const MyModuleProvider: React.FC<{
       console.error(error);
       setShouldRequestIp(true);
     },
-    () => { },
+    () => {},
     [myModuleInfo]
   );
 
@@ -250,9 +255,6 @@ export const MyModuleProvider: React.FC<{
     }
   }, [moduleTypes, myModule]);
 
-
-
-
   // ==================================================================
 
   const refreshMyModule = () => {
@@ -264,9 +266,10 @@ export const MyModuleProvider: React.FC<{
   const clearModuleInfo = () => {
     setMyModuleInfo(undefined);
     localStorage.removeItem("module-info");
-  }
+  };
 
   // ==================================================================
+  console.log(myModule?.enabled);
 
   return (
     <MyModuleContext.Provider
@@ -280,12 +283,40 @@ export const MyModuleProvider: React.FC<{
         clearModuleInfo,
       }}
     >
-      <ConfigureModuleProvider>
-        {shouldRequestIp ? <ModuleConfigPage /> : children}
-      </ConfigureModuleProvider>
+      {myModule?.enabled == false ? (
+        <BlockedModulePage />
+      ) : (
+        <ConfigureModuleProvider>
+          {shouldRequestIp ? <ModuleConfigPage /> : children}
+        </ConfigureModuleProvider>
+      )}
     </MyModuleContext.Provider>
   );
 };
+
+const BlockedModulePage: React.FC = () => {
+  return (
+    <StyledBlockedModulePage>
+      <div className="text-blue-500 flex flex-col justify-center items-center">
+        <FontAwesomeIcon icon={faBan} size="7x" />
+        <h1>Este modulo esta inhabilitado</h1>
+        <p>Por favor, contacte al administrador</p>
+      </div>
+    </StyledBlockedModulePage>
+  );
+};
+
+const StyledBlockedModulePage = styled.div`
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const useMyModule = () => {
   const context = useContext(MyModuleContext);
