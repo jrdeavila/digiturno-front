@@ -15,11 +15,9 @@ import ClientProvider from "./providers/client-provider.tsx";
 import ClientTypeProvider from "./providers/client-type-provider.tsx";
 import ServiceProvider from "./providers/service-provider.tsx";
 import "./pusher.js";
-
-
+import AttendantProvider from "./providers/attendant-provider.tsx";
 
 const RootApp = () => {
-
   return (
     <LoadingProvider>
       <SectionalProvider>
@@ -31,9 +29,11 @@ const RootApp = () => {
                   <MyModuleProvider>
                     <AttentionProfileProvider>
                       <ShiftProvider>
-                        <AuthenticatedProvider>
-                          <App />
-                        </AuthenticatedProvider>
+                        <AttendantProvider>
+                          <AuthenticatedProvider>
+                            <App />
+                          </AuthenticatedProvider>
+                        </AttendantProvider>
                       </ShiftProvider>
                     </AttentionProfileProvider>
                   </MyModuleProvider>
@@ -45,9 +45,6 @@ const RootApp = () => {
         <NotificationContainer />
       </SectionalProvider>
     </LoadingProvider>
-
-  )
-}
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <RootApp />
-);
+  );
+};
+ReactDOM.createRoot(document.getElementById("root")!).render(<RootApp />);

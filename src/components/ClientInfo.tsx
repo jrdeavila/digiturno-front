@@ -1,23 +1,24 @@
+import useModuleShifts from "@/hooks/operator/use-module-shifts";
+import { dateFormatter } from "@/utils/date";
 import { faCheck, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useMemo, useState } from "react";
-import GenericComponent from "./GenericComponent";
+import React, { useMemo } from "react";
 import styled from "styled-components";
-import { dateFormatter } from "@/utils/date";
-import useModuleShifts from "@/hooks/operator/use-module-shifts";
+import GenericComponent from "./GenericComponent";
+import TimeClockAnimation from "./time-clock-animation";
 
 const ClientInfo: React.FC = () => {
   const { currentShift, completeShift, onTransfer } = useModuleShifts();
 
-  const renderCreatedDate = useMemo(() => {
+  const renderStartDate = useMemo(() => {
     // 2024-07-25T02:22:30.000000Z
-    const date = currentShift?.createdAt;
+    const date = currentShift?.updatedAt;
     return <div className="text-4xl font-bold">{dateFormatter(date)}</div>;
   }, [currentShift]);
 
-  const time = useMemo(() => {
-    return new Date();
-  }, []);
+  const time = currentShift?.updatedAt
+    ? new Date(currentShift.updatedAt)
+    : new Date();
 
   return currentShift ? (
     <GenericComponent title="CLIENTE EN ATENCIÓN">
@@ -35,55 +36,36 @@ const ClientInfo: React.FC = () => {
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex flex-col justify-center items-center">
             <p className="text">Hora de Inicio:</p>
-            {renderCreatedDate}
+            {renderStartDate}
           </div>
 
           <div className="flex flex-col justify-center items-center">
             <p className="text">Tiempo transcurrido:</p>
-            <TemporaryComponent initial={time} />
+            <div className="text-4xl font-bold">
+              <TimeClockAnimation createdAt={time} />
+            </div>
           </div>
         </div>
 
         <div className="flex-grow"></div>
 
-        <div className="flex flex-row justify-stretch gap-x-3 flex-wrap items-center w-full">
-          <ButtonGradient onClick={() => completeShift(currentShift)}>
-            <FontAwesomeIcon icon={faCheck} className="mr-2" />
-            ATENDIDO
-          </ButtonGradient>
-          <ButtonGradient onClick={onTransfer}>
-            <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
-            TRANSFERIR
-          </ButtonGradient>
+        <div className="flex flex-col gap-y-3 flex-wrap items-center w-full">
+          <div className="w-full">
+            <ButtonGradient onClick={() => completeShift(currentShift)}>
+              <FontAwesomeIcon icon={faCheck} className="mr-2" />
+              ATENDIDO
+            </ButtonGradient>
+          </div>
+          <div className="w-full">
+            <ButtonGradient onClick={onTransfer}>
+              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+              TRANSFERIR
+            </ButtonGradient>
+          </div>
         </div>
       </section>
     </GenericComponent>
   ) : null;
-};
-
-const TemporaryComponent: React.FC<{
-  initial: Date;
-}> = ({ initial }) => {
-  const [now, setNow] = useState(new Date());
-
-  // Update time every second
-  // Get the difference between the current time and the initial time
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(new Date(new Date().getTime() - initial.getTime()));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [initial]);
-
-  // Render mm:ss
-  return (
-    <div className="text-4xl font-bold">{`${now
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`}</div>
-
-  );
 };
 
 export default ClientInfo;
@@ -94,6 +76,7 @@ const ButtonGradient = styled.button`
   padding: 1rem 1.5rem;
   border-radius: 5px;
   font-weight: 700;
+  width: 100%;
   cursor: pointer;
   transition: all 0.3s;
   font-size: 1.1rem;

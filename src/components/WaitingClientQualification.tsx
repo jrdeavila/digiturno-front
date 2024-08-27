@@ -4,30 +4,35 @@ import { Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
 import { useEffect } from "react";
 
 const WaitingClientQualification: React.FC<{
-  onQualified: (qualification: number) => void;
-}> = ({ onQualified }) => {
+  onQualified: (qualification: number) => Promise<void>;
+  onError?: () => void;
+}> = ({ onQualified, onError }) => {
   const { onListenQualification, removeListener } = useConfigureModule();
   // ==============================================================================
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onQualified(0);
+      onQualified(0).catch(() => {
+        onError && onError();
+      });
     }, timeToQualify);
     return () => {
       clearTimeout(timeout);
     };
-  }, [onQualified]);
+  }, [onError, onQualified]);
 
   useEffect(() => {
     onListenQualification((qualification) => {
-      onQualified(qualification);
+      onQualified(qualification).catch(() => {
+        onError && onError();
+      });
     });
     return () => {
       removeListener((qualification) => {
         onQualified(qualification);
       });
     };
-  }, [onQualified]);
+  }, []);
 
   // ==============================================================================
 

@@ -3,6 +3,11 @@ import SearchClientForm from "@/components/search-client-form";
 import ShiftList from "@/components/shift-list";
 import useEcho from "@/hooks/operator/use-echo";
 import useReceptorShifts from "@/hooks/operator/use-receptor-shifts";
+import {
+  Attendant,
+  AttendantResponse,
+  attendantResponseToAttendant,
+} from "@/hooks/use-authentication-service";
 import useModule, { ModuleProvider } from "@/hooks/use-module";
 import {
   Module,
@@ -11,15 +16,16 @@ import {
 } from "@/hooks/use-module-service";
 import DefaultLayout from "@/layouts/default";
 import AttentionProfile from "@/models/attention-profile";
+import { useAttendantResource } from "@/providers/attendant-provider";
 import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import CreateShiftProvider, {
   useCreateShift,
 } from "@/providers/create-shift-provider";
-import { faDesktop } from "@fortawesome/free-solid-svg-icons";
+import { faDesktop, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import styled from "styled-components";
 
 export default function ReceptorPage() {
@@ -69,46 +75,83 @@ const CreateShiftButton = () => {
 };
 
 const AttentionProfileShiftInfo = () => {
-  const { shifts } = useReceptorShifts();
   const { attentionProfiles } = useAttentionProfileResource();
   const { modules } = useModule();
+
+  const renderModules = useCallback(() => {
+    return attentionProfiles.map((ap) => {
+      return (
+        <div className="flex flex-col" key={ap.id}>
+          <div className="flex flex-row justify-between">
+            <div>
+              <FontAwesomeIcon icon={faDesktop} color="red" className="mr-1" />
+              <span className="text-sm text-gray-500">Modulo Inactivo</span>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faDesktop}
+                color="green"
+                className="mr-1"
+              />
+              <span className="text-sm text-gray-500">Modulo Activo</span>
+            </div>
+          </div>
+          <Divider className="w-full" />
+          <div className="flex flex-row justify-between">
+            <div>
+              <FontAwesomeIcon icon={faPerson} color="red" className="mr-1" />
+              <span className="text-sm text-gray-500">
+                Funcionario Inactivo
+              </span>
+            </div>
+            <div>
+              <FontAwesomeIcon icon={faPerson} color="green" className="mr-1" />
+              <span className="text-sm text-gray-500">
+                Funcionario disponible
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-row justify-between">
+            <div>
+              <FontAwesomeIcon icon={faPerson} color="blue" className="mr-1" />
+              <span className="text-sm text-gray-500">Funcionario ocupado</span>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faPerson}
+                color="orange"
+                className="mr-1"
+              />
+              <span className="text-sm text-gray-500">Funcionario ausente</span>
+            </div>
+          </div>
+          <Divider className="w-full" />
+          <div className="flex flex-row items-center justify-center gap-x-2 w-full">
+            <span className="font-bold">{ap.name}</span>
+          </div>
+          <div className="flex flex-col">
+            {modules
+              .filter((module) => module.attentionProfileId === ap.id)
+              .map((module) => (
+                <ModuleLiveInfo
+                  key={module.id}
+                  module={module}
+                  attentionProfile={ap}
+                />
+              ))}
+          </div>
+        </div>
+      );
+    });
+  }, [attentionProfiles, modules]);
+
+  // =====================================================
 
   return (
     <div className="flex flex-col items-center h-full w-full rounded-lg p-5">
       <h1 className="text-3xl font-bold">Perfiles de atención</h1>
       <div className="flex flex-col gap-y-2 w-full overflow-y-auto px-2">
-        {attentionProfiles.map((attentionProfile) => (
-          <div className="flex flex-col" key={attentionProfile.id}>
-            <Divider className="w-full" />
-            <div
-              key={attentionProfile.id}
-              className="flex flex-row items-center justify-between gap-x-2 w-full"
-            >
-              <span className="font-bold">{attentionProfile.name}</span>
-              <CountIndicatorTarget>
-                {
-                  shifts.filter(
-                    (shift) => shift.attentionProfile === attentionProfile.name
-                  ).length
-                }
-              </CountIndicatorTarget>
-            </div>
-            <Divider className="w-full" />
-            <div className="flex flex-col">
-              {modules
-                .filter(
-                  (module) => module.attentionProfileId === attentionProfile.id
-                )
-                .map((module) => (
-                  <ModuleLiveInfo
-                    key={module.id}
-                    module={module}
-                    attentionProfile={attentionProfile}
-                  />
-                ))}
-            </div>
-          </div>
-        ))}
+        {renderModules()}
       </div>
     </div>
   );
@@ -120,10 +163,40 @@ const ModuleLiveInfo: React.FC<{
 }> = ({ module, attentionProfile }) => {
   const { shifts } = useReceptorShifts();
   const [currentModule, setCurrentModule] = React.useState<Module>(module);
+  const [attendant, setAttendant] = React.useState<Attendant | undefined>(
+    undefined
+  );
 
   // =====================================================
 
   const echo = useEcho();
+  const { attendants } = useAttendantResource();
+
+  // =====================================================
+  useEffect(() => {
+    setAttendant(
+      attendants.find((attendant) => attendant.id === module.currentAttendantId)
+    );
+  }, [attendants, module.currentAttendantId]);
+
+  // =====================================================
+
+  useEffect(() => {
+    echo
+      .channel(`attendants.${attendant?.id}`)
+      .listen(
+        ".attendant.updated",
+        (event: { attendant: AttendantResponse }) => {
+          const attendant = attendantResponseToAttendant(event.attendant);
+          setAttendant(attendant);
+        }
+      );
+    return () => {
+      if (attendant) {
+        echo.leaveChannel(`attendants.${attendant.id}`);
+      }
+    };
+  }, [attendant]);
 
   // =====================================================
 
@@ -136,6 +209,26 @@ const ModuleLiveInfo: React.FC<{
       });
   }, [echo, module]);
 
+  // =====================================================
+
+  const renderAttendantStatus = useCallback(() => {
+    switch (attendant?.status) {
+      case "offline": {
+        return <FontAwesomeIcon icon={faPerson} color="gray" />;
+      }
+      case "free": {
+        return <FontAwesomeIcon icon={faPerson} color="green" />;
+      }
+      case "busy": {
+        return <FontAwesomeIcon icon={faPerson} color="blue" />;
+      }
+      case "absent": {
+        return <FontAwesomeIcon icon={faPerson} color="orange" />;
+      }
+    }
+  }, [attendant?.status]);
+
+  // =====================================================
   return (
     <div
       key={module.id}
@@ -146,13 +239,15 @@ const ModuleLiveInfo: React.FC<{
         color={currentModule.status === "offline" ? "red" : "green"}
       />
       <span>{currentModule.name}</span>
+      {renderAttendantStatus()}
       <div className="flex-grow"></div>
       <CountIndicatorTarget>
         {
           shifts.filter((shift) => {
             return (
               shift.module === currentModule.name &&
-              module.attentionProfileId === attentionProfile.id
+              module.attentionProfileId === attentionProfile.id &&
+              shift.state === "qualified"
             );
           }).length
         }

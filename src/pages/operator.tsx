@@ -8,7 +8,6 @@ import DefaultLayout from "@/layouts/default";
 import AbsenceProvider from "@/providers/absence-provider";
 import styled from "styled-components";
 
-
 const OperatorPage: React.FC = () => {
   const { currentShift } = useModuleShifts();
   return (
@@ -26,7 +25,6 @@ const OperatorPage: React.FC = () => {
                 </div>
               )}
               <div className="h-full">
-
                 <WaitingClients />
               </div>
             </div>
@@ -44,7 +42,6 @@ const OperatorPage: React.FC = () => {
           </div>
         </GridContainer>
       </AbsenceProvider>
-
     </DefaultLayout>
   );
 };
@@ -54,9 +51,7 @@ const GridContainer = styled.div`
   padding: 20px;
   .col-span-1 {
     border-radius: 10px;
-
   }
-  
 `;
 
 export default OperatorPage;

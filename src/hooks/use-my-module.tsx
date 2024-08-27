@@ -269,7 +269,6 @@ export const MyModuleProvider: React.FC<{
   };
 
   // ==================================================================
-  console.log(myModule?.enabled);
 
   return (
     <MyModuleContext.Provider

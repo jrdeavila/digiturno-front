@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { AttentionProfile } from "./use-http-attention-profile-service";
-import useHttpShiftService, { Shift, ShiftResponse, shiftResponseToModel } from "./use-http-shifts-service";
+import useHttpShiftService, {
+  Shift,
+  ShiftResponse,
+  shiftResponseToModel,
+} from "./use-http-shifts-service";
 import useEcho from "./use-echo";
 import useMyModule from "../use-my-module";
 import { toast } from "react-toastify";
@@ -29,14 +33,30 @@ interface ModuleShiftCtxProps {
   onTransfer: () => void;
   setServices?: (services: Service[]) => void;
   services: Service[];
+  moveToUpShift: (shift: Shift) => void;
 }
 
-const ModuleShiftContext = createContext<ModuleShiftCtxProps | undefined>(
-  undefined
-);
+const ModuleShiftContext = createContext<ModuleShiftCtxProps>({
+  shifts: [],
+  distractedShifts: [],
+  sendToDistracted: async () => {},
+  sendToWaiting: async () => {},
+  callClient: async () => {},
+  attendClient: async () => {},
+  completeShift: async () => {},
+  transferShift: async () => {},
+  qualifyShift: async () => {},
+  cancelTransfer: () => {},
+  moveToUpShift: async () => {},
+  onTransfer: () => {},
+  services: [],
+});
 
-
-export const ModuleShiftProvider = ({ children }: { children: React.ReactNode }) => {
+export const ModuleShiftProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [currentShift, setCurrentShift] = useState<Shift | undefined>();
   const [distractedShifts, setDistractedShifts] = useState<Shift[]>([]);
@@ -82,46 +102,52 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
     // ======================================== ROOM CHANNEL ========================================
     // ======================================== ONLY DISTRACTED ========================================
 
-    echo.channel(roomShiftChannelName).listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
-      const shift = shiftResponseToModel(data.shift);
-      setDistractedShifts((prevShifts) => {
-        if (!prevShifts.find((s) => s.id === shift.id)) {
-          return [shift, ...prevShifts];
-        }
-        return prevShifts;
+    echo
+      .channel(roomShiftChannelName)
+      .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
+        setDistractedShifts((prevShifts) => {
+          if (!prevShifts.find((s) => s.id === shift.id)) {
+            return [shift, ...prevShifts];
+          }
+          return prevShifts;
+        });
+
+        setShifts((prevShifts) => prevShifts.filter((s) => s.id !== shift.id));
       });
 
-      setShifts((prevShifts) =>
-        prevShifts.filter((s) => s.id !== shift.id)
-      );
+    echo
+      .channel(roomShiftChannelName)
+      .listen(".shift.pending", (data: { shift: ShiftResponse }) => {
+        const shift = shiftResponseToModel(data.shift);
+        setDistractedShifts((prevShifts) =>
+          prevShifts.filter((s) => s.id !== shift.id)
+        );
+      });
 
-    });
-
-    echo.channel(roomShiftChannelName).listen(".shift.pending", (data: { shift: ShiftResponse }) => {
-      const shift = shiftResponseToModel(data.shift);
-      setDistractedShifts((prevShifts) =>
-        prevShifts.filter((s) => s.id !== shift.id)
-      );
-
-    });
-
-    echo.channel(roomShiftChannelName).listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
-      setDistractedShifts((prevShifts) =>
-        prevShifts.filter((shift) => shift.id !== data.shift.id)
-      );
-    });
-
-
+    echo
+      .channel(roomShiftChannelName)
+      .listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
+        setDistractedShifts((prevShifts) =>
+          prevShifts.filter((shift) => shift.id !== data.shift.id)
+        );
+      });
 
     // ======================================== MODULE CHANNEL ========================================
 
-    echo.
-      channel(myModuleShiftChannelName)
+    echo
+      .channel(myModuleShiftChannelName)
+      .listen(".shift.created", (event: { shift: ShiftResponse }) => {
+        const newShift = shiftResponseToModel(event.shift);
+        setShifts((prevShifts) => orderByPreferential(prevShifts, newShift));
+        setServices([]);
+      });
+
+    echo
+      .channel(myModuleShiftChannelName)
       .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
-        setShifts((prevShifts) =>
-          prevShifts.filter((s) => s.id !== shift.id)
-        );
+        setShifts((prevShifts) => prevShifts.filter((s) => s.id !== shift.id));
       });
 
     echo
@@ -130,7 +156,6 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
         const shift = shiftResponseToModel(data.shift);
         setShifts((prevShifts) => orderByPreferential(prevShifts, shift));
       });
-
 
     echo
       .channel(myModuleShiftChannelName)
@@ -154,12 +179,13 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
-    echo.channel(myModuleShiftChannelName).listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
-      setShifts((prevShifts) =>
-        prevShifts.filter((shift) => shift.id !== data.shift.id)
-      );
-    });
-
+    echo
+      .channel(myModuleShiftChannelName)
+      .listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
+        setShifts((prevShifts) =>
+          prevShifts.filter((shift) => shift.id !== data.shift.id)
+        );
+      });
 
     // ======================================== CURRENT SHIFT CHANNEL ========================================
 
@@ -214,7 +240,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
     (error) => {
       console.error(error);
     },
-    () => { },
+    () => {},
     [myModule]
   );
 
@@ -229,16 +255,18 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
     (error) => {
       console.log(error);
     },
-    () => { },
+    () => {},
     [myModule]
   );
 
   useAsync<Shift[]>(
     async () => {
       if (!myModule) return [];
-      return shiftService.getDistractedShifts(myModule!.room.id,
+      return shiftService.getDistractedShifts(
+        myModule!.room.id,
         myModule!.moduleTypeId,
-        myModule!.ipAddress);
+        myModule!.ipAddress
+      );
     },
     (shifts) => {
       setDistractedShifts(shifts);
@@ -246,7 +274,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
     (error) => {
       console.error(error);
     },
-    () => { },
+    () => {},
     [myModule]
   );
 
@@ -264,12 +292,17 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
 
   const callClient = async (shift: Shift) => {
     await shiftService.callClient(shift.id, myModule!.ipAddress);
+    setServices([]);
     toast("Cliente llamado");
   };
 
   const attendClient = async (shift: Shift) => {
     if (!myModule) return;
-    await shiftService.attendClient(shift.id, myModule!.id, myModule!.ipAddress);
+    await shiftService.attendClient(
+      shift.id,
+      myModule!.id,
+      myModule!.ipAddress
+    );
     setServices([]);
   };
 
@@ -300,7 +333,6 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
     qualification: number,
     attentionProfile: AttentionProfile
   ) => {
-
     await shiftService.transferredShift(
       shift.id,
       qualification,
@@ -313,13 +345,25 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
   };
 
   const qualifyShift = async (shift: Shift, qualification: number) => {
-    await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
+    await shiftService.qualifiedShift(
+      shift.id,
+      qualification,
+      myModule!.ipAddress
+    );
     setOnQualifying(false);
     setServices([]);
   };
 
-
-
+  const moveToUpShift = async (shift: Shift) => {
+    const shiftIndex = shifts.findIndex((s) => s.id === shift.id);
+    if (shiftIndex === 0) return;
+    // Move the shift to the previous index
+    const newShifts = [...shifts];
+    const temp = newShifts[shiftIndex];
+    newShifts[shiftIndex] = newShifts[shiftIndex - 1];
+    newShifts[shiftIndex - 1] = temp;
+    setShifts(newShifts);
+  };
 
   // ==============================================================================
 
@@ -340,6 +384,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
         onTransfer,
         setServices: (services) => setServices(services),
         services,
+        moveToUpShift,
       }}
     >
       {children}
@@ -347,9 +392,7 @@ export const ModuleShiftProvider = ({ children }: { children: React.ReactNode })
       {onTransferring && <TransferShiftModal />}
     </ModuleShiftContext.Provider>
   );
-
 };
-
 
 const TransferShiftModal: React.FC = () => {
   const { cancelTransfer, transferShift, currentShift } = useModuleShifts();
@@ -359,8 +402,11 @@ const TransferShiftModal: React.FC = () => {
     <ModalContainer>
       {attentionProfile ? (
         <WaitingClientQualification
-          onQualified={(qualification) => {
-            transferShift(currentShift!, qualification, attentionProfile);
+          onQualified={async (qualification) => {
+            await transferShift(currentShift!, qualification, attentionProfile);
+          }}
+          onError={() => {
+            cancelTransfer();
           }}
         />
       ) : (
@@ -380,7 +426,7 @@ const WaitingQualificationModal: React.FC = () => {
   return (
     <ModalContainer>
       <WaitingClientQualification
-        onQualified={(qualification) => {
+        onQualified={async (qualification) => {
           qualifyShift(currentShift!, qualification);
         }}
       />
@@ -415,7 +461,6 @@ const ModalContainer = styled.div`
     animation: ${transitionKeyframes} 0.3s;
   }
 `;
-
 
 export default function useModuleShifts() {
   const context = useContext(ModuleShiftContext);

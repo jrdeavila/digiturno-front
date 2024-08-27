@@ -26,14 +26,14 @@ export const CreateShiftContext = React.createContext<{
 }>({
   client: undefined,
   services: undefined,
-  setClient: () => { },
-  setServices: () => { },
-  createShift: () => { },
-  setDniSearched: () => { },
-  setQualification: () => { },
-  startQualification: () => { },
-  setAttentionProfile: () => { },
-  createShiftWithAttentionProfile: () => { },
+  setClient: () => {},
+  setServices: () => {},
+  createShift: () => {},
+  setDniSearched: () => {},
+  setQualification: () => {},
+  startQualification: () => {},
+  setAttentionProfile: () => {},
+  createShiftWithAttentionProfile: () => {},
 });
 
 export const useCreateShift = () => useContext(CreateShiftContext);
@@ -47,7 +47,9 @@ const CreateShiftProvider: React.FC<{
   const [dniSearched, setDniSearched] = useState("");
   const [isQualifying, setIsQualifying] = useState(false);
   const [qualification, setQualification] = useState(0);
-  const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
+  const [attentionProfile, setAttentionProfile] = useState<
+    AttentionProfile | undefined
+  >(undefined);
 
   const shiftService = useHttpShiftService();
 
@@ -84,24 +86,26 @@ const CreateShiftProvider: React.FC<{
       return;
     }
 
-
-    await shiftService.createShiftWithAttentionProfile({
-      room_id: myModule!.room.id,
-      client: {
-        dni: client!.dni,
-        name: client!.name,
-        client_type_id: clientTypes.filter(
-          (clientType) => clientType.slug === client!.clientType
-        )[0].id,
+    await shiftService.createShiftWithAttentionProfile(
+      {
+        room_id: myModule!.room.id,
+        client: {
+          dni: client!.dni,
+          name: client!.name,
+          client_type_id: clientTypes.filter(
+            (clientType) => clientType.slug === client!.clientType
+          )[0].id,
+        },
+        attention_profile_id: attentionProfile!.id,
+        state: "pending",
       },
-      attention_profile_id: attentionProfile!.id,
-      state: "pending",
-    }, myModule!.ipAddress);
+      myModule!.ipAddress
+    );
 
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
     refreshClients();
-  }
+  };
 
   const handleCreateShift = async () => {
     if (services === undefined && services!.length == 0) {
@@ -112,21 +116,28 @@ const CreateShiftProvider: React.FC<{
       alert("Debe seleccionar un cliente");
       return;
     }
-    const shift = await shiftService.createShift({
-      room_id: myModule!.room.id,
-      client: {
-        dni: client!.dni,
-        name: client!.name,
-        client_type_id: clientTypes.filter(
-          (clientType) => clientType.slug === client!.clientType
-        )[0].id,
+    const shift = await shiftService.createShift(
+      {
+        room_id: myModule!.room.id,
+        client: {
+          dni: client!.dni,
+          name: client!.name,
+          client_type_id: clientTypes.filter(
+            (clientType) => clientType.slug === client!.clientType
+          )[0].id,
+        },
+        services: services!.map((service) => service.id),
+        state: "pending",
       },
-      services: services!.map((service) => service.id),
-      state: "pending",
-    }, myModule!.ipAddress);
+      myModule!.ipAddress
+    );
 
-    await shiftService.qualifiedShift(shift.id, qualification, myModule!.ipAddress);
-    setServices([])
+    await shiftService.qualifiedShift(
+      shift.id,
+      qualification,
+      myModule!.ipAddress
+    );
+    setServices([]);
     setClient(undefined);
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
@@ -163,7 +174,7 @@ const CreateShiftProvider: React.FC<{
 
   const handleSetAttention = (attentionProfile: AttentionProfile) => {
     setAttentionProfile(attentionProfile);
-  }
+  };
 
   // ==============================================================================
 
@@ -206,9 +217,16 @@ const CreateShiftProvider: React.FC<{
         <ModalContent>
           {(onClose) => (
             <WaitingClientQualification
-              onQualified={(qualification: number) => {
+              onQualified={async (qualification: number) => {
                 setQualification(qualification);
-                handleCreateShift();
+                await handleCreateShift();
+                onClose();
+              }}
+              onError={() => {
+                setIsQualifying(false);
+                setServices([]);
+                setClient(undefined);
+                setQualification(0);
                 onClose();
               }}
             />

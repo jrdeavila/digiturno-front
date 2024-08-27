@@ -16,6 +16,7 @@ export interface ModuleResponse {
   enabled: boolean;
   attention_profile_id: number;
   module_type_id: number;
+  current_attendant_id: number;
 }
 
 export class Module {
@@ -28,6 +29,7 @@ export class Module {
   enabled: boolean;
   attentionProfileId: number;
   moduleTypeId: number;
+  currentAttendantId: number;
 
   constructor(
     id: number,
@@ -38,7 +40,8 @@ export class Module {
     status: string,
     enabled: boolean,
     attentionProfileId: number,
-    module_type_id: number
+    module_type_id: number,
+    current_attendant_id: number
   ) {
     this.id = id;
     this.name = name;
@@ -49,10 +52,13 @@ export class Module {
     this.enabled = enabled;
     this.attentionProfileId = attentionProfileId;
     this.moduleTypeId = module_type_id;
+    this.currentAttendantId = current_attendant_id;
   }
 }
 
-export const moduleResponseToModule = (moduleResponse: ModuleResponse): Module => {
+export const moduleResponseToModule = (
+  moduleResponse: ModuleResponse
+): Module => {
   return new Module(
     moduleResponse.id,
     moduleResponse.name,
@@ -62,9 +68,10 @@ export const moduleResponseToModule = (moduleResponse: ModuleResponse): Module =
     moduleResponse.status,
     moduleResponse.enabled,
     moduleResponse.attention_profile_id,
-    moduleResponse.module_type_id
+    moduleResponse.module_type_id,
+    moduleResponse.current_attendant_id
   );
-}
+};
 
 class HttpModuleService {
   private static instance: HttpModuleService;
@@ -89,8 +96,8 @@ class HttpModuleService {
         ip_address: ipAddress,
       },
       headers: {
-        'X-Module-Ip': ipAddress
-      }
+        "X-Module-Ip": ipAddress,
+      },
     });
     return new Module(
       response.data.data.id,
@@ -101,7 +108,8 @@ class HttpModuleService {
       response.data.data.status,
       response.data.data.enabled,
       response.data.data.attention_profile_id,
-      response.data.data.module_type_id
+      response.data.data.module_type_id,
+      response.data.data.current_attendant_id
     );
   }
 
@@ -110,8 +118,8 @@ class HttpModuleService {
       data: ModuleResponse[];
     }>("/modules", {
       headers: {
-        'X-Module-Ip': ipAddress
-      }
+        "X-Module-Ip": ipAddress,
+      },
     });
     return response.data.data.map(moduleResponseToModule);
   }

@@ -38,25 +38,43 @@ const useHttpClient = () => {
       password_invalid: "Contraseña inválida",
       invalid_credentials: "Contraseña o correo incorrectos",
       expired_token: "La sesión ha expirado",
-    }
-    if (statusCode !== 422 && statusCode !== 403 && statusCode !== 401 && statusCode !== 400) {
+      no_available_module: "No hay módulos disponibles",
+      "module-already-in-progress": "El módulo ya esta siendo atendido",
+      shift_in_progress_cannot_be_deleted: "El turno ya esta siendo atendido",
+      attendant_already_busy: "El funcionario tiene un turno en progreso",
+    };
+    if (
+      statusCode !== 422 &&
+      statusCode !== 403 &&
+      statusCode !== 401 &&
+      statusCode !== 400
+    ) {
       showError(statusCode);
       return;
     }
-    if (statusCode === 403 || statusCode === 401) {
-      toast.error(errorMessageMapping[errors.message] || `${statusCode}: Error desconocido`, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+    if (statusCode === 403 || statusCode === 401 || statusCode === 400) {
+      toast.error(
+        errorMessageMapping[errors.message] ||
+          `${statusCode}: Error desconocido`,
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
       return;
-
     }
-    const messages = Object.values(errors).map((values: any) => values.map((e: any) => errorMessageMapping[e] || "422: Error desconocido")).join(", ");
+    const messages = Object.values(errors)
+      .map((values: any) =>
+        values.map(
+          (e: any) => errorMessageMapping[e] || "422: Error desconocido"
+        )
+      )
+      .join(", ");
     toast.error(messages, {
       position: "top-right",
       autoClose: 5000,
@@ -66,7 +84,6 @@ const useHttpClient = () => {
       draggable: true,
       progress: undefined,
     });
-
   };
 
   httpClient.interceptors.request.use((config) => {
