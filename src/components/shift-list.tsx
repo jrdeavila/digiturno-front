@@ -25,7 +25,13 @@ import { useCallback, useEffect, useState } from "react";
 import TimeClockAnimation from "./time-clock-animation";
 
 const ShiftList = () => {
-  const { shifts, cancelShift } = useReceptorShifts();
+  const {
+    shifts,
+    cancelShift,
+    transferToAnotherRoom,
+    transferToAnotherModule,
+    modifyShift,
+  } = useReceptorShifts();
   const [filterShifts, setFilterShifts] = useState<Shift[]>([]);
 
   useEffect(() => {
@@ -201,19 +207,19 @@ const ShiftList = () => {
                     },
                     {
                       label: "Transferir a otra sala",
-                      onClick: () => {},
+                      onClick: () => transferToAnotherRoom(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
                     },
                     {
                       label: "Transferir a otro módulo",
-                      onClick: () => {},
+                      onClick: () => transferToAnotherModule(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
                     },
                     {
                       label: "Modificar",
-                      onClick: () => {},
+                      onClick: () => modifyShift(shift),
                       icon: faCog,
                       color: "text-orange-500",
                     },

@@ -82,50 +82,6 @@ const AttentionProfileShiftInfo = () => {
     return attentionProfiles.map((ap) => {
       return (
         <div className="flex flex-col" key={ap.id}>
-          <div className="flex flex-row justify-between">
-            <div>
-              <FontAwesomeIcon icon={faDesktop} color="red" className="mr-1" />
-              <span className="text-sm text-gray-500">Modulo Inactivo</span>
-            </div>
-            <div>
-              <FontAwesomeIcon
-                icon={faDesktop}
-                color="green"
-                className="mr-1"
-              />
-              <span className="text-sm text-gray-500">Modulo Activo</span>
-            </div>
-          </div>
-          <Divider className="w-full" />
-          <div className="flex flex-row justify-between">
-            <div>
-              <FontAwesomeIcon icon={faPerson} color="red" className="mr-1" />
-              <span className="text-sm text-gray-500">
-                Funcionario Inactivo
-              </span>
-            </div>
-            <div>
-              <FontAwesomeIcon icon={faPerson} color="green" className="mr-1" />
-              <span className="text-sm text-gray-500">
-                Funcionario disponible
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-row justify-between">
-            <div>
-              <FontAwesomeIcon icon={faPerson} color="blue" className="mr-1" />
-              <span className="text-sm text-gray-500">Funcionario ocupado</span>
-            </div>
-            <div>
-              <FontAwesomeIcon
-                icon={faPerson}
-                color="orange"
-                className="mr-1"
-              />
-              <span className="text-sm text-gray-500">Funcionario ausente</span>
-            </div>
-          </div>
-          <Divider className="w-full" />
           <div className="flex flex-row items-center justify-center gap-x-2 w-full">
             <span className="font-bold">{ap.name}</span>
           </div>
@@ -151,6 +107,40 @@ const AttentionProfileShiftInfo = () => {
     <div className="flex flex-col items-center h-full w-full rounded-lg p-5">
       <h1 className="text-3xl font-bold">Perfiles de atención</h1>
       <div className="flex flex-col gap-y-2 w-full overflow-y-auto px-2">
+        <div className="flex flex-row justify-between">
+          <div>
+            <FontAwesomeIcon icon={faDesktop} color="red" className="mr-1" />
+            <span className="text-sm text-gray-500">Modulo Inactivo</span>
+          </div>
+          <div>
+            <FontAwesomeIcon icon={faDesktop} color="green" className="mr-1" />
+            <span className="text-sm text-gray-500">Modulo Activo</span>
+          </div>
+        </div>
+        <Divider className="w-full" />
+        <div className="flex flex-row justify-between">
+          <div>
+            <FontAwesomeIcon icon={faPerson} color="red" className="mr-1" />
+            <span className="text-sm text-gray-500">Funcionario Inactivo</span>
+          </div>
+          <div>
+            <FontAwesomeIcon icon={faPerson} color="green" className="mr-1" />
+            <span className="text-sm text-gray-500">
+              Funcionario disponible
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-row justify-between">
+          <div>
+            <FontAwesomeIcon icon={faPerson} color="blue" className="mr-1" />
+            <span className="text-sm text-gray-500">Funcionario ocupado</span>
+          </div>
+          <div>
+            <FontAwesomeIcon icon={faPerson} color="orange" className="mr-1" />
+            <span className="text-sm text-gray-500">Funcionario ausente</span>
+          </div>
+        </div>
+        <Divider className="w-full" />
         {renderModules()}
       </div>
     </div>
