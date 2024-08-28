@@ -204,40 +204,46 @@ const ShiftList = () => {
                       onClick: () => cancelShift(shift),
                       icon: faCancel,
                       color: "text-red-500",
+                      enabled: true,
                     },
                     {
                       label: "Transferir a otra sala",
                       onClick: () => transferToAnotherRoom(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
+                      enabled: false,
                     },
                     {
                       label: "Transferir a otro módulo",
                       onClick: () => transferToAnotherModule(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
+                      enabled: false,
                     },
                     {
                       label: "Modificar",
                       onClick: () => modifyShift(shift),
                       icon: faCog,
                       color: "text-orange-500",
+                      enabled: true,
                     },
-                  ].map((action) => (
-                    <div
-                      key={action.label}
-                      onClick={action.onClick}
-                      className="w-full hover:bg-gray-300 rounded-lg px-4 py-3 cursor-pointer select-none"
-                    >
-                      <div className="flex flex-row gap-x-1 items-center w-full">
-                        <FontAwesomeIcon
-                          icon={action.icon}
-                          className={action.color}
-                        />
-                        <span className={action.color}>{action.label}</span>
+                  ]
+                    .filter((action) => action.enabled)
+                    .map((action) => (
+                      <div
+                        key={action.label}
+                        onClick={action.onClick}
+                        className="w-full hover:bg-gray-300 rounded-lg px-4 py-3 cursor-pointer select-none"
+                      >
+                        <div className="flex flex-row gap-x-1 items-center w-full">
+                          <FontAwesomeIcon
+                            icon={action.icon}
+                            className={action.color}
+                          />
+                          <span className={action.color}>{action.label}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </PopoverContent>
             </Popover>
