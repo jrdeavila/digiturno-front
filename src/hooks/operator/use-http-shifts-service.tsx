@@ -28,7 +28,22 @@ export interface ShiftResponse {
   state: string;
   created_at: string;
   updated_at: string;
-  module?: string;
+  module: string;
+  room_id: number;
+  attention_profile_id: number;
+  module_id: number;
+}
+
+export interface ShiftRequest {
+  room_id: number;
+  attention_profile_id: number;
+  client: {
+    dni: string;
+    name: string;
+    client_type_id: number;
+  };
+  state: string;
+  module_id?: number;
 }
 
 export class Client {
@@ -56,22 +71,28 @@ export class Client {
 export class Shift {
   id: number;
   room: string;
+  roomId: number;
+  attentionProfileId: number;
   attentionProfile: string;
   client: Client;
   module: string | undefined;
   state: string;
+  moduleId: number;
   createdAt: string;
   updatedAt: string;
 
   constructor(
     id: number,
     room: string,
+    room_id: number,
+    attention_profile_id: number,
     attentionProfile: string,
     client: Client,
     state: string,
     createdAt: string,
     updatedAt: string,
-    module: string | undefined,
+    module: string,
+    moduleId: number
   ) {
     this.id = id;
     this.room = room;
@@ -81,6 +102,9 @@ export class Shift {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.module = module;
+    this.roomId = room_id;
+    this.attentionProfileId = attention_profile_id;
+    this.moduleId = moduleId;
   }
 }
 
@@ -95,17 +119,33 @@ export const shiftResponseToModel = (shiftResponse: ShiftResponse): Shift => {
   return new Shift(
     shiftResponse.id,
     shiftResponse.room,
+    shiftResponse.room_id,
+    shiftResponse.attention_profile_id,
     shiftResponse.attention_profile,
     client,
     shiftResponse.state,
     shiftResponse.created_at,
     shiftResponse.updated_at,
     shiftResponse.module,
+    shiftResponse.module_id
   );
 };
 
-class HttpShiftService {
+const shiftToRequest = (shift: Shift): ShiftRequest => {
+  return {
+    room_id: shift.roomId,
+    attention_profile_id: shift.attentionProfileId,
+    client: {
+      dni: shift.client.dni,
+      name: shift.client.name,
+      client_type_id: 1,
+    },
+    state: shift.state,
+    module_id: shift.moduleId,
+  };
+};
 
+class HttpShiftService {
   private static instance: HttpShiftService;
   private httpClient: AxiosInstance;
 
@@ -122,29 +162,38 @@ class HttpShiftService {
 
   public async getShiftsByRoom(
     roomId: number,
-    ipAddress: string,
+    ipAddress: string
   ): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
     }>(`/rooms/${roomId}/shifts`, {
       headers: {
-        "X-Module-Ip": ipAddress
-      }
+        "X-Module-Ip": ipAddress,
+      },
     });
     return response.data.data.map((shift) => {
-      return shiftResponseToModel(
-        shift
-      );
+      return shiftResponseToModel(shift);
     });
   }
 
-  async createShiftWithAttentionProfile(arg0: { room_id: number; client: { dni: string; name: string; client_type_id: number; }; state: string; attention_profile_id: number; }, ipAddress: string): Promise<Shift> {
-
-    const response = await this.httpClient.post<{ data: ShiftResponse }>("/shifts/with-attention-profile", arg0, {
-      headers: {
-        "X-Module-Ip": ipAddress
+  async createShiftWithAttentionProfile(
+    arg0: {
+      room_id: number;
+      client: { dni: string; name: string; client_type_id: number };
+      state: string;
+      attention_profile_id: number;
+    },
+    ipAddress: string
+  ): Promise<Shift> {
+    const response = await this.httpClient.post<{ data: ShiftResponse }>(
+      "/shifts/with-attention-profile",
+      arg0,
+      {
+        headers: {
+          "X-Module-Ip": ipAddress,
+        },
       }
-    });
+    );
     return shiftResponseToModel(response.data.data);
   }
 
@@ -153,35 +202,50 @@ class HttpShiftService {
       data: ShiftResponse[];
     }>(`/rooms/${id}/shifts`, {
       headers: {
-        "X-Module-Ip": moduleIp
-      }
+        "X-Module-Ip": moduleIp,
+      },
     });
     return response.data.data.map((shift) => {
-      return shiftResponseToModel(shift)
+      return shiftResponseToModel(shift);
     });
   }
-  async getDistractedShiftsByModule(id: number, moduleIp: string): Promise<Shift[]> {
+  async getDistractedShiftsByModule(
+    id: number,
+    moduleIp: string
+  ): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
     }>(`/rooms/${id}/shifts/distracted`, {
       headers: {
-        'X-Module-Ip': moduleIp
-      }
+        "X-Module-Ip": moduleIp,
+      },
     });
     return response.data.data.map((shift) => {
-      return shiftResponseToModel(shift)
+      return shiftResponseToModel(shift);
     });
   }
 
-  async getShifts(
-    moduleIp: string,
-  ): Promise<Shift[]> {
+  async updateShift(shift: Shift, moduleIp: string) {
+    const data = shiftToRequest(shift);
+    const response = await this.httpClient.put<{ data: ShiftResponse }>(
+      `/shifts/${shift.id}/with-attention-profile`,
+      data,
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
+      }
+    );
+    return shiftResponseToModel(response.data.data);
+  }
+
+  async getShifts(moduleIp: string): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
     }>(`/modules/shifts`, {
       headers: {
-        "X-Module-Ip": moduleIp
-      }
+        "X-Module-Ip": moduleIp,
+      },
     });
     const shifts = response.data.data.map((shift) => {
       return shiftResponseToModel(shift);
@@ -192,19 +256,20 @@ class HttpShiftService {
   async getDistractedShifts(
     roomId: number,
     attentionProfileId: number,
-    moduleIp: string,
+    moduleIp: string
   ): Promise<Shift[]> {
     const response = await this.httpClient.get<{
       data: ShiftResponse[];
     }>(
-      `/rooms/${roomId}/attention_profiles/${attentionProfileId}/shifts/distracted`, {
-      headers: {
-        "X-Module-Ip": moduleIp
+      `/rooms/${roomId}/attention_profiles/${attentionProfileId}/shifts/distracted`,
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    }
     );
     const shifts = response.data.data.map((shift) => {
-      return shiftResponseToModel(shift)
+      return shiftResponseToModel(shift);
     });
     return shifts;
   }
@@ -212,35 +277,51 @@ class HttpShiftService {
   async completeShift(shiftId: number, moduleIp: string): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/completed`, {}, {
-      headers: {
-        "X-Module-Ip": moduleIp
+    }>(
+      `/shifts/${shiftId}/completed`,
+      {},
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
-    return shiftResponseToModel(res.data.data)
+    return shiftResponseToModel(res.data.data);
   }
 
   async sendToDistracted(shiftId: number, moduleIp: string): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/distracted`, {}, {
-      headers: {
-        "X-Module-Ip": moduleIp
+    }>(
+      `/shifts/${shiftId}/distracted`,
+      {},
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
-    return shiftResponseToModel(res.data.data)
+    return shiftResponseToModel(res.data.data);
   }
 
-  async qualifiedShift(shiftId: number, qualification: number, moduleIp: string): Promise<Shift> {
+  async qualifiedShift(
+    shiftId: number,
+    qualification: number,
+    moduleIp: string
+  ): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/qualified`, { qualification }, {
-      headers: {
-        "X-Module-Ip": moduleIp
+    }>(
+      `/shifts/${shiftId}/qualified`,
+      { qualification },
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
     return shiftResponseToModel(res.data.data);
   }
@@ -253,68 +334,88 @@ class HttpShiftService {
   ): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/transfer`, {
-      qualification,
-      attention_profile_id: attentionProfileId,
-    }, {
-      headers: {
-        "X-Module-Ip": moduleIp
+    }>(
+      `/shifts/${shiftId}/transfer`,
+      {
+        qualification,
+        attention_profile_id: attentionProfileId,
+      },
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
-    return shiftResponseToModel(res.data.data)
-
+    return shiftResponseToModel(res.data.data);
   }
 
-  async callClient(shiftId: number,
-    moduleIp: string
-  ): Promise<Shift> {
+  async callClient(shiftId: number, moduleIp: string): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/call`, {}, {
-      headers: {
-        "X-Module-Ip": moduleIp
+    }>(
+      `/shifts/${shiftId}/call`,
+      {},
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
-    return shiftResponseToModel(res.data.data)
+    return shiftResponseToModel(res.data.data);
   }
 
   async sendToWaiting(shiftId: number, moduleIp: string): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/pending`, {}, {
-      headers: {
-        "X-Module-Ip": moduleIp
+    }>(
+      `/shifts/${shiftId}/pending`,
+      {},
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
-    return shiftResponseToModel(res.data.data)
+    return shiftResponseToModel(res.data.data);
   }
 
-  async attendClient(shiftId: number, moduleId: number, moduleIp: string): Promise<Shift> {
+  async attendClient(
+    shiftId: number,
+    moduleId: number,
+    moduleIp: string
+  ): Promise<Shift> {
     const res = await this.httpClient.put<{
       data: ShiftResponse;
-    }>(`/shifts/${shiftId}/in-progress`, {
-      module_id: moduleId,
-    }, {
-      headers: {
-        "X-Module-Ip": moduleIp,
+    }>(
+      `/shifts/${shiftId}/in-progress`,
+      {
+        module_id: moduleId,
+      },
+      {
+        headers: {
+          "X-Module-Ip": moduleIp,
+        },
       }
-    });
+    );
 
-    return shiftResponseToModel(res.data.data)
+    return shiftResponseToModel(res.data.data);
   }
 
-  public async createShift(request: CreateShiftRequest, moduleIp: string): Promise<Shift> {
+  public async createShift(
+    request: CreateShiftRequest,
+    moduleIp: string
+  ): Promise<Shift> {
     const response = await this.httpClient.post<{
       data: ShiftResponse;
     }>("/shifts", request, {
       headers: {
-        "X-Module-Ip": moduleIp
-      }
+        "X-Module-Ip": moduleIp,
+      },
     });
-    return shiftResponseToModel(response.data.data)
+    return shiftResponseToModel(response.data.data);
   }
 
   async getMyCurrentShift(moduleIp: string): Promise<Shift | undefined> {
@@ -322,24 +423,21 @@ class HttpShiftService {
       data: ShiftResponse | null;
     }>(`/modules/shifts/current`, {
       headers: {
-        "X-Module-Ip": moduleIp
-      }
+        "X-Module-Ip": moduleIp,
+      },
     });
     const shift = response.data.data;
     if (!shift) {
       return undefined;
     }
-    return shiftResponseToModel(
-      shift
-    )
-
+    return shiftResponseToModel(shift);
   }
 
   public async deleteShift(id: number, ipAddress: string): Promise<void> {
     await this.httpClient.delete(`/shifts/${id}`, {
       headers: {
-        "X-Module-Ip": ipAddress
-      }
+        "X-Module-Ip": ipAddress,
+      },
     });
   }
 }

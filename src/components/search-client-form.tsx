@@ -22,31 +22,6 @@ const SearchClientForm = () => {
 
   // ==================================================================================================================
 
-  const handleSearchClient = (
-    dni: string,
-    onFound: (values: {
-      dni: string;
-      name: string;
-      client_type_id: number;
-    }) => void
-  ) => {
-    const client = clients.find((client) => client.dni === dni);
-    if (client) {
-      setClient(client);
-      onFound({
-        dni: client.dni,
-        name: client.name,
-        client_type_id:
-          clientTypes.find((clientType) => clientType.slug == client.clientType)
-            ?.id || 0,
-      });
-    } else {
-      return;
-    }
-  };
-
-  // ==================================================================================================================
-
   const { handleChange, values, errors, handleSubmit, setValues, resetForm } =
     useFormik({
       initialValues: {
@@ -83,6 +58,38 @@ const SearchClientForm = () => {
         });
       },
     });
+
+  // ==================================================================================================================
+
+  const handleSearchClient = (
+    dni: string,
+    onFound: (values: {
+      dni: string;
+      name: string;
+      client_type_id: number;
+    }) => void
+  ) => {
+    const client = clients.find((client) => client.dni === dni);
+    if (client) {
+      setClient(client);
+      onFound({
+        dni: client.dni,
+        name: client.name,
+        client_type_id:
+          clientTypes.find((clientType) => clientType.slug == client.clientType)
+            ?.id || 0,
+      });
+      setValues({
+        dni: client.dni,
+        name: client.name,
+        client_type_id:
+          clientTypes.find((clientType) => clientType.slug == client.clientType)
+            ?.id || 1,
+      });
+    } else {
+      return;
+    }
+  };
 
   // ==================================================================================================================
 

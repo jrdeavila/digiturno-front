@@ -92,10 +92,7 @@ class HttpModuleService {
   async getMyModule(ipAddress: string): Promise<Module> {
     const response = await this.httpClient.get<{
       data: ModuleResponse;
-    }>("/modules/ip-address", {
-      params: {
-        ip_address: ipAddress,
-      },
+    }>("/modules/myself", {
       headers: {
         "X-Module-Ip": ipAddress,
       },
