@@ -128,6 +128,7 @@ const CreateShiftProvider: React.FC<{
         },
         services: services!.map((service) => service.id),
         state: "pending",
+        module_id: myModule!.id,
       },
       myModule!.ipAddress
     );

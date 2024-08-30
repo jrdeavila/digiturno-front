@@ -10,6 +10,7 @@ export interface CreateShiftRequest {
   };
   services: number[];
   state: string;
+  module_id: number;
 }
 
 export interface ClientResponse {
