@@ -147,6 +147,9 @@ export const ModuleShiftProvider = ({
       .channel(roomShiftChannelName)
       .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
+        if (currentShift?.id === shift.id) {
+          setCurrentShift(undefined);
+        }
         setShifts((prevShifts) => prevShifts.filter((s) => s.id !== shift.id));
       });
 
