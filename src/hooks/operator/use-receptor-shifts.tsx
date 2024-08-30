@@ -1,14 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import useAsync from "../use-async";
-import useMyModule from "../use-my-module";
-import useEcho from "./use-echo";
-import useHttpShiftService, {
-  Shift,
-  ShiftResponse,
-  shiftResponseToModel,
-} from "./use-http-shifts-service";
-import styled, { keyframes } from "styled-components";
+import { Room } from "@/services/room-service";
 import {
   Card,
   CardBody,
@@ -17,8 +7,20 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { Room } from "../use-module-service";
+import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import styled, { keyframes } from "styled-components";
+import useAsync from "../use-async";
+import useModule, { ModuleProvider } from "../use-module";
+import { Module } from "../use-module-service";
+import useMyModule from "../use-my-module";
 import useRoomService from "../use-room-service";
+import useEcho from "./use-echo";
+import useHttpShiftService, {
+  Shift,
+  ShiftResponse,
+  shiftResponseToModel,
+} from "./use-http-shifts-service";
 
 interface ReceptorShiftCtxProps {
   shifts: Shift[];
@@ -231,6 +233,39 @@ export const ReceptorShiftsProvider = ({
     setEditingModule(true);
   };
 
+  const handleChangeShiftName = async (name: string) => {
+    let shift: Shift = {
+      ...editingShift!,
+      client: {
+        ...editingShift!.client,
+        name,
+      },
+    };
+    shift = await shiftService.updateShift(shift, myModule!.ipAddress);
+    setShifts((prev) => prev.map((s) => (s.id === shift.id ? shift : s)));
+    toast.success("El turno ha sido modificado con éxito");
+  };
+
+  const handleChangeShiftRoom = async (room: Room) => {
+    const shift = {
+      ...editingShift!,
+      roomId: room.id,
+    };
+    await shiftService.updateShift(shift, myModule!.ipAddress);
+    setShifts((prev) => prev.filter((s) => s.id != editingShift?.id));
+    toast.success("El turno se ha enviado a otra sala");
+  };
+  const handleChangeShiftModule = async (module: Module) => {
+    let shift: Shift = {
+      ...editingShift!,
+      module: module.name,
+      moduleId: module.id,
+    };
+    shift = await shiftService.updateShift(shift, myModule!.ipAddress);
+
+    setShifts((prev) => prev.map((s) => (s.id === shift.id ? shift : s)));
+  };
+
   // ==============================================================================
 
   return (
@@ -252,9 +287,7 @@ export const ReceptorShiftsProvider = ({
             setEditingShift(null);
             setEditingName(false);
           }}
-          onUpdate={(name) => {
-            // Update the shift name
-          }}
+          onUpdate={handleChangeShiftName}
         />
       )}
       {editingShift && editingRoom && (
@@ -263,21 +296,19 @@ export const ReceptorShiftsProvider = ({
             setEditingShift(null);
             setEditingRoom(false);
           }}
-          onUpdate={(room) => {
-            // Update the shift room
-          }}
+          onUpdate={handleChangeShiftRoom}
         />
       )}
       {editingShift && editingModule && (
-        <EditModuleModal
-          onClose={() => {
-            setEditingShift(null);
-            setEditingModule(false);
-          }}
-          onUpdate={(module) => {
-            // Update the shift module
-          }}
-        />
+        <ModuleProvider>
+          <EditModuleModal
+            onClose={() => {
+              setEditingShift(null);
+              setEditingModule(false);
+            }}
+            onUpdate={handleChangeShiftModule}
+          />
+        </ModuleProvider>
       )}
     </ReceptorShiftsContext.Provider>
   );
@@ -360,15 +391,24 @@ const EditRoomModal: React.FC<{
   onClose: () => void;
   onUpdate: (room: Room) => void;
 }> = ({ onClose, onUpdate }) => {
-  const [room] = useState<Room | undefined>(undefined);
+  const [room, setRoom] = useState<Room | undefined>(undefined);
   const [rooms, setRooms] = useState<Room[]>([]);
   // =======================================================
+
   const roomService = useRoomService();
   // =======================================================
 
+  const { myModule } = useMyModule();
+
+  // =======================================================
+
   useAsync<Room[]>(
-    () => {
-      return roomService.getRooms();
+    async () => {
+      const rooms = await roomService.getRooms();
+      return rooms.filter(
+        (r) =>
+          r.sectionalId === myModule?.room.branch_id && r.id != myModule.room.id
+      );
     },
     (rooms) => {
       setRooms(rooms);
@@ -377,7 +417,7 @@ const EditRoomModal: React.FC<{
       console.error(error);
     },
     () => {},
-    []
+    [myModule?.room.branch_id, myModule?.room.id]
   );
 
   // =======================================================
@@ -388,7 +428,14 @@ const EditRoomModal: React.FC<{
           <h1>Editar sala</h1>
         </CardHeader>
         <CardBody>
-          <Select>
+          <Select
+            label="Sala"
+            name="room"
+            placeholder="Seleccione una sala"
+            onChange={(e) => {
+              setRoom(rooms.find((r) => r.id.toString() === e.target.value));
+            }}
+          >
             {rooms.map((room) => (
               <SelectItem key={room.id} value={room.id} textValue={room.name}>
                 {room.name}
@@ -419,11 +466,78 @@ const EditRoomModal: React.FC<{
   );
 };
 
-const EditModuleModal = () => {
+const EditModuleModal: React.FC<{
+  onClose: () => void;
+  onUpdate: (module: Module) => void;
+}> = ({ onClose, onUpdate }) => {
+  const [module, setModule] = useState<Module | undefined>(undefined);
+  const { modules, refreshModules } = useModule();
+  const [currentModules, setCurrentModules] = useState<Module[]>([]);
+  const { editingShift } = useReceptorShifts();
+
+  // ==============================================================
+  useEffect(() => {
+    refreshModules();
+  }, []);
+
+  useEffect(() => {
+    setCurrentModules(
+      modules.filter(
+        (m) =>
+          m.attentionProfileId == editingShift?.attentionProfileId &&
+          m.id != editingShift.moduleId &&
+          m.status === "online"
+      )
+    );
+  }, [editingShift?.attentionProfileId, editingShift?.moduleId, modules]);
+  // ==============================================================
+
   return (
     <ModalContainer>
       <StyledCard>
-        <h1>Editar módulo</h1>
+        <CardHeader>
+          <h1>Editar módulo</h1>
+        </CardHeader>
+        <CardBody>
+          <Select
+            label="Módulo"
+            name="module"
+            placeholder="Seleccione un módulo"
+            onChange={(e) => {
+              setModule(
+                modules.find((m) => m.id.toString() === e.target.value)
+              );
+            }}
+          >
+            {currentModules.map((module) => (
+              <SelectItem
+                key={module.id}
+                value={module.id}
+                textValue={module.name}
+              >
+                {module.name}
+              </SelectItem>
+            ))}
+          </Select>
+
+          <div className="flex flex-row gap-x-2">
+            <button
+              onClick={onClose}
+              className="w-full bg-red-500 text-white rounded-lg p-2 mt-2"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                module && onUpdate(module);
+                onClose();
+              }}
+              className="w-full bg-blue-500 text-white rounded-lg p-2 mt-2"
+            >
+              Guardar
+            </button>
+          </div>
+        </CardBody>
       </StyledCard>
     </ModalContainer>
   );

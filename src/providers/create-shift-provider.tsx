@@ -93,7 +93,7 @@ const CreateShiftProvider: React.FC<{
           dni: client!.dni,
           name: client!.name,
           client_type_id: clientTypes.filter(
-            (clientType) => clientType.slug === client!.clientType
+            (clientType) => clientType.slug === client?.clientType
           )[0].id,
         },
         attention_profile_id: attentionProfile!.id,
@@ -102,9 +102,9 @@ const CreateShiftProvider: React.FC<{
       myModule!.ipAddress
     );
 
+    await refreshClients();
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
-    refreshClients();
   };
 
   const handleCreateShift = async () => {
@@ -139,9 +139,9 @@ const CreateShiftProvider: React.FC<{
     );
     setServices([]);
     setClient(undefined);
+    await refreshClients();
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
-    refreshClients();
   };
 
   const clearShift = () => {
