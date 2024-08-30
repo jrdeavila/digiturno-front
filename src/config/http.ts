@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const host = "localhost";
+const host = "digiturnov2.ccvalledupar.org.co";
 
 const httpClient = axios.create({
-  baseURL: `http://${host}/api`,
+  baseURL: `https://${host}/api`,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
