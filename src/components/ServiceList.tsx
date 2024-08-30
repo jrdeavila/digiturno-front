@@ -1,15 +1,13 @@
+import useModuleShifts from "@/hooks/operator/use-module-shifts";
 import useMyModule from "@/hooks/use-my-module";
-import Service from "@/models/service";
+import AttentionProfile from "@/models/attention-profile";
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import { Switch } from "@nextui-org/react";
 import React, { useCallback, useEffect, useState } from "react";
 import "./GenericComponent";
 import GenericComponent from "./GenericComponent";
-import useModuleShifts from "@/hooks/operator/use-module-shifts";
-import AttentionProfile from "@/models/attention-profile";
-import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 
 const ServiceList: React.FC = () => {
-  const [currentServices, setCurrentServices] = useState<Service[]>([]);
   const [attentionProfile, setAttentionProfile] = useState<
     AttentionProfile | undefined
   >(undefined);
@@ -33,12 +31,6 @@ const ServiceList: React.FC = () => {
 
   // ==============================================================================
 
-  useEffect(() => {
-    if (currentServices.length != services.length) {
-      setServices && setServices(currentServices);
-    }
-  }, [currentServices, services]);
-
   // ==============================================================================
 
   const renderServices = useCallback(() => {
@@ -48,9 +40,10 @@ const ServiceList: React.FC = () => {
           isSelected={services?.some((s) => s.id === service.id)}
           onChange={(event) => {
             if (event.target.checked) {
-              setCurrentServices([...(services || []), service]);
+              setServices && setServices([...(services || []), service]);
             } else {
-              setCurrentServices(services?.filter((s) => s.id !== service.id));
+              setServices &&
+                setServices(services?.filter((s) => s.id !== service.id));
             }
           }}
         />
