@@ -1,3 +1,4 @@
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import { Room } from "@/services/room-service";
 import {
   Card,
@@ -11,11 +12,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import styled, { keyframes } from "styled-components";
 import useAsync from "../use-async";
-import useModule, { ModuleProvider } from "../use-module";
-import { Module } from "../use-module-service";
+import { ModuleProvider } from "../use-module";
 import useMyModule from "../use-my-module";
 import useRoomService from "../use-room-service";
 import useEcho from "./use-echo";
+import { AttentionProfile } from "./use-http-attention-profile-service";
 import useHttpShiftService, {
   Shift,
   ShiftResponse,
@@ -255,11 +256,12 @@ export const ReceptorShiftsProvider = ({
     setShifts((prev) => prev.filter((s) => s.id != editingShift?.id));
     toast.success("El turno se ha enviado a otra sala");
   };
-  const handleChangeShiftModule = async (module: Module) => {
+  const handleChangeShiftModule = async (
+    attentionProfile: AttentionProfile
+  ) => {
     let shift: Shift = {
       ...editingShift!,
-      module: module.name,
-      moduleId: module.id,
+      attentionProfileId: attentionProfile.id,
     };
     shift = await shiftService.updateShift(shift, myModule!.ipAddress);
 
@@ -301,7 +303,7 @@ export const ReceptorShiftsProvider = ({
       )}
       {editingShift && editingModule && (
         <ModuleProvider>
-          <EditModuleModal
+          <EditAttentionProfileModal
             onClose={() => {
               setEditingShift(null);
               setEditingModule(false);
@@ -466,58 +468,50 @@ const EditRoomModal: React.FC<{
   );
 };
 
-const EditModuleModal: React.FC<{
+const EditAttentionProfileModal: React.FC<{
   onClose: () => void;
-  onUpdate: (module: Module) => void;
+  onUpdate: (attentionProfile: AttentionProfile) => void;
 }> = ({ onClose, onUpdate }) => {
-  const [module, setModule] = useState<Module | undefined>(undefined);
-  const { modules, refreshModules } = useModule();
-  const [currentModules, setCurrentModules] = useState<Module[]>([]);
+  const { attentionProfiles, refreshAttentionProfiles } =
+    useAttentionProfileResource();
+  const [attentionProfile, setAttentionProfile] = useState<
+    AttentionProfile | undefined
+  >(undefined);
   const { editingShift } = useReceptorShifts();
 
   // ==============================================================
   useEffect(() => {
-    refreshModules();
+    refreshAttentionProfiles();
   }, []);
 
-  useEffect(() => {
-    setCurrentModules(
-      modules.filter(
-        (m) =>
-          m.attentionProfileId == editingShift?.attentionProfileId &&
-          m.id != editingShift.moduleId &&
-          m.status === "online"
-      )
-    );
-  }, [editingShift?.attentionProfileId, editingShift?.moduleId, modules]);
   // ==============================================================
 
   return (
     <ModalContainer>
       <StyledCard>
         <CardHeader>
-          <h1>Editar módulo</h1>
+          <h1>Editar Perfil de atención</h1>
         </CardHeader>
         <CardBody>
           <Select
             label="Módulo"
             name="module"
-            placeholder="Seleccione un módulo"
+            placeholder="Seleccione un perfil de atención"
             onChange={(e) => {
-              setModule(
-                modules.find((m) => m.id.toString() === e.target.value)
+              setAttentionProfile(
+                attentionProfiles.find(
+                  (ap) => ap.id.toString() === e.target.value
+                )
               );
             }}
           >
-            {currentModules.map((module) => (
-              <SelectItem
-                key={module.id}
-                value={module.id}
-                textValue={module.name}
-              >
-                {module.name}
-              </SelectItem>
-            ))}
+            {attentionProfiles
+              .filter((ap) => ap.id != editingShift?.attentionProfileId)
+              .map((ap) => (
+                <SelectItem key={ap.id} value={ap.id} textValue={ap.name}>
+                  {ap.name}
+                </SelectItem>
+              ))}
           </Select>
 
           <div className="flex flex-row gap-x-2">
@@ -529,7 +523,7 @@ const EditModuleModal: React.FC<{
             </button>
             <button
               onClick={() => {
-                module && onUpdate(module);
+                attentionProfile && onUpdate(attentionProfile);
                 onClose();
               }}
               className="w-full bg-blue-500 text-white rounded-lg p-2 mt-2"
