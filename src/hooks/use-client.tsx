@@ -31,23 +31,75 @@ export const ScreenClientProvider: React.FC<{ children: React.ReactNode }> = ({
     const channel = `rooms.${myModule?.room.id}.clients`;
     echo
       .channel(channel)
-      .listen(".client.call", (data: { client: ClientResponse, module: ModuleResponse }) => {
-        const module = moduleResponseToModule(data.module);
-        const client = new Client(
-          data.client.id,
-          data.client.name,
-          data.client.dni,
-          data.client.client_type,
-          data.client.is_deleted,
-          module.name,
-        );
-        voice.speak(`${client.name}. modulo ${module.name}`);
+      .listen(
+        ".client.call",
+        (data: { client: ClientResponse; module: ModuleResponse }) => {
+          const module = moduleResponseToModule(data.module);
+          const client = new Client(
+            data.client.id,
+            data.client.name,
+            data.client.dni,
+            data.client.client_type,
+            data.client.is_deleted,
+            module.name
+          );
+          voice.speak(`${client.name}. modulo ${module.name}`);
 
+          setClients((prev) => {
+            if (prev.find((c) => c.id === client.id)) {
+              return prev;
+            }
+            // Get only the last 5 clients
+            return [client, ...prev].slice(0, 5);
+          });
+        }
+      );
+
+    echo
+      .channel(`rooms.${myModule?.room.id}.shifts`)
+      .listen(
+        ".shift.pending-transferred",
+        (data: { shift: ShiftResponse }) => {
+          setClients((prev) => {
+            return prev.filter((c) => c.id !== data.shift.client.id);
+          });
+        }
+      );
+
+    echo
+      .channel(`rooms.${myModule?.room.id}.shifts`)
+      .listen(".shift.pending", (data: { shift: ShiftResponse }) => {
         setClients((prev) => {
-          if (prev.find((c) => c.id === client.id)) {
-            return prev;
-          }
-          return [...prev, client];
+          return prev.filter((c) => c.id !== data.shift.client.id);
+        });
+      });
+
+    echo
+      .channel(`rooms.${myModule?.room.id}.shifts`)
+      .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
+        setClients((prev) => {
+          return prev.filter((c) => c.id !== data.shift.client.id);
+        });
+      });
+    echo
+      .channel(`rooms.${myModule?.room.id}.shifts`)
+      .listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
+        setClients((prev) => {
+          return prev.filter((c) => c.id !== data.shift.client.id);
+        });
+      });
+    echo
+      .channel(`rooms.${myModule?.room.id}.shifts`)
+      .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
+        setClients((prev) => {
+          return prev.filter((c) => c.id !== data.shift.client.id);
+        });
+      });
+    echo
+      .channel(`rooms.${myModule?.room.id}.shifts`)
+      .listen(".shift.qualified", (data: { shift: ShiftResponse }) => {
+        setClients((prev) => {
+          return prev.filter((c) => c.id !== data.shift.client.id);
         });
       });
 

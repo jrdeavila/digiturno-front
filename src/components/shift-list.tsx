@@ -213,7 +213,7 @@ const ShiftList = () => {
                       enabled: true,
                     },
                     {
-                      label: "Transferir a otro módulo",
+                      label: "Cambiar perfil de atención",
                       onClick: () => transferToAnotherModule(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
