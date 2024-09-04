@@ -14,6 +14,7 @@ import {
   ModuleResponse,
   moduleResponseToModule,
 } from "@/hooks/use-module-service";
+import useMyModule from "@/hooks/use-my-module";
 import DefaultLayout from "@/layouts/default";
 import AttentionProfile from "@/models/attention-profile";
 import { useAttendantResource } from "@/providers/attendant-provider";
@@ -77,28 +78,30 @@ const CreateShiftButton = () => {
 const AttentionProfileShiftInfo = () => {
   const { attentionProfiles } = useAttentionProfileResource();
   const { modules } = useModule();
+  const { myModule } = useMyModule();
 
   const renderModules = useCallback(() => {
-    return attentionProfiles.map((ap) => {
-      return (
-        <div className="flex flex-col" key={ap.id}>
-          <div className="flex flex-row items-center justify-center gap-x-2 w-full">
-            <span className="font-bold">{ap.name}</span>
+    return attentionProfiles
+      .map((ap) => {
+        return (
+          <div className="flex flex-col" key={ap.id}>
+            <div className="flex flex-row items-center justify-center gap-x-2 w-full">
+              <span className="font-bold">{ap.name}</span>
+            </div>
+            <div className="flex flex-col">
+              {modules
+                .filter((module) => module.attentionProfileId === ap.id && module.room.id === myModule?.room.id)
+                .map((module) => (
+                  <ModuleLiveInfo
+                    key={module.id}
+                    module={module}
+                    attentionProfile={ap}
+                  />
+                ))}
+            </div>
           </div>
-          <div className="flex flex-col">
-            {modules
-              .filter((module) => module.attentionProfileId === ap.id)
-              .map((module) => (
-                <ModuleLiveInfo
-                  key={module.id}
-                  module={module}
-                  attentionProfile={ap}
-                />
-              ))}
-          </div>
-        </div>
-      );
-    });
+        );
+      });
   }, [attentionProfiles, modules]);
 
   // =====================================================
