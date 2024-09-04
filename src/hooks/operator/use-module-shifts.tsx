@@ -313,7 +313,7 @@ export const ModuleShiftProvider = ({
       toast("Debe seleccionar al menos un servicio", { type: "error" });
       return;
     }
-    await shiftService.completeShift(shift.id, myModule!.ipAddress);
+    await shiftService.completeShift(shift.id, myModule!.ipAddress, services);
     setServices([]);
   };
 

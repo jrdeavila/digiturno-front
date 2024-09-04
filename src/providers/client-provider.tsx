@@ -15,17 +15,19 @@ const ClientContext = createContext<{
   forceDeleteClient: (id: number) => Promise<void>;
   restoreClient: (id: number) => Promise<void>;
   refreshClients: () => Promise<void>;
+  addClient: (client: Client) => void;
 }>({
   clients: [],
   currentClient: undefined,
   loading: false,
   createClient: async () => Client.empty(),
   updateClient: async () => Client.empty(),
-  setCurrentClient: () => {},
-  deleteClient: async () => {},
-  forceDeleteClient: async () => {},
-  restoreClient: async () => {},
-  refreshClients: async () => {},
+  setCurrentClient: () => { },
+  deleteClient: async () => { },
+  forceDeleteClient: async () => { },
+  restoreClient: async () => { },
+  refreshClients: async () => { },
+  addClient: () => { },
 });
 
 export const useClientResource = () => {
@@ -119,6 +121,12 @@ const ClientProvider: React.FC<{
 
   // ==============================================================================
 
+  const addClient = (client: Client) => {
+    setClients([client, ...clients]);
+  };
+
+  // ==============================================================================
+
   return (
     <ClientContext.Provider
       value={{
@@ -132,6 +140,7 @@ const ClientProvider: React.FC<{
         restoreClient,
         setCurrentClient,
         refreshClients,
+        addClient,
       }}
     >
       {children}

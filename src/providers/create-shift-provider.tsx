@@ -2,14 +2,14 @@ import { CreateClientForm } from "@/components/create-client-form";
 import WaitingClientQualification from "@/components/WaitingClientQualification";
 import useHttpShiftService from "@/hooks/operator/use-http-shifts-service";
 import useMyModule from "@/hooks/use-my-module";
+import AttentionProfile from "@/models/attention-profile";
 import Client from "@/models/client";
 import Service from "@/models/service";
 import { Modal, ModalContent } from "@nextui-org/modal";
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { useClientTypeResource } from "./client-type-provider";
-import AttentionProfile from "@/models/attention-profile";
 import { useClientResource } from "./client-provider";
+import { useClientTypeResource } from "./client-type-provider";
 
 export const CreateShiftContext = React.createContext<{
   client: Client | undefined;
@@ -26,14 +26,14 @@ export const CreateShiftContext = React.createContext<{
 }>({
   client: undefined,
   services: undefined,
-  setClient: () => {},
-  setServices: () => {},
-  createShift: () => {},
-  setDniSearched: () => {},
-  setQualification: () => {},
-  startQualification: () => {},
-  setAttentionProfile: () => {},
-  createShiftWithAttentionProfile: () => {},
+  setClient: () => { },
+  setServices: () => { },
+  createShift: () => { },
+  setDniSearched: () => { },
+  setQualification: () => { },
+  startQualification: () => { },
+  setAttentionProfile: () => { },
+  createShiftWithAttentionProfile: () => { },
 });
 
 export const useCreateShift = () => useContext(CreateShiftContext);
@@ -55,7 +55,7 @@ const CreateShiftProvider: React.FC<{
 
   const { myModule } = useMyModule();
   const { clientTypes } = useClientTypeResource();
-  const { refreshClients } = useClientResource();
+  const { addClient } = useClientResource();
 
   // ==============================================================================
 
@@ -86,7 +86,7 @@ const CreateShiftProvider: React.FC<{
       return;
     }
 
-    await shiftService.createShiftWithAttentionProfile(
+    const shift = await shiftService.createShiftWithAttentionProfile(
       {
         room_id: myModule!.room.id,
         client: {
@@ -102,7 +102,7 @@ const CreateShiftProvider: React.FC<{
       myModule!.ipAddress
     );
 
-    await refreshClients();
+    addClient(shift.client);
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
   };
@@ -133,14 +133,17 @@ const CreateShiftProvider: React.FC<{
       myModule!.ipAddress
     );
 
-    await shiftService.qualifiedShift(
+    const res = await shiftService.qualifiedShift(
       shift.id,
       qualification,
       myModule!.ipAddress
     );
     setServices([]);
     setClient(undefined);
-    await refreshClients();
+
+
+    addClient(res.client);
+
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
   };

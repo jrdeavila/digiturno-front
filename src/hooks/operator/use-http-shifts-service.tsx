@@ -1,5 +1,7 @@
 import { AxiosInstance } from "axios";
 import useHttpClient from "./use-http-client";
+import Service from "@/models/service";
+import Client from "@/models/client";
 
 export interface CreateShiftRequest {
   room_id: number;
@@ -45,28 +47,6 @@ export interface ShiftRequest {
   };
   state: string;
   module_id?: number;
-}
-
-export class Client {
-  id: number;
-  name: string;
-  dni: string;
-  clientType: string;
-  isDeleted: boolean;
-
-  constructor(
-    id: number,
-    name: string,
-    dni: string,
-    clientType: string,
-    isDeleted: boolean
-  ) {
-    this.id = id;
-    this.name = name;
-    this.dni = dni;
-    this.clientType = clientType;
-    this.isDeleted = isDeleted;
-  }
 }
 
 export class Shift {
@@ -115,7 +95,8 @@ export const shiftResponseToModel = (shiftResponse: ShiftResponse): Shift => {
     shiftResponse.client.name,
     shiftResponse.client.dni,
     shiftResponse.client.client_type,
-    shiftResponse.client.is_deleted
+    shiftResponse.client.is_deleted,
+    "",
   );
   return new Shift(
     shiftResponse.id,
@@ -275,12 +256,15 @@ class HttpShiftService {
     return shifts;
   }
 
-  async completeShift(shiftId: number, moduleIp: string): Promise<Shift> {
+  async completeShift(shiftId: number, moduleIp: string, services?: Service[]): Promise<Shift> {
+    const data = services ? {
+      services: services.map((service) => service.id),
+    } : {};
     const res = await this.httpClient.put<{
       data: ShiftResponse;
     }>(
       `/shifts/${shiftId}/completed`,
-      {},
+      data,
       {
         headers: {
           "X-Module-Ip": moduleIp,
