@@ -27,7 +27,7 @@ const SearchClientForm = () => {
       initialValues: {
         dni: "",
         name: "",
-        client_type_id: 1,
+        client_type_id: 3,
       },
       validationSchema: validationScheme,
       validate: (values) => {
