@@ -39,7 +39,7 @@ export default function ReceptorPage() {
         <CreateShiftProvider>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
             <div className="col-span-1 row-span-1">
-              <SearchClientForm />
+              <SearchClientForm enabledType />
             </div>
             <div className="col-span-2 row-span-4">
               <ShiftList />
