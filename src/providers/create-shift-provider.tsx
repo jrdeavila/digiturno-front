@@ -16,7 +16,7 @@ export const CreateShiftContext = React.createContext<{
   services: Service[] | undefined;
   setClient: (client: Client | undefined) => void;
   setServices: (services: Service[]) => void;
-  createShift: () => void;
+  createShift: (qualification: number) => void;
   onCreateClient?: () => void;
   setDniSearched: (dni: string) => void;
   setQualification: (qualification: number) => void;
@@ -107,7 +107,7 @@ const CreateShiftProvider: React.FC<{
     clearShift();
   };
 
-  const handleCreateShift = async () => {
+  const handleCreateShift = async (qualification: number) => {
     if (services === undefined && services!.length == 0) {
       alert("Debe seleccionar al menos un servicio");
       return;
@@ -129,20 +129,17 @@ const CreateShiftProvider: React.FC<{
         services: services!.map((service) => service.id),
         state: "pending",
         module_id: myModule!.id,
+        qualification: qualification,
       },
       myModule!.ipAddress
     );
 
-    const res = await shiftService.qualifiedShift(
-      shift.id,
-      qualification,
-      myModule!.ipAddress
-    );
+
     setServices([]);
     setClient(undefined);
 
 
-    addClient(res.client);
+    addClient(shift.client);
 
     toast("Turno creado exitosamente", { type: "success" });
     clearShift();
@@ -222,8 +219,9 @@ const CreateShiftProvider: React.FC<{
           {(onClose) => (
             <WaitingClientQualification
               onQualified={async (qualification: number) => {
-                setQualification(qualification);
-                await handleCreateShift();
+                console.log(qualification);
+                // setQualification(qualification);
+                await handleCreateShift(qualification);
                 onClose();
               }}
               onError={() => {
