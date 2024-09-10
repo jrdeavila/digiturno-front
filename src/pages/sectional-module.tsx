@@ -1,15 +1,22 @@
 import SearchClientForm from "@/components/search-client-form";
 import ServiceList from "@/components/service-list";
+import useMyModule from "@/hooks/use-my-module";
 import DefaultLayout from "@/layouts/default";
 import CreateShiftProvider, { useCreateShift } from "@/providers/create-shift-provider";
 
 export default function SectionalModulePage() {
+  const { myModule } = useMyModule();
   return (
     <DefaultLayout className="overflow-y-auto pb-10 h-full w-full">
       <CreateShiftProvider>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
 
           <div className="col-span-1 row-span-3">
+
+            <h2 className="mt-3 w-full text-center">
+              {myModule?.room.name}
+            </h2>
+
             <SearchClientForm />
           </div>
           <div className="col-span-3 row-span-4">
@@ -21,7 +28,6 @@ export default function SectionalModulePage() {
             <div className="flex flex-col gap-y-2">
               <CreateShiftButton />
               <ClearServicesButton />
-              <CancelShiftButton />
             </div>
 
           </div>
@@ -32,21 +38,7 @@ export default function SectionalModulePage() {
   );
 }
 
-const CancelShiftButton = () => {
 
-  const {
-    setServices,
-    setClient,
-  } = useCreateShift();
-
-  const cancelShift = () => {
-    setServices([]);
-    setClient(undefined);
-  }
-  return (
-    <button onClick={cancelShift} className="w-full bg-red-500 text-white rounded-lg py-2">Cancelar turno</button>
-  )
-}
 
 const ClearServicesButton = () => {
   const {
