@@ -23,6 +23,7 @@ interface ConfigureModuleCtxProps {
   requestQualificationModule: () => void;
   onListenQualification: (listener: (qualification: number) => void) => void;
   removeListener: (listener: (qualification: number) => void) => void;
+  clearListeners: () => void;
 }
 
 const ConfigureModuleCtx = createContext<ConfigureModuleCtxProps | undefined>(
@@ -66,7 +67,7 @@ export const ConfigureModuleProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [type, qualificationModuleService]
   );
 
@@ -103,6 +104,10 @@ export const ConfigureModuleProvider: React.FC<{
     setListeners((prev) => prev.filter((l) => l !== listener));
   };
 
+  const clearListeners = () => {
+    setListeners([]);
+  }
+
   // ==================================================================
 
   return (
@@ -113,6 +118,7 @@ export const ConfigureModuleProvider: React.FC<{
         requestQualificationModule,
         onListenQualification,
         removeListener,
+        clearListeners,
       }}
     >
       {children}
@@ -225,7 +231,7 @@ export const MyModuleProvider: React.FC<{
       console.error(error);
       setShouldRequestIp(true);
     },
-    () => {},
+    () => { },
     [myModuleInfo]
   );
 

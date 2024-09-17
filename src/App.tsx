@@ -47,12 +47,7 @@ const ModuleGuard = () => {
 };
 
 function App() {
-  useEffect(() => {
-    window.addEventListener("beforeunload", (e) => {
-      e.preventDefault();
-      e.returnValue = "";
-    });
-  }, [])
+
   return (
     <Routes>
       <Route element={<ModuleGuard />}>

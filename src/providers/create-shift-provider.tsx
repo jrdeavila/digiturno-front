@@ -139,6 +139,7 @@ const CreateShiftProvider: React.FC<{
     setClient(undefined);
 
 
+
     addClient(shift.client);
 
     toast("Turno creado exitosamente", { type: "success" });
