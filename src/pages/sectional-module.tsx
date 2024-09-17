@@ -12,15 +12,6 @@ export default function SectionalModulePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
 
           <div className="col-span-1 row-span-3">
-            <div className="flex flex-col gap-y-2 p-3">
-
-              <div className="text-lg font-bold ml-4">
-                {
-                  myModule?.room.name
-                }
-              </div>
-              <SearchClientForm />
-            </div>
 
             <h2 className="mt-3 w-full text-center">
               {myModule?.room.name}
@@ -37,7 +28,6 @@ export default function SectionalModulePage() {
             <div className="flex flex-col gap-y-2">
               <CreateShiftButton />
               <ClearServicesButton />
-              {/* <CancelShiftButton /> */}
             </div>
 
           </div>
