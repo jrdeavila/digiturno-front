@@ -39,16 +39,16 @@ interface ModuleShiftCtxProps {
 const ModuleShiftContext = createContext<ModuleShiftCtxProps>({
   shifts: [],
   distractedShifts: [],
-  sendToDistracted: async () => {},
-  sendToWaiting: async () => {},
-  callClient: async () => {},
-  attendClient: async () => {},
-  completeShift: async () => {},
-  transferShift: async () => {},
-  qualifyShift: async () => {},
-  cancelTransfer: () => {},
-  moveToUpShift: async () => {},
-  onTransfer: () => {},
+  sendToDistracted: async () => { },
+  sendToWaiting: async () => { },
+  callClient: async () => { },
+  attendClient: async () => { },
+  completeShift: async () => { },
+  transferShift: async () => { },
+  qualifyShift: async () => { },
+  cancelTransfer: () => { },
+  moveToUpShift: async () => { },
+  onTransfer: () => { },
   services: [],
 });
 
@@ -231,6 +231,16 @@ export const ModuleShiftProvider = ({
     }
   }, [currentShift]);
 
+  useEffect(() => {
+    if (shifts.length === 0) {
+      document.title = "DIGITURNO";
+    }
+    else {
+      document.title = `(${shifts.length}) Turnos - DIGITURNO`;
+    }
+  }, [shifts])
+
+
   useAsync<Shift[]>(
     async () => {
       if (!myModule) return [];
@@ -242,7 +252,7 @@ export const ModuleShiftProvider = ({
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -257,7 +267,7 @@ export const ModuleShiftProvider = ({
     (error) => {
       console.log(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -276,7 +286,7 @@ export const ModuleShiftProvider = ({
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 

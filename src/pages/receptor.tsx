@@ -26,7 +26,7 @@ import { faDesktop, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 
 export default function ReceptorPage() {
@@ -221,6 +221,15 @@ const ModuleLiveInfo: React.FC<{
     }
   }, [attendant?.status]);
 
+  const qualifiedShiftCount = useMemo(() => {
+    return shifts.filter((shift) => {
+      return (
+        shift.moduleId === currentModule.id &&
+        // module.attentionProfileId === attentionProfile.id &&
+        shift.state === "qualified"
+      );
+    }).length
+  }, [shifts, currentModule]);
   // =====================================================
   return (
     <div
@@ -234,17 +243,7 @@ const ModuleLiveInfo: React.FC<{
       <span>{currentModule.name}</span>
       {renderAttendantStatus()}
       <div className="flex-grow"></div>
-      <CountIndicatorTarget>
-        {
-          shifts.filter((shift) => {
-            return (
-              shift.module === currentModule.name &&
-              module.attentionProfileId === attentionProfile.id &&
-              shift.state === "qualified"
-            );
-          }).length
-        }
-      </CountIndicatorTarget>
+      <CountIndicatorTarget> {qualifiedShiftCount} </CountIndicatorTarget>
     </div>
   );
 };
