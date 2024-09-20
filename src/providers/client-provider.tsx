@@ -16,6 +16,7 @@ const ClientContext = createContext<{
   restoreClient: (id: number) => Promise<void>;
   refreshClients: () => Promise<void>;
   addClient: (client: Client) => void;
+  findClient: (dni: string) => Promise<Client | undefined>;
 }>({
   clients: [],
   currentClient: undefined,
@@ -28,6 +29,7 @@ const ClientContext = createContext<{
   restoreClient: async () => { },
   refreshClients: async () => { },
   addClient: () => { },
+  findClient: async () => Client.empty(),
 });
 
 export const useClientResource = () => {
@@ -127,6 +129,16 @@ const ClientProvider: React.FC<{
 
   // ==============================================================================
 
+  const findClient = async (dni: string) => {
+    const client = await clientService.findClient(dni);
+    if (client) {
+      setClients([client, ...clients]);
+    }
+    return client;
+  }
+
+  // ==============================================================================
+
   return (
     <ClientContext.Provider
       value={{
@@ -141,6 +153,7 @@ const ClientProvider: React.FC<{
         setCurrentClient,
         refreshClients,
         addClient,
+        findClient,
       }}
     >
       {children}

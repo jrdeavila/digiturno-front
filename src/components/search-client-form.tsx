@@ -12,7 +12,7 @@ const SearchClientForm: React.FC<{
 }> = ({
   enabledType,
 }) => {
-    const { clients } = useClientResource();
+    const { clients, findClient } = useClientResource();
     const { setClient, client } = useCreateShift();
     const { clientTypes } = useClientTypeResource();
 
@@ -95,6 +95,38 @@ const SearchClientForm: React.FC<{
       }
     };
 
+    const forceSearchClient = (
+      dni: string,
+      onFound: (values: {
+        dni: string;
+        name: string;
+        client_type_id: number;
+      }) => void
+    ) => {
+      findClient(dni).then((client) => {
+        if (client) {
+          setClient(client);
+          onFound({
+            dni: client.dni,
+            name: client.name,
+            client_type_id:
+              clientTypes.find((clientType) => clientType.slug == client.clientType)
+                ?.id || 0,
+          });
+          setValues({
+            dni: client.dni,
+            name: client.name,
+            client_type_id:
+              clientTypes.find((clientType) => clientType.slug == client.clientType)
+                ?.id || 1,
+          });
+        } else {
+          return;
+        }
+      });
+
+    }
+
     // ==================================================================================================================
 
     useEffect(() => {
@@ -157,6 +189,23 @@ const SearchClientForm: React.FC<{
                 ))}
               </Select>
             )
+          }
+
+          {
+            !values.name &&
+            values.dni &&
+
+            (<button
+              onClick={(e) => {
+                e.preventDefault();
+                return forceSearchClient(values.dni, (values) => {
+                  setValues(values);
+                });
+              }}
+              className="w-full bg-primary text-white rounded-lg py-2 cursor-pointer"
+            >
+              Forzar búsqueda
+            </button>)
           }
         </div>
       </form>
