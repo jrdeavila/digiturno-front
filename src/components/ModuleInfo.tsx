@@ -1,6 +1,6 @@
 import useAuth from "@/hooks/use-auth";
 import useMyModule from "@/hooks/use-my-module";
-import { faDesktop, faPerson, faSignOut, faToilet } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faDesktop, faPerson, faSignOut, faToilet } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useMemo, useState } from "react";
 import GenericComponent from "./GenericComponent";
@@ -11,14 +11,25 @@ import { useAttentionProfileResource } from "@/providers/attention-profile-provi
 
 const ModuleInfo: React.FC = () => {
   const { myModule } = useMyModule();
-  const { logout } = useAuth();
-  const { attendant } = useAuth();
+  const { attendant, logout } = useAuth(); // Hook que me trae la información del funcionario
   const { openModal, backToWork } = useAbsence();
   const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
 
   // =======================================================
 
   const { attentionProfiles } = useAttentionProfileResource();
+
+  // =======================================================
+
+  const at = attentionProfiles.find((ap) => ap.id === myModule?.attentionProfileId);
+
+  const isAJ = useMemo(() => at?.name === "ASESORIA JURIDICA", [at]);
+
+  // =======================================================
+
+  const goToCaseView = () => {
+    console.log("Ir a la vista de casos")
+  }
 
   // =======================================================
 
@@ -126,7 +137,7 @@ const ModuleInfo: React.FC = () => {
         </div>
 
         <div className="flex-grow"></div>
-        <div className="flex flex-row items-center flex-wrap justify-stretch gap-x-3">
+        <div className="flex flex-row items-center flex-wrap justify-stretch gap-3">
           <Button style={{
             backgroundColor: "#00204D",
           }} className=" text-white font-bold"
@@ -156,6 +167,22 @@ const ModuleInfo: React.FC = () => {
               </Button>
             )
           }
+          {
+            isAJ &&
+            (<Button style={{
+              backgroundColor: "#0070B3",
+            }} className=" text-white font-bold"
+              onClick={goToCaseView}
+            >
+              <div className="flex flex-row gap-x-2 items-center">
+                <FontAwesomeIcon icon={faBook} />
+                <span> CASOS </span>
+              </div>
+            </Button>)
+          }
+
+
+
 
         </div>
       </div>
