@@ -41,7 +41,7 @@ export default function DefaultLayout({
       <main className={className}>{children}</main>
       {showLogo && (
         <img
-          src={logo}
+          src={logo} 
           alt="logo"
           className="absolute bottom-0 left-[calc(50%-12rem)] h-20 w-96"
         />
