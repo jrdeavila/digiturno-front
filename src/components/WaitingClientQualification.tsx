@@ -7,7 +7,8 @@ const WaitingClientQualification: React.FC<{
   onQualified: (qualification: number) => Promise<void>;
   onError?: () => void;
 }> = ({ onQualified, onError }) => {
-  const { onListenQualification, removeListener } = useConfigureModule();
+  const { onListenQualification, clearListeners } = useConfigureModule();
+
   // ==============================================================================
 
   useEffect(() => {
@@ -16,21 +17,14 @@ const WaitingClientQualification: React.FC<{
         onError && onError();
       });
     }, timeToQualify);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [onError, onQualified]);
-
-  useEffect(() => {
     onListenQualification((qualification) => {
       onQualified(qualification).catch(() => {
         onError && onError();
       });
     });
     return () => {
-      removeListener((qualification) => {
-        onQualified(qualification);
-      });
+      clearTimeout(timeout);
+      clearListeners();
     };
   }, []);
 

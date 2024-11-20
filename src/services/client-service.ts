@@ -28,6 +28,18 @@ export default class ClientService {
     return mapClientResponseToClient(response.data.data);
   }
 
+  async findClient(dni: string): Promise<Client | undefined> {
+    const response = await this.httpClient.get<{
+      data: ClientResponse;
+    }>("/clients/find", {
+      params: {
+        dni,
+      }
+    });
+    return response.data.data ? mapClientResponseToClient(response.data.data) : undefined;
+  }
+
+
   async createClient(client: Client, clientType: ClientType): Promise<Client> {
     const request = mapClientToCreateClientRequest(client, clientType);
     const response = await this.httpClient.post<{

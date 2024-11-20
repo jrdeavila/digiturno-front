@@ -14,6 +14,7 @@ import {
   ModuleResponse,
   moduleResponseToModule,
 } from "@/hooks/use-module-service";
+import useMyModule from "@/hooks/use-my-module";
 import DefaultLayout from "@/layouts/default";
 import AttentionProfile from "@/models/attention-profile";
 import { useAttendantResource } from "@/providers/attendant-provider";
@@ -25,7 +26,7 @@ import { faDesktop, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 
 export default function ReceptorPage() {
@@ -38,7 +39,7 @@ export default function ReceptorPage() {
         <CreateShiftProvider>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
             <div className="col-span-1 row-span-1">
-              <SearchClientForm />
+              <SearchClientForm enabledType={true} />
             </div>
             <div className="col-span-2 row-span-4">
               <ShiftList />
@@ -77,28 +78,30 @@ const CreateShiftButton = () => {
 const AttentionProfileShiftInfo = () => {
   const { attentionProfiles } = useAttentionProfileResource();
   const { modules } = useModule();
+  const { myModule } = useMyModule();
 
   const renderModules = useCallback(() => {
-    return attentionProfiles.map((ap) => {
-      return (
-        <div className="flex flex-col" key={ap.id}>
-          <div className="flex flex-row items-center justify-center gap-x-2 w-full">
-            <span className="font-bold">{ap.name}</span>
+    return attentionProfiles
+      .map((ap) => {
+        return (
+          <div className="flex flex-col" key={ap.id}>
+            <div className="flex flex-row items-center justify-center gap-x-2 w-full">
+              <span className="font-bold">{ap.name}</span>
+            </div>
+            <div className="flex flex-col">
+              {modules
+                .filter((module) => module.attentionProfileId === ap.id && module.room.id === myModule?.room.id)
+                .map((module) => (
+                  <ModuleLiveInfo
+                    key={module.id}
+                    module={module}
+                    attentionProfile={ap}
+                  />
+                ))}
+            </div>
           </div>
-          <div className="flex flex-col">
-            {modules
-              .filter((module) => module.attentionProfileId === ap.id)
-              .map((module) => (
-                <ModuleLiveInfo
-                  key={module.id}
-                  module={module}
-                  attentionProfile={ap}
-                />
-              ))}
-          </div>
-        </div>
-      );
-    });
+        );
+      });
   }, [attentionProfiles, modules]);
 
   // =====================================================
@@ -218,6 +221,15 @@ const ModuleLiveInfo: React.FC<{
     }
   }, [attendant?.status]);
 
+  const qualifiedShiftCount = useMemo(() => {
+    return shifts.filter((shift) => {
+      return (
+        shift.moduleId === currentModule.id &&
+        // module.attentionProfileId === attentionProfile.id &&
+        shift.state === "qualified"
+      );
+    }).length
+  }, [shifts, currentModule]);
   // =====================================================
   return (
     <div
@@ -231,17 +243,7 @@ const ModuleLiveInfo: React.FC<{
       <span>{currentModule.name}</span>
       {renderAttendantStatus()}
       <div className="flex-grow"></div>
-      <CountIndicatorTarget>
-        {
-          shifts.filter((shift) => {
-            return (
-              shift.module === currentModule.name &&
-              module.attentionProfileId === attentionProfile.id &&
-              shift.state === "qualified"
-            );
-          }).length
-        }
-      </CountIndicatorTarget>
+      <CountIndicatorTarget> {qualifiedShiftCount} </CountIndicatorTarget>
     </div>
   );
 };

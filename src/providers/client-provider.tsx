@@ -15,17 +15,21 @@ const ClientContext = createContext<{
   forceDeleteClient: (id: number) => Promise<void>;
   restoreClient: (id: number) => Promise<void>;
   refreshClients: () => Promise<void>;
+  addClient: (client: Client) => void;
+  findClient: (dni: string) => Promise<Client | undefined>;
 }>({
   clients: [],
   currentClient: undefined,
   loading: false,
   createClient: async () => Client.empty(),
   updateClient: async () => Client.empty(),
-  setCurrentClient: () => {},
-  deleteClient: async () => {},
-  forceDeleteClient: async () => {},
-  restoreClient: async () => {},
-  refreshClients: async () => {},
+  setCurrentClient: () => { },
+  deleteClient: async () => { },
+  forceDeleteClient: async () => { },
+  restoreClient: async () => { },
+  refreshClients: async () => { },
+  addClient: () => { },
+  findClient: async () => Client.empty(),
 });
 
 export const useClientResource = () => {
@@ -119,6 +123,22 @@ const ClientProvider: React.FC<{
 
   // ==============================================================================
 
+  const addClient = (client: Client) => {
+    setClients([client, ...clients]);
+  };
+
+  // ==============================================================================
+
+  const findClient = async (dni: string) => {
+    const client = await clientService.findClient(dni);
+    if (client) {
+      setClients([client, ...clients]);
+    }
+    return client;
+  }
+
+  // ==============================================================================
+
   return (
     <ClientContext.Provider
       value={{
@@ -132,6 +152,8 @@ const ClientProvider: React.FC<{
         restoreClient,
         setCurrentClient,
         refreshClients,
+        addClient,
+        findClient,
       }}
     >
       {children}

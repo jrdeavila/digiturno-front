@@ -1,6 +1,10 @@
 import useModuleShifts from "@/hooks/operator/use-module-shifts";
 import { dateFormatter } from "@/utils/date";
-import { faCheck, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faExchangeAlt,
+  faFrown,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useMemo } from "react";
 import styled from "styled-components";
@@ -8,7 +12,8 @@ import GenericComponent from "./GenericComponent";
 import TimeClockAnimation from "./time-clock-animation";
 
 const ClientInfo: React.FC = () => {
-  const { currentShift, completeShift, onTransfer } = useModuleShifts();
+  const { currentShift, completeShift, onTransfer, sendToDistracted } =
+    useModuleShifts();
 
   const renderStartDate = useMemo(() => {
     // 2024-07-25T02:22:30.000000Z
@@ -62,6 +67,15 @@ const ClientInfo: React.FC = () => {
               TRANSFERIR
             </ButtonGradient>
           </div>
+          <div className="w-full">
+            <ButtonGradient
+              color="#a31d1d"
+              onClick={() => sendToDistracted(currentShift)}
+            >
+              <FontAwesomeIcon icon={faFrown} className="mr-2" />
+              DISTRAÍDO
+            </ButtonGradient>
+          </div>
         </div>
       </section>
     </GenericComponent>
@@ -70,8 +84,10 @@ const ClientInfo: React.FC = () => {
 
 export default ClientInfo;
 
-const ButtonGradient = styled.button`
-  background-color: var(--bg-primary);
+const ButtonGradient = styled.button<{
+  color?: string;
+}>`
+  background-color: ${(props) => props.color || "var(--bg-primary)"};
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 5px;

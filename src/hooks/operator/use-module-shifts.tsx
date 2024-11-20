@@ -39,16 +39,16 @@ interface ModuleShiftCtxProps {
 const ModuleShiftContext = createContext<ModuleShiftCtxProps>({
   shifts: [],
   distractedShifts: [],
-  sendToDistracted: async () => {},
-  sendToWaiting: async () => {},
-  callClient: async () => {},
-  attendClient: async () => {},
-  completeShift: async () => {},
-  transferShift: async () => {},
-  qualifyShift: async () => {},
-  cancelTransfer: () => {},
-  moveToUpShift: async () => {},
-  onTransfer: () => {},
+  sendToDistracted: async () => { },
+  sendToWaiting: async () => { },
+  callClient: async () => { },
+  attendClient: async () => { },
+  completeShift: async () => { },
+  transferShift: async () => { },
+  qualifyShift: async () => { },
+  cancelTransfer: () => { },
+  moveToUpShift: async () => { },
+  onTransfer: () => { },
   services: [],
 });
 
@@ -96,7 +96,7 @@ export const ModuleShiftProvider = ({
     if (!myModule) return;
 
     const roomShiftChannelName = `rooms.${myModule?.room.id}.attention_profiles.${myModule?.attentionProfileId}.shifts`;
-    const myModuleShiftChannelName = `modules.${myModule?.id}.shifts`;
+    // const roomShiftChannelName = `modules.${myModule?.id}.shifts`;
     const myCurrentShiftChannelName = `modules.${myModule?.id}.current-shift`;
 
     // ======================================== ROOM CHANNEL ========================================
@@ -136,7 +136,7 @@ export const ModuleShiftProvider = ({
     // ======================================== MODULE CHANNEL ========================================
 
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.created", (event: { shift: ShiftResponse }) => {
         const newShift = shiftResponseToModel(event.shift);
         setShifts((prevShifts) => orderByPreferential(prevShifts, newShift));
@@ -144,28 +144,31 @@ export const ModuleShiftProvider = ({
       });
 
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.distracted", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
+        if (currentShift?.id === shift.id) {
+          setCurrentShift(undefined);
+        }
         setShifts((prevShifts) => prevShifts.filter((s) => s.id !== shift.id));
       });
 
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.pending", (data: { shift: ShiftResponse }) => {
         const shift = shiftResponseToModel(data.shift);
         setShifts((prevShifts) => orderByPreferential(prevShifts, shift));
       });
 
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.transferred", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((s) => s.id !== data.shift.id)
         );
       });
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.qualified", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
@@ -173,14 +176,14 @@ export const ModuleShiftProvider = ({
       });
 
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.in-progress", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
         );
       });
     echo
-      .channel(myModuleShiftChannelName)
+      .channel(roomShiftChannelName)
       .listen(".shift.deleted", (data: { shift: ShiftResponse }) => {
         setShifts((prevShifts) =>
           prevShifts.filter((shift) => shift.id !== data.shift.id)
@@ -216,7 +219,6 @@ export const ModuleShiftProvider = ({
 
     return () => {
       echo.leave(roomShiftChannelName);
-      echo.leave(myModuleShiftChannelName);
       echo.leave(myCurrentShiftChannelName);
     };
   }, [myModule]);
@@ -229,6 +231,16 @@ export const ModuleShiftProvider = ({
     }
   }, [currentShift]);
 
+  useEffect(() => {
+    if (shifts.length === 0) {
+      document.title = "DIGITURNO";
+    }
+    else {
+      document.title = `(${shifts.length}) Turnos - DIGITURNO`;
+    }
+  }, [shifts])
+
+
   useAsync<Shift[]>(
     async () => {
       if (!myModule) return [];
@@ -240,7 +252,7 @@ export const ModuleShiftProvider = ({
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -255,7 +267,7 @@ export const ModuleShiftProvider = ({
     (error) => {
       console.log(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -274,7 +286,7 @@ export const ModuleShiftProvider = ({
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -311,7 +323,7 @@ export const ModuleShiftProvider = ({
       toast("Debe seleccionar al menos un servicio", { type: "error" });
       return;
     }
-    await shiftService.completeShift(shift.id, myModule!.ipAddress);
+    await shiftService.completeShift(shift.id, myModule!.ipAddress, services);
     setServices([]);
   };
 

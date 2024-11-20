@@ -21,10 +21,10 @@ export interface ModuleResponse {
 }
 
 export class Module {
-  id: number;
-  name: string;
-  ipAddress: string;
-  room: Room;
+  id: number; // Identificador del módulo
+  name: string; // Nombre del módulo
+  ipAddress: string; // Dirección IP del módulo
+  room: Room; // Sala a la que pertenece el módulo
   type: string;
   status: string;
   enabled: boolean;
@@ -92,10 +92,7 @@ class HttpModuleService {
   async getMyModule(ipAddress: string): Promise<Module> {
     const response = await this.httpClient.get<{
       data: ModuleResponse;
-    }>("/modules/ip-address", {
-      params: {
-        ip_address: ipAddress,
-      },
+    }>("/modules/myself", {
       headers: {
         "X-Module-Ip": ipAddress,
       },

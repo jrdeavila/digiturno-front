@@ -1,14 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import useAsync from "../use-async";
-import useMyModule from "../use-my-module";
-import useEcho from "./use-echo";
-import useHttpShiftService, {
-  Shift,
-  ShiftResponse,
-  shiftResponseToModel,
-} from "./use-http-shifts-service";
-import styled, { keyframes } from "styled-components";
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
+import { Room } from "@/services/room-service";
 import {
   Card,
   CardBody,
@@ -17,8 +8,20 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { Room } from "../use-module-service";
+import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import styled, { keyframes } from "styled-components";
+import useAsync from "../use-async";
+import { ModuleProvider } from "../use-module";
+import useMyModule from "../use-my-module";
 import useRoomService from "../use-room-service";
+import useEcho from "./use-echo";
+import { AttentionProfile } from "./use-http-attention-profile-service";
+import useHttpShiftService, {
+  Shift,
+  ShiftResponse,
+  shiftResponseToModel,
+} from "./use-http-shifts-service";
 
 interface ReceptorShiftCtxProps {
   shifts: Shift[];
@@ -70,7 +73,7 @@ export const ReceptorShiftsProvider = ({
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -88,7 +91,7 @@ export const ReceptorShiftsProvider = ({
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     [myModule]
   );
 
@@ -98,9 +101,9 @@ export const ReceptorShiftsProvider = ({
         return prevShifts.map((s) =>
           s.id === shift.id
             ? {
-                ...s,
-                state: "pending",
-              }
+              ...s,
+              state: "pending",
+            }
             : s
         );
       }
@@ -231,6 +234,40 @@ export const ReceptorShiftsProvider = ({
     setEditingModule(true);
   };
 
+  const handleChangeShiftName = async (name: string) => {
+    let shift: Shift = {
+      ...editingShift!,
+      client: {
+        ...editingShift!.client,
+        name,
+      },
+    };
+    shift = await shiftService.updateShift(shift, myModule!.ipAddress);
+    setShifts((prev) => prev.map((s) => (s.id === shift.id ? shift : s)));
+    toast.success("El turno ha sido modificado con éxito");
+  };
+
+  const handleChangeShiftRoom = async (room: Room) => {
+    const shift = {
+      ...editingShift!,
+      roomId: room.id,
+    };
+    await shiftService.updateShift(shift, myModule!.ipAddress);
+    setShifts((prev) => prev.filter((s) => s.id != editingShift?.id));
+    toast.success("El turno se ha enviado a otra sala");
+  };
+  const handleChangeShiftModule = async (
+    attentionProfile: AttentionProfile
+  ) => {
+    let shift: Shift = {
+      ...editingShift!,
+      attentionProfileId: attentionProfile.id,
+    };
+    shift = await shiftService.updateShift(shift, myModule!.ipAddress);
+
+    setShifts((prev) => prev.map((s) => (s.id === shift.id ? shift : s)));
+  };
+
   // ==============================================================================
 
   return (
@@ -252,9 +289,7 @@ export const ReceptorShiftsProvider = ({
             setEditingShift(null);
             setEditingName(false);
           }}
-          onUpdate={(name) => {
-            // Update the shift name
-          }}
+          onUpdate={handleChangeShiftName}
         />
       )}
       {editingShift && editingRoom && (
@@ -263,21 +298,19 @@ export const ReceptorShiftsProvider = ({
             setEditingShift(null);
             setEditingRoom(false);
           }}
-          onUpdate={(room) => {
-            // Update the shift room
-          }}
+          onUpdate={handleChangeShiftRoom}
         />
       )}
       {editingShift && editingModule && (
-        <EditModuleModal
-          onClose={() => {
-            setEditingShift(null);
-            setEditingModule(false);
-          }}
-          onUpdate={(module) => {
-            // Update the shift module
-          }}
-        />
+        <ModuleProvider>
+          <EditAttentionProfileModal
+            onClose={() => {
+              setEditingShift(null);
+              setEditingModule(false);
+            }}
+            onUpdate={handleChangeShiftModule}
+          />
+        </ModuleProvider>
       )}
     </ReceptorShiftsContext.Provider>
   );
@@ -360,15 +393,24 @@ const EditRoomModal: React.FC<{
   onClose: () => void;
   onUpdate: (room: Room) => void;
 }> = ({ onClose, onUpdate }) => {
-  const [room] = useState<Room | undefined>(undefined);
+  const [room, setRoom] = useState<Room | undefined>(undefined);
   const [rooms, setRooms] = useState<Room[]>([]);
   // =======================================================
+
   const roomService = useRoomService();
   // =======================================================
 
+  const { myModule } = useMyModule();
+
+  // =======================================================
+
   useAsync<Room[]>(
-    () => {
-      return roomService.getRooms();
+    async () => {
+      const rooms = await roomService.getRooms();
+      return rooms.filter(
+        (r) =>
+          r.sectionalId === myModule?.room.branch_id && r.id != myModule.room.id
+      );
     },
     (rooms) => {
       setRooms(rooms);
@@ -376,8 +418,8 @@ const EditRoomModal: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
-    []
+    () => { },
+    [myModule?.room.branch_id, myModule?.room.id]
   );
 
   // =======================================================
@@ -388,7 +430,14 @@ const EditRoomModal: React.FC<{
           <h1>Editar sala</h1>
         </CardHeader>
         <CardBody>
-          <Select>
+          <Select
+            label="Sala"
+            name="room"
+            placeholder="Seleccione una sala"
+            onChange={(e) => {
+              setRoom(rooms.find((r) => r.id.toString() === e.target.value));
+            }}
+          >
             {rooms.map((room) => (
               <SelectItem key={room.id} value={room.id} textValue={room.name}>
                 {room.name}
@@ -419,11 +468,70 @@ const EditRoomModal: React.FC<{
   );
 };
 
-const EditModuleModal = () => {
+const EditAttentionProfileModal: React.FC<{
+  onClose: () => void;
+  onUpdate: (attentionProfile: AttentionProfile) => void;
+}> = ({ onClose, onUpdate }) => {
+  const { attentionProfiles, refreshAttentionProfiles } =
+    useAttentionProfileResource();
+  const [attentionProfile, setAttentionProfile] = useState<
+    AttentionProfile | undefined
+  >(undefined);
+  const { editingShift } = useReceptorShifts();
+
+  // ==============================================================
+  useEffect(() => {
+    refreshAttentionProfiles();
+  }, []);
+
+  // ==============================================================
+
   return (
     <ModalContainer>
       <StyledCard>
-        <h1>Editar módulo</h1>
+        <CardHeader>
+          <h1>Editar Perfil de atención</h1>
+        </CardHeader>
+        <CardBody>
+          <Select
+            label="Módulo"
+            name="module"
+            placeholder="Seleccione un perfil de atención"
+            onChange={(e) => {
+              setAttentionProfile(
+                attentionProfiles.find(
+                  (ap) => ap.id.toString() === e.target.value
+                )
+              );
+            }}
+          >
+            {attentionProfiles
+              .filter((ap) => ap.id != editingShift?.attentionProfileId)
+              .map((ap) => (
+                <SelectItem key={ap.id} value={ap.id} textValue={ap.name}>
+                  {ap.name}
+                </SelectItem>
+              ))}
+          </Select>
+
+          <div className="flex flex-row gap-x-2">
+            <button
+              onClick={onClose}
+              className="w-full bg-red-500 text-white rounded-lg p-2 mt-2"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => {
+                attentionProfile && onUpdate(attentionProfile);
+                onClose();
+              }}
+              className="w-full bg-blue-500 text-white rounded-lg p-2 mt-2"
+            >
+              Guardar
+            </button>
+          </div>
+        </CardBody>
       </StyledCard>
     </ModalContainer>
   );

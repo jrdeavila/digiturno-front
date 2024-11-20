@@ -173,7 +173,6 @@ const ShiftList = () => {
           return (
             <div className="flex flex-col gap-y-1 ">
               <span>{shift.attentionProfile}</span>
-              <span>{shift.module ?? "No Asignado"}</span>
             </div>
           );
         case "state": {
@@ -211,14 +210,14 @@ const ShiftList = () => {
                       onClick: () => transferToAnotherRoom(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
-                      enabled: false,
+                      enabled: true,
                     },
                     {
-                      label: "Transferir a otro módulo",
+                      label: "Cambiar perfil de atención",
                       onClick: () => transferToAnotherModule(shift),
                       icon: faPaperPlane,
                       color: "text-blue-500",
-                      enabled: false,
+                      enabled: true,
                     },
                     {
                       label: "Modificar",
