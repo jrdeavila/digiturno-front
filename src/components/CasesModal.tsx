@@ -4,7 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 
 type Case = {
   id: number;
-  caseNumber: string;
+  caseNumber: string; // back-end
   subject: string;
   attendedBy: string;
   username: string;
@@ -37,13 +37,15 @@ const CasesModal: React.FC<CasesModalProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCases, setFilteredCases] = useState<Case[]>(cases);
 
   const currentDate = new Date().toISOString().slice(0, 10);
 
   const handleEdit = (caseData: Case) => {
     setSelectedCase({
       ...caseData,
-      modificationDate: currentDate, // Actualiza la fecha de modificación automáticamente
+      modificationDate: currentDate,
     });
     setIsEditing(true);
   };
@@ -71,6 +73,23 @@ const CasesModal: React.FC<CasesModalProps> = ({
       setIsEditing(false);
       setSelectedCase(null);
     }
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim() === '') {
+      setFilteredCases(cases);
+    } else {
+      setFilteredCases(
+        cases.filter((c) =>
+          c.caseNumber.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  };
+
+  const handleResetSearch = () => {
+    setSearchQuery('');
+    setFilteredCases(cases);
   };
 
   const handleChange = (
@@ -116,12 +135,43 @@ const CasesModal: React.FC<CasesModalProps> = ({
 
         {!isEditing && (
           <>
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={handleCreate}
+                className="bg-blue-600 text-white py-2 px-4 rounded"
+              >
+                Crear Nuevo Caso
+              </button>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar por Número de Caso"
+                  className="border rounded px-3 py-2"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="bg-green-600 text-white px-4 py-2 rounded"
+                >
+                  Buscar
+                </button>
+                <button
+                  onClick={handleResetSearch}
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                >
+                  Reiniciar
+                </button>
+              </div>
+            </div>
+
             {loading && <p className="text-gray-500">Cargando casos...</p>}
             {error && <p className="text-red-500">{error}</p>}
             <table className="min-w-full bg-white border rounded shadow-lg mt-4">
               <thead>
                 <tr className="bg-gray-200 text-left">
                   {[
+                    'Número de Caso',
                     'Asunto',
                     'Atendido Por',
                     'Cliente',
@@ -138,8 +188,9 @@ const CasesModal: React.FC<CasesModalProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {cases.map((c) => (
+                {filteredCases.map((c) => (
                   <tr key={c.id} className="border-t">
+                    <td className="py-2 px-4">{c.caseNumber}</td>
                     <td className="py-2 px-4">{c.subject}</td>
                     <td className="py-2 px-4">{c.attendedBy}</td>
                     <td className="py-2 px-4">
@@ -169,18 +220,21 @@ const CasesModal: React.FC<CasesModalProps> = ({
                 ))}
               </tbody>
             </table>
-            <button
-              onClick={handleCreate}
-              className="mt-4 bg-blue-600 text-white py-2 px-4 rounded"
-            >
-              Crear Nuevo Caso
-            </button>
           </>
         )}
 
         {isEditing && selectedCase && (
           <form className="grid grid-cols-2 gap-4 mt-4">
-            <input type="hidden" name="id" value={selectedCase.id} />
+            <div>
+              <label className="font-semibold">Número de Caso</label>
+              <input
+                type="text"
+                name="caseNumber"
+                value={selectedCase.caseNumber}
+                readOnly
+                className="border rounded px-3 py-2 bg-gray-100"
+              />
+            </div>
 
             <div>
               <label className="font-semibold">Asunto</label>
@@ -198,7 +252,7 @@ const CasesModal: React.FC<CasesModalProps> = ({
               <ReactQuill
                 value={selectedCase.observation}
                 onChange={handleObservationChange}
-                className="rounded"
+                className="rounded h-60" 
               />
             </div>
 
