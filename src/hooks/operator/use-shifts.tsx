@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useMyModule from "../use-my-module";
 import { ModuleShiftProvider } from "./use-module-shifts";
 import { ReceptorShiftsProvider } from "./use-receptor-shifts";
@@ -9,9 +9,18 @@ export const ShiftProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
 
+
+
   // ==================================================================
 
   const { myModule } = useMyModule();
+
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("Shift Provider Provider mounted");
+  }, [])
+
 
   // ==================================================================
 

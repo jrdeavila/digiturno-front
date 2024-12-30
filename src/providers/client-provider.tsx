@@ -1,8 +1,9 @@
 import useAsync from "@/hooks/use-async";
+import useCache from "@/hooks/use-cache";
 import useClientService from "@/hooks/use-client-service";
 import Client from "@/models/client";
 import ClientType from "@/models/client-type";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const ClientContext = createContext<{
   clients: Client[];
@@ -51,9 +52,34 @@ const ClientProvider: React.FC<{
 
   // ==============================================================================
 
+  const cache = useCache();
+
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("Client Provider mounted");
+  }, [])
+
+
+
+
+  // ==============================================================================
+
   useAsync<Client[]>(
-    () => {
-      return clientService.getClients();
+    async () => {
+
+      let clients = cache.get<Client[]>("clients");
+
+      if (clients) {
+        return clients;
+
+      }
+
+      clients = await clientService.getClients();
+      cache.set("clients", clients);
+
+      return clients;
+
     },
     (data) => setClients(data),
     (error) => console.error(error),

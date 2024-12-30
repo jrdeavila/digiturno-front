@@ -1,8 +1,9 @@
 import useAsync from "@/hooks/use-async";
+import useCache from "@/hooks/use-cache";
 import useServiceService from "@/hooks/use-sevice-service";
 import Service from "@/models/service";
 import delay from "@/utils/delay";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const ServiceContext = createContext<{
   services: Service[];
@@ -11,7 +12,7 @@ const ServiceContext = createContext<{
 }>({
   services: [],
   loading: false,
-  refreshServices: async () => {},
+  refreshServices: async () => { },
 });
 
 export const useServiceResource = () => {
@@ -31,16 +32,16 @@ const ServiceProvider: React.FC<{
   // ==============================================================================
 
   const serviceService = useServiceService();
+  const cache = useCache();
 
   // ==============================================================================
 
   const refreshServices = async () => {
-    const services = await delay<Service[]>(
-      2000,
-      () => setLoading(true),
-      () => setLoading(false),
-      () => serviceService.getAll()
-    );
+    setLoading(true);
+    await delay(1000, () => setLoading(true), () => setLoading(false), async () => { });
+    const services = await serviceService.getAll();
+    cache.set("services", services);
+
     setServices(services);
   };
 
@@ -48,18 +49,27 @@ const ServiceProvider: React.FC<{
 
   useAsync<Service[]>(
     async () => {
-      return await delay<Service[]>(
-        2000,
-        () => setLoading(true),
-        () => setLoading(false),
-        () => serviceService.getAll()
-      );
+      let services = cache.get<Service[]>("services");
+      if (services) {
+        return services;
+      }
+      services = await serviceService.getAll();
+      cache.set("services", services);
+      return services;
     },
     (data) => setServices(data),
     (error) => console.error(error),
     undefined,
     []
   );
+
+
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("Service Provider mounted");
+  }, [])
+
 
   // ==============================================================================
 

@@ -1,5 +1,6 @@
 import httpClient from "@/config/http";
 import { toast } from "react-toastify";
+import useCache from "../use-cache";
 
 // export const host = "192.168.1.9";
 // export const host = "localhost";
@@ -55,7 +56,7 @@ const useHttpClient = () => {
     if (statusCode === 403 || statusCode === 401 || statusCode === 400) {
       toast.error(
         errorMessageMapping[errors.message] ||
-          `${statusCode}: Error desconocido`,
+        `${statusCode}: Error desconocido`,
         {
           position: "top-right",
           autoClose: 5000,
@@ -87,7 +88,7 @@ const useHttpClient = () => {
   };
 
   httpClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+    const token = useCache().get<string>("token");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }

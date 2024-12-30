@@ -1,8 +1,9 @@
 import useAsync from "@/hooks/use-async";
 import useAttentionProfileService from "@/hooks/use-attention-profile-service";
+import useCache from "@/hooks/use-cache";
 import useMyModule from "@/hooks/use-my-module";
 import AttentionProfile from "@/models/attention-profile";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AttentionProfileContext = createContext<{
   attentionProfiles: AttentionProfile[];
@@ -33,13 +34,28 @@ const AttentionProfileProvider: React.FC<{
   const { myModule } = useMyModule();
 
   const attentionProfileService = useAttentionProfileService();
+  const cache = useCache();
+
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("Attention Profile Provider mounted");
+  }, [])
+
+
 
   // ==============================================================================
 
   useAsync<AttentionProfile[]>(
     async () => {
       if (!myModule) return [];
-      return await attentionProfileService.getAll(myModule.ipAddress);
+      let ap = cache.get<AttentionProfile[]>("attention_profiles");
+      if (ap) {
+        return ap;
+      }
+      ap = await attentionProfileService.getAll(myModule.ipAddress);
+      cache.set("attention_profiles", ap);
+      return ap;
     },
     (data) => {
       return setAttentionProfiles(data);
@@ -54,6 +70,7 @@ const AttentionProfileProvider: React.FC<{
   const refreshAttentionProfiles = async () => {
     if (!myModule) return;
     const attentionProfiles = await attentionProfileService.getAll(myModule.ipAddress);
+    cache.set("attention_profiles", attentionProfiles);
     setAttentionProfiles(attentionProfiles);
   };
 
