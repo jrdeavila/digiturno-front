@@ -218,6 +218,7 @@ export const MyModuleProvider: React.FC<{
 
   useAsync<Module | undefined>(
     async () => {
+
       let myModule = cache.get<Module>("my-module");
       if (myModule) {
         return myModule;
@@ -241,7 +242,9 @@ export const MyModuleProvider: React.FC<{
 
   useEffect(() => {
     if (!myModuleInfo) {
-      const moduleInfo = cache.get<MyModuleProps>("module-info");
+
+      const moduleInfo = JSON.parse(localStorage.getItem("module-info") || "") ||
+        cache.get<MyModuleProps>("module-info");
       if (moduleInfo) {
         setMyModuleInfo(new MyModuleProps(moduleInfo.ip));
       } else {
@@ -272,6 +275,7 @@ export const MyModuleProvider: React.FC<{
 
   const clearModuleInfo = () => {
     setMyModuleInfo(undefined);
+    localStorage.removeItem("module-info");
     cache.delete("module-info");
     cache.delete("my-module");
     cache.delete("services");
