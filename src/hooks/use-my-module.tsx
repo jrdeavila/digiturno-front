@@ -58,11 +58,11 @@ export const ConfigureModuleProvider: React.FC<{
       );
     },
     (data) => {
-      // if (type?.useQualification) {
-      // setDeviceConnected(data !== undefined);
-      // } else {
-      setDeviceConnected(true);
-      // }
+      if (type?.useQualification) {
+        setDeviceConnected(data !== undefined);
+      } else {
+        setDeviceConnected(true);
+      }
     },
     (error) => {
       console.error(error);
