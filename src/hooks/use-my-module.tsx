@@ -3,19 +3,19 @@ import ModuleConfigPage from "@/pages/module-config";
 import { ModuleType } from "@/services/module-type-service";
 import useQualificationModule from "@/services/use-qualification-module";
 import delay from "@/utils/delay";
+import { faBan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import styled from "styled-components";
+import useEcho from "./operator/use-echo";
 import useAsync from "./use-async";
-import useLoading from "./use-loading";
+import useCache from "./use-cache";
 import useHttpModuleService, {
   Module,
   ModuleResponse,
   moduleResponseToModule,
 } from "./use-module-service";
 import useSectional from "./use-sectional";
-import useEcho from "./operator/use-echo";
-import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConfigureModuleCtxProps {
   pared: boolean;
@@ -59,9 +59,9 @@ export const ConfigureModuleProvider: React.FC<{
     },
     (data) => {
       // if (type?.useQualification) {
-        // setDeviceConnected(data !== undefined);
+      // setDeviceConnected(data !== undefined);
       // } else {
-        setDeviceConnected(true);
+      setDeviceConnected(true);
       // }
     },
     (error) => {
@@ -165,9 +165,9 @@ export const MyModuleProvider: React.FC<{
   );
 
   const { moduleTypes } = useSectional();
-  const { setLoading } = useLoading();
 
   const echo = useEcho();
+  const cache = useCache();
 
   // ==================================================================
 
@@ -175,7 +175,17 @@ export const MyModuleProvider: React.FC<{
     setMyModuleInfo(moduleInfo);
   };
 
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("My Module Provider mounted");
+  }, [])
+
+
+
   // ==================================================================
+
+
 
   useEffect(() => {
     if (!moduleType) {
@@ -208,21 +218,13 @@ export const MyModuleProvider: React.FC<{
 
   useAsync<Module | undefined>(
     async () => {
-      return await delay<Module | undefined>(
-        1000,
-        () => {
-          setLoading(true);
-        },
-        () => {
-          setLoading(false);
-        },
-        () => {
-          if (!myModuleInfo) {
-            return Promise.resolve(undefined);
-          }
-          return myModuleService.getMyModule(myModuleInfo.ip);
-        }
-      );
+      let myModule = cache.get<Module>("my-module");
+      if (myModule) {
+        return myModule;
+      }
+      myModule = await myModuleService.getMyModule(myModuleInfo!.ip);
+      cache.set("my-module", myModule);
+      return myModule;
     },
     (data) => {
       setMyModule(data);
@@ -239,15 +241,14 @@ export const MyModuleProvider: React.FC<{
 
   useEffect(() => {
     if (!myModuleInfo) {
-      const moduleInfo = localStorage.getItem("module-info");
+      const moduleInfo = cache.get<MyModuleProps>("module-info");
       if (moduleInfo) {
-        const data = JSON.parse(moduleInfo);
-        setMyModuleInfo(new MyModuleProps(data.ip));
+        setMyModuleInfo(new MyModuleProps(moduleInfo.ip));
       } else {
         setShouldRequestIp(true);
       }
     } else {
-      localStorage.setItem("module-info", JSON.stringify(myModuleInfo));
+      cache.set("module-info", myModuleInfo);
     }
     setShouldRequestIp(!myModuleInfo);
   }, [myModuleInfo]);
@@ -271,7 +272,12 @@ export const MyModuleProvider: React.FC<{
 
   const clearModuleInfo = () => {
     setMyModuleInfo(undefined);
-    localStorage.removeItem("module-info");
+    cache.delete("module-info");
+    cache.delete("my-module");
+    cache.delete("services");
+    cache.delete("attention_profiles");
+    cache.delete("profile");
+    cache.delete("token");
   };
 
   // ==================================================================

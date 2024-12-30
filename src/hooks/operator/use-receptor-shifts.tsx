@@ -22,6 +22,7 @@ import useHttpShiftService, {
   ShiftResponse,
   shiftResponseToModel,
 } from "./use-http-shifts-service";
+import useCache from "../use-cache";
 
 interface ReceptorShiftCtxProps {
   shifts: Shift[];
@@ -398,6 +399,7 @@ const EditRoomModal: React.FC<{
   // =======================================================
 
   const roomService = useRoomService();
+  const cache = useCache();
   // =======================================================
 
   const { myModule } = useMyModule();
@@ -406,7 +408,12 @@ const EditRoomModal: React.FC<{
 
   useAsync<Room[]>(
     async () => {
-      const rooms = await roomService.getRooms();
+      let rooms = cache.get<Room[]>("rooms");
+      if (rooms) {
+        return rooms;
+      }
+      rooms = await roomService.getRooms();
+      cache.set("rooms", rooms);
       return rooms.filter(
         (r) =>
           r.sectionalId === myModule?.room.branch_id && r.id != myModule.room.id

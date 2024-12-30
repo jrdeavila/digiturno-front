@@ -2,7 +2,7 @@ import useAsync from "@/hooks/use-async";
 import useCache from "@/hooks/use-cache";
 import useClientTypeService from "@/hooks/use-client-type-service";
 import ClientType from "@/models/client-type";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const ClientTypeContext = createContext<{
   clientTypes: ClientType[];
@@ -11,7 +11,7 @@ const ClientTypeContext = createContext<{
 }>({
   clientTypes: [],
   loading: false,
-  refreshClientTypes: () => {},
+  refreshClientTypes: () => { },
 });
 
 export const useClientTypeResource = () => {
@@ -25,6 +25,14 @@ const ClientTypeProvider: React.FC<{
   const cache = useCache();
   const [clientTypes, setClientTypes] = useState<ClientType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("Client Type Provider mounted");
+  }, [])
+
+
 
   // =================================================================
 

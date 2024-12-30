@@ -226,7 +226,7 @@ const ModuleLiveInfo: React.FC<{
       return (
         shift.moduleId === currentModule.id &&
         // module.attentionProfileId === attentionProfile.id &&
-        shift.state === "qualified"
+        (shift.state === "qualified" || shift.state === "transferred")
       );
     }).length
   }, [shifts, currentModule]);
@@ -293,7 +293,7 @@ const ShiftInfo = () => {
         <div className="flex flex-col items-center justify-center">
           <h2 className="text-sm font-bold">Atendidos</h2>
           <p className="text-2xl">
-            {shifts.filter((shift) => shift.state === "qualified").length}
+            {shifts.filter((shift) => shift.state === "qualified" || shift.state === "transferred").length}
           </p>
         </div>
       </div>
