@@ -243,7 +243,9 @@ export const MyModuleProvider: React.FC<{
   useEffect(() => {
     if (!myModuleInfo) {
 
-      const moduleInfo = JSON.parse(localStorage.getItem("module-info") || "") ||
+      const oldConfig = localStorage.getItem("module-info");
+      const moduleInfo = oldConfig ?
+        JSON.parse(oldConfig) :
         cache.get<MyModuleProps>("module-info");
       if (moduleInfo) {
         setMyModuleInfo(new MyModuleProps(moduleInfo.ip));
