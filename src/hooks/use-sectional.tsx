@@ -1,11 +1,12 @@
+import { ModuleType } from "@/services/module-type-service";
 import { Room } from "@/services/room-service";
 import { Sectional } from "@/services/sectional-service";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import useAsync from "./use-async";
+import useCache from "./use-cache";
+import useModuleTypeService from "./use-module-type-service";
 import useRoomService from "./use-room-service";
 import useSectionalService from "./use-sectional-service";
-import { ModuleType } from "@/services/module-type-service";
-import useModuleTypeService from "./use-module-type-service";
 
 type SectionalCtxProps = {
   sectionals: Sectional[];
@@ -33,9 +34,28 @@ export const SectionalProvider: React.FC<{
 
   // ==================================================================
 
+  const cache = useCache();
+
+  // ==============================================================================
+
+  useEffect(() => {
+    console.log("Sectional Provider mounted");
+  }, [])
+
+
+
+  // ==================================================================
+
   useAsync<Sectional[]>(
     async () => {
-      return sectionalService.getSectionals();
+      let sectionals = cache.get<Sectional[]>("sectionals");
+      if (sectionals) {
+        return sectionals;
+      }
+      sectionals = await sectionalService.getSectionals();
+      cache.set("sectionals", sectionals);
+      return sectionals;
+
     },
     (data) => {
       setSectionals(data);
@@ -43,13 +63,19 @@ export const SectionalProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     []
   );
 
   useAsync<Room[]>(
     async () => {
-      return roomService.getRooms();
+      let rooms = cache.get<Room[]>("rooms");
+      if (rooms) {
+        return rooms;
+      }
+      rooms = await roomService.getRooms();
+      cache.set("rooms", rooms);
+      return rooms;
     },
     (data) => {
       setRooms(data);
@@ -57,13 +83,19 @@ export const SectionalProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     []
   );
 
   useAsync<ModuleType[]>(
     async () => {
-      return moduleTypeService.getModuleTypes();
+      let types = cache.get<ModuleType[]>("module_types");
+      if (types) {
+        return types;
+      }
+      types = await moduleTypeService.getModuleTypes();
+      cache.set("module_types", types);
+      return types;
     },
     (data) => {
       setModuleTypes(data);
@@ -71,7 +103,7 @@ export const SectionalProvider: React.FC<{
     (error) => {
       console.error(error);
     },
-    () => {},
+    () => { },
     []
   );
 
@@ -79,6 +111,7 @@ export const SectionalProvider: React.FC<{
 
   const refreshSectionals = () => {
     sectionalService.getSectionals().then(setSectionals);
+    cache.set("sectionals", sectionals);
   };
 
   const filterRooms = (sectionalId: number) => {

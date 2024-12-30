@@ -2,11 +2,7 @@
 
 export default class CacheService {
   private static instance: CacheService;
-  private cache: Map<string, any>;
 
-  private constructor() {
-    this.cache = new Map();
-  }
 
   public static getInstance(): CacheService {
     if (!CacheService.instance) {
@@ -17,14 +13,18 @@ export default class CacheService {
   }
 
   public set(key: string, value: any): void {
-    this.cache.set(key, value);
+    return localStorage.setItem(`cache:${key}`, JSON.stringify(value));
   }
 
   public get<T>(key: string): T | undefined {
-    return this.cache.get(key);
+    const item = localStorage.getItem(`cache:${key}`);
+    if (item) {
+      return JSON.parse(item);
+    }
+    return undefined;
   }
 
   public delete(key: string): void {
-    this.cache.delete(key);
+    return localStorage.removeItem(`cache:${key}`);
   }
 }

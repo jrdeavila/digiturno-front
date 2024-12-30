@@ -97,7 +97,9 @@ class HttpAuthenticationService {
           Authorization: `Bearer ${token}`,
           "X-Module-Ip": this.moduleIp,
         },
+        validateStatus: () => true,
       }
+
     );
   }
 
@@ -109,6 +111,7 @@ class HttpAuthenticationService {
         Authorization: `Bearer ${token}`,
         "X-Module-Ip": this.moduleIp,
       },
+      validateStatus: () => true,
     });
     return attendantResponseToAttendant(res.data.data);
   }
@@ -121,6 +124,7 @@ class HttpAuthenticationService {
         Authorization: `Bearer ${token}`,
         "X-Module-Ip": this.moduleIp,
       },
+      validateStatus: () => true,
     });
 
     return res.data.token;

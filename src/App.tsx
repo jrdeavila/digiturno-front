@@ -4,7 +4,7 @@ import LoginPage from "@/pages/login";
 import NotFoundPage from "@/pages/not-found";
 import SectionalModulePage from "@/pages/sectional-module";
 import UsersPage from "@/pages/users";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import LoadingPage from "./components/loading-page";
 import useAuth from "./hooks/use-auth";
 import useMyModule from "./hooks/use-my-module";
@@ -15,6 +15,7 @@ import ScreenPage from "./pages/screen";
 const ModuleGuard = () => {
   const { type } = useMyModule();
   const { loading, authenticated } = useAuth();
+
 
   const render = useMemo(() => {
 

@@ -1,6 +1,7 @@
 import useAsync from "@/hooks/use-async";
 import useAttendantService from "@/hooks/use-attendant-service";
 import { Attendant } from "@/hooks/use-authentication-service";
+import useCache from "@/hooks/use-cache";
 import { createContext, useContext, useState } from "react";
 
 interface AttendantContextType {
@@ -16,12 +17,19 @@ const AttendantProvider: React.FC<{
   // ================================================================
 
   const attendantService = useAttendantService();
+  const cache = useCache();
 
   // ================================================================
 
   useAsync<Attendant[]>(
     async () => {
-      return attendantService.getAttendants();
+      let attendants = cache.get<Attendant[]>("attendants");
+      if (attendants) {
+        return attendants;
+      }
+      attendants = await attendantService.getAttendants();
+      cache.set("attendants", attendants);
+      return attendants;
     },
     (data) => {
       setAttendants(data);

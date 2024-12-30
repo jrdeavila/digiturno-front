@@ -15,7 +15,7 @@ import styled from "styled-components";
 export default function DefaultLayout({
   children,
   className = "container mx-auto max-w-7xl px-6 flex-grow pt-16",
-  showLogo = true,
+  showLogo = false,
 }: {
   children: React.ReactNode;
   className?: string;
