@@ -1,18 +1,17 @@
 import useAuth from "@/hooks/use-auth";
 import useMyModule from "@/hooks/use-my-module";
-import { faBook, faDesktop, faPerson, faSignOut, faToilet } from "@fortawesome/free-solid-svg-icons";
+import AttentionProfile from "@/models/attention-profile";
+import { useAbsence } from "@/providers/absence-provider";
+import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
+import { faDesktop, faPerson, faSignOut, faToilet } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "@nextui-org/react";
 import React, { useEffect, useMemo, useState } from "react";
 import GenericComponent from "./GenericComponent";
-import { Button } from "@nextui-org/react";
-import { useAbsence } from "@/providers/absence-provider";
-import AttentionProfile from "@/models/attention-profile";
-import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
-import CasesModal from "@/components/CasesModal"; 
 
 const ModuleInfo: React.FC = () => {
   const { myModule } = useMyModule();
-  const { attendant, logout } = useAuth(); 
+  const { attendant, logout } = useAuth();
   const { openModal, backToWork } = useAbsence();
   const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
 
@@ -25,8 +24,6 @@ const ModuleInfo: React.FC = () => {
     }
   }, [attentionProfiles, myModule]);
 
-  const at = attentionProfiles.find((ap) => ap.id === myModule?.attentionProfileId);
-  const isAJ = useMemo(() => at?.name === "ASESORIA JURIDICA", [at]);
 
 
   const moduleStatus = useMemo(() => {
@@ -96,13 +93,6 @@ const ModuleInfo: React.FC = () => {
   }, [attendant]);
 
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const closeModal = () => setIsModalOpen(false);
-
-
-  const handleOpenCaseModal = () => {
-    setIsModalOpen(true);
-  };
 
   return (
     <GenericComponent
@@ -151,28 +141,8 @@ const ModuleInfo: React.FC = () => {
               <span> AUSENTARSE </span>
             </Button>
           )}
-          {isAJ && (
-            <Button
-              onClick={handleOpenCaseModal}
-              className="bg-blue-700 text-white font-bold"
-            >
-              <FontAwesomeIcon icon={faBook} />
-              <span> VER CASO </span>
-            </Button>
-          )}
 
-          {isAJ && (
-            <CasesModal
-              isOpen={isModalOpen}
-              onClose={closeModal}
-              cases={[]}
-              loading={false}
-              error={null} onSave={function (caseData: { id: number; caseNumber: string; subject: string; attendedBy: string; username: string; identification: string; recordType: string; documentType: string; creationDate: string; modificationDate: string; observation: string; }): void {
-                throw new Error("Function not implemented.");
-              } } onDelete={function (id: number): void {
-                throw new Error("Function not implemented.");
-              } }            />
-          )}
+
         </div>
       </div>
     </GenericComponent>

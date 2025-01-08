@@ -19,7 +19,6 @@ export const CreateShiftContext = React.createContext<{
   createShift: (qualification: number) => void;
   onCreateClient?: () => void;
   setDniSearched: (dni: string) => void;
-  setQualification: (qualification: number) => void;
   setAttentionProfile: (attentionProfile: AttentionProfile) => void;
   createShiftWithAttentionProfile: () => void;
   startQualification: () => void;
@@ -30,7 +29,6 @@ export const CreateShiftContext = React.createContext<{
   setServices: () => { },
   createShift: () => { },
   setDniSearched: () => { },
-  setQualification: () => { },
   startQualification: () => { },
   setAttentionProfile: () => { },
   createShiftWithAttentionProfile: () => { },
@@ -46,7 +44,6 @@ const CreateShiftProvider: React.FC<{
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [dniSearched, setDniSearched] = useState("");
   const [isQualifying, setIsQualifying] = useState(false);
-  const [qualification, setQualification] = useState(0);
   const [attentionProfile, setAttentionProfile] = useState<
     AttentionProfile | undefined
   >(undefined);
@@ -149,14 +146,11 @@ const CreateShiftProvider: React.FC<{
   const clearShift = () => {
     setClient(undefined);
     setServices(undefined);
-    setQualification(0);
     setDniSearched("");
     setIsCreatingClient(false);
   };
 
-  const handleSetQualification = (qualification: number) => {
-    setQualification(qualification);
-  };
+
 
   const handleSetClient = (client: Client | undefined) => {
     setClient(client);
@@ -190,7 +184,6 @@ const CreateShiftProvider: React.FC<{
         createShift: handleCreateShift,
         onCreateClient: handleCreateClient,
         setDniSearched: handleSetDniSearched,
-        setQualification: handleSetQualification,
         startQualification: handleStartQualification,
         setAttentionProfile: handleSetAttention,
         createShiftWithAttentionProfile: handleCreateShiftWithAttentionProfile,
@@ -221,7 +214,6 @@ const CreateShiftProvider: React.FC<{
             <WaitingClientQualification
               onQualified={async (qualification: number) => {
                 console.log(qualification);
-                // setQualification(qualification);
                 await handleCreateShift(qualification);
                 onClose();
               }}
@@ -229,7 +221,6 @@ const CreateShiftProvider: React.FC<{
                 setIsQualifying(false);
                 setServices([]);
                 setClient(undefined);
-                setQualification(0);
                 onClose();
               }}
             />

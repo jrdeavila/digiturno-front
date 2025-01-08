@@ -153,7 +153,7 @@ const AttentionProfileShiftInfo = () => {
 const ModuleLiveInfo: React.FC<{
   module: Module;
   attentionProfile: AttentionProfile;
-}> = ({ module, attentionProfile }) => {
+}> = ({ module }) => {
   const { shifts } = useReceptorShifts();
   const [currentModule, setCurrentModule] = React.useState<Module>(module);
   const [attendant, setAttendant] = React.useState<Attendant | undefined>(

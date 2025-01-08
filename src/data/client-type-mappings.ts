@@ -8,5 +8,5 @@ export interface ClientTypeResponse {
 export function mapClientTypeResponseToClientType(
   response: ClientTypeResponse
 ): ClientType {
-  return new ClientType(response.id, response.name);
+  return new ClientType(response.id, response.name, response.name);
 }

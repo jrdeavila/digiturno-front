@@ -26,6 +26,7 @@ export const VoiceProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       });
       setQueue(rest);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queue, speaking]);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export const VoiceProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default function useVoice() {
   const ctx = useContext(VoiceCtx);
   if (!ctx) {
