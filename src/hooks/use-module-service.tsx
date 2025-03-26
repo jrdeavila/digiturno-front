@@ -97,6 +97,7 @@ class HttpModuleService {
         "X-Module-Ip": ipAddress,
       },
     });
+    console.log(response.data);
     return new Module(
       response.data.data.id,
       response.data.data.name,

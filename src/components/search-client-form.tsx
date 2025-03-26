@@ -4,7 +4,7 @@ import { useCreateShift } from "@/providers/create-shift-provider";
 import { Input, Select, SelectItem } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useFormik } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 const SearchClientForm: React.FC<{
@@ -15,6 +15,7 @@ const SearchClientForm: React.FC<{
     const { clients, findClient } = useClientResource();
     const { setClient, client } = useCreateShift();
     const { clientTypes } = useClientTypeResource();
+    const [forceSearching, setForceSearching] = useState(false);
 
     // ==================================================================================================================
 
@@ -26,13 +27,21 @@ const SearchClientForm: React.FC<{
 
     // ==================================================================================================================
 
-    const { handleChange, values, errors, handleSubmit, setValues, resetForm } =
+    const initialValues: {
+      dni: string;
+      name: string;
+      client_type_id: number;
+    } = {
+      dni: client?.dni || "",
+      name: client?.name || "",
+      client_type_id: clientTypes.find(
+        (clientType) => clientType.slug === client?.clientType
+      )?.id || 0,
+    };
+
+    const { handleChange, values, errors, setFieldValue, resetForm } =
       useFormik({
-        initialValues: {
-          dni: "",
-          name: "",
-          client_type_id: 3,
-        },
+        initialValues: initialValues,
         validationSchema: validationScheme,
         validate: (values) => {
           setClient({
@@ -67,29 +76,14 @@ const SearchClientForm: React.FC<{
 
     const handleSearchClient = (
       dni: string,
-      onFound: (values: {
-        dni: string;
-        name: string;
-        client_type_id: number;
-      }) => void
     ) => {
       const client = clients.find((client) => client.dni === dni);
+
       if (client) {
-        setClient(client);
-        onFound({
-          dni: client.dni,
-          name: client.name,
-          client_type_id:
-            clientTypes.find((clientType) => clientType.slug == client.clientType)
-              ?.id || 0,
-        });
-        setValues({
-          dni: client.dni,
-          name: client.name,
-          client_type_id:
-            clientTypes.find((clientType) => clientType.slug == client.clientType)
-              ?.id || 1,
-        });
+        const clientTypeId = clientTypes.find((clientType) => clientType.slug == client.clientType)
+          ?.id || 0;
+        setFieldValue("client_type_id", clientTypeId);
+        setFieldValue("name", client.name);
       } else {
         return;
       }
@@ -97,32 +91,18 @@ const SearchClientForm: React.FC<{
 
     const forceSearchClient = (
       dni: string,
-      onFound: (values: {
-        dni: string;
-        name: string;
-        client_type_id: number;
-      }) => void
     ) => {
+      setForceSearching(true);
       findClient(dni).then((client) => {
         if (client) {
           setClient(client);
-          onFound({
-            dni: client.dni,
-            name: client.name,
-            client_type_id:
-              clientTypes.find((clientType) => clientType.slug == client.clientType)
-                ?.id || 0,
-          });
-          setValues({
-            dni: client.dni,
-            name: client.name,
-            client_type_id:
-              clientTypes.find((clientType) => clientType.slug == client.clientType)
-                ?.id || 1,
-          });
-        } else {
-          return;
+          setFieldValue("client_type_id", clientTypes.find((clientType) => clientType.slug == client.clientType)?.id || 0);
+          setFieldValue("name", client.name);
+
         }
+        setForceSearching(false);
+      }).catch(() => {
+        setForceSearching(false);
       });
 
     }
@@ -146,11 +126,10 @@ const SearchClientForm: React.FC<{
               placeholder="Cédula del cliente"
               label="Cédula"
               value={values.dni}
+              type="tel"
               onChange={(e) => {
                 handleChange("dni")(e);
-                handleSearchClient(e.target.value, (values) => {
-                  setValues(values);
-                });
+                handleSearchClient(e.target.value);
               }}
               errorMessage={errors.dni}
               isInvalid={!!errors.dni}
@@ -178,8 +157,10 @@ const SearchClientForm: React.FC<{
                 value={values.client_type_id.toString()}
                 selectedKeys={values.client_type_id.toString()}
                 onChange={(e) => {
-                  handleChange("client_type_id")(e);
-                  handleSubmit();
+                  if (e.target.value === "") {
+                    return;
+                  }
+                  setFieldValue("client_type_id", parseInt(e.target.value));
                 }}
               >
                 {clientTypes.map((clientType) => (
@@ -193,19 +174,21 @@ const SearchClientForm: React.FC<{
 
           {
             !values.name &&
-            values.dni &&
+            values.dni && (forceSearching ? (
+              <div className="mt-2 text-center py-2">
+                Buscando...
+              </div>
+            ) :
 
-            (<button
-              onClick={(e) => {
-                e.preventDefault();
-                return forceSearchClient(values.dni, (values) => {
-                  setValues(values);
-                });
-              }}
-              className="w-full bg-primary text-white rounded-lg py-2 cursor-pointer"
-            >
-              Forzar búsqueda
-            </button>)
+              (<button
+                onClick={(e) => {
+                  e.preventDefault();
+                  return forceSearchClient(values.dni)
+                }}
+                className="w-full bg-primary text-white rounded-lg py-2 cursor-pointer"
+              >
+                Forzar búsqueda
+              </button>))
           }
         </div>
       </form>
