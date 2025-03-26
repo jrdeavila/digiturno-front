@@ -11,23 +11,25 @@ import useMyModule from "./hooks/use-my-module";
 import OperatorPage from "./pages/operator";
 import ReceptorPage from "./pages/receptor";
 import ScreenPage from "./pages/screen";
+import Qualification from "./pages/qualification";
 
 const ModuleGuard = () => {
   const { type } = useMyModule();
   const { loading, authenticated } = useAuth();
-
-
   const render = useMemo(() => {
-
     if (loading) {
       return <LoadingPage />;
     }
     switch (type?.id) {
       case 2:
         return <Navigate to="/modulo-seccional" />;
+      case 6:
+        if (!authenticated) {
+          return <Navigate to="/login" />;
+        }
+        return <Navigate to="/caja" />;
       case 1:
         if (!authenticated) {
-          console.log("ModuleGuard -> !authenticated");
           return <Navigate to="/login" />;
         }
         return <Navigate to="/caja" />;
@@ -36,6 +38,9 @@ const ModuleGuard = () => {
 
       case 4:
         return <Navigate to="/pantalla" />;
+
+      case 5:
+        return <Navigate to="/calificación" />;
 
     }
   }, [authenticated, type, loading]);
@@ -48,7 +53,6 @@ const ModuleGuard = () => {
 };
 
 function App() {
-
   return (
     <Routes>
       <Route element={<ModuleGuard />}>
@@ -62,6 +66,7 @@ function App() {
         <Route element={<ModuleGuard />} path="/" />
         <Route element={<NotFoundPage />} path="*" />
         <Route element={<LoginPage />} path="/login" />
+        <Route element={<Qualification />} path="/calificación" />
       </Route>
     </Routes>
   );

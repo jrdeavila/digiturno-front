@@ -42,8 +42,7 @@ export const ShiftProvider: React.FC<{
 
   if (myModule?.moduleTypeId === 3) {
     return (
-      <ReceptorShiftsProvider
-      >
+      <ReceptorShiftsProvider >
         {children}
       </ReceptorShiftsProvider>
     )
@@ -55,6 +54,24 @@ export const ShiftProvider: React.FC<{
       </ScreenShiftsProvider>
     )
   }
+
+  if (myModule?.moduleTypeId === 5) {
+    return (
+      <>
+        {children}
+      </>
+    )
+  }
+
+  if (myModule?.moduleTypeId === 6) {
+    return (
+      <>
+        {children}
+      </>
+    )
+  }
+
+
 
   return <Navigate to="/" />
 
