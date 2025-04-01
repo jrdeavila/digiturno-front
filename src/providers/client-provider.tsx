@@ -1,4 +1,3 @@
-import useAsync from "@/hooks/use-async";
 import useCache from "@/hooks/use-cache";
 import useClientService from "@/hooks/use-client-service";
 import Client from "@/models/client";

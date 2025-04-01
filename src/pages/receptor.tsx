@@ -16,7 +16,6 @@ import {
 } from "@/hooks/use-module-service";
 import useMyModule from "@/hooks/use-my-module";
 import DefaultLayout from "@/layouts/default";
-import AttentionProfile from "@/models/attention-profile";
 import { useAttendantResource } from "@/providers/attendant-provider";
 import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import CreateShiftProvider, {
@@ -24,9 +23,9 @@ import CreateShiftProvider, {
 } from "@/providers/create-shift-provider";
 import { faDesktop, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Card, CardBody, Divider } from "@nextui-org/react";
+import { Divider } from "@nextui-org/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 
 export default function ReceptorPage() {
@@ -72,46 +71,6 @@ export default function ReceptorPage() {
   );
 }
 
-const VirtualKeyboard = () => {
-  const [value, setValue] = useState("");
-  const { setDniSearched } = useCreateShift();
-
-  useEffect(() => {
-    setDniSearched(value);
-  }, [value]);
-
-  return (
-    <Card className="h-full w-full">
-      <CardBody>
-        <div className="grid grid-cols-3 grid-rows-4 gap-2 w-full h-full">
-          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Borrar"].map(
-            (key) => (
-              <div
-                key={key}
-                onClick={() => {
-                  if (key === "Borrar") {
-                    setValue("");
-                  } else {
-                    setValue(value + key);
-                  }
-                }}
-                className={`flex items-center justify-center  text-white rounded-lg py-2 ${key === "Borrar" ? "col-span-2 bg-secondary" : "bg-primary"}`}
-              >
-                {key}
-              </div>
-            )
-          )}
-        </div>
-
-
-
-        <div className="col-span-1">
-        </div>
-      </CardBody>
-    </Card>
-  );
-};
-
 const CreateShiftButton = () => {
   const { createShiftWithAttentionProfile } = useCreateShift();
   return (
@@ -144,7 +103,6 @@ const AttentionProfileShiftInfo = () => {
                   <ModuleLiveInfo
                     key={module.id}
                     module={module}
-                    attentionProfile={ap}
                   />
                 ))}
             </div>
@@ -201,8 +159,7 @@ const AttentionProfileShiftInfo = () => {
 
 const ModuleLiveInfo: React.FC<{
   module: Module;
-  attentionProfile: AttentionProfile;
-}> = ({ module, attentionProfile }) => {
+}> = ({ module }) => {
   const { shifts } = useReceptorShifts();
   const [currentModule, setCurrentModule] = React.useState<Module>(module);
   const [attendant, setAttendant] = React.useState<Attendant | undefined>(

@@ -65,9 +65,9 @@ export const ShiftProvider: React.FC<{
 
   if (myModule?.moduleTypeId === 6) {
     return (
-      <>
+      <ModuleShiftProvider>
         {children}
-      </>
+      </ModuleShiftProvider>
     )
   }
 

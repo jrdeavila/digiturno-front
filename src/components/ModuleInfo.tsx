@@ -8,11 +8,11 @@ import { Button } from "@nextui-org/react";
 import { useAbsence } from "@/providers/absence-provider";
 import AttentionProfile from "@/models/attention-profile";
 import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
-import CasesModal from "@/components/CasesModal"; 
+import CasesModal from "@/components/CasesModal";
 
 const ModuleInfo: React.FC = () => {
   const { myModule } = useMyModule();
-  const { attendant, logout } = useAuth(); 
+  const { attendant, logout } = useAuth();
   const { openModal, backToWork } = useAbsence();
   const [attentionProfile, setAttentionProfile] = useState<AttentionProfile | undefined>(undefined);
 
@@ -167,11 +167,11 @@ const ModuleInfo: React.FC = () => {
               onClose={closeModal}
               cases={[]}
               loading={false}
-              error={null} onSave={function (caseData: { id: number; caseNumber: string; subject: string; attendedBy: string; username: string; identification: string; recordType: string; documentType: string; creationDate: string; modificationDate: string; observation: string; }): void {
+              error={null} onSave={function (): void {
                 throw new Error("Function not implemented.");
-              } } onDelete={function (id: number): void {
+              }} onDelete={function (): void {
                 throw new Error("Function not implemented.");
-              } }            />
+              }} />
           )}
         </div>
       </div>

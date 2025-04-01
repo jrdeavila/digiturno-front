@@ -2394,6 +2394,11 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-speech-kit@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-speech-kit/-/react-speech-kit-3.0.0.tgz#052fd97f779c6f113509fffe1f01d4548b35eb59"
+  integrity sha512-goiaBx0c84n3IvalvfCukJzWFqA4SBx0EEZebRuc4WGeyveQXIuQlDGtUVFgnsFEUNlWNWDhvr+itA8Tbf5rUg==
+
 "@types/react-speech-recognition@^3.9.5":
   version "3.9.5"
   resolved "https://registry.npmjs.org/@types/react-speech-recognition/-/react-speech-recognition-3.9.5.tgz"
@@ -4172,7 +4177,7 @@ react-speakup@^1.0.0:
 
 react-speech-kit@^3.0.1:
   version "3.0.1"
-  resolved "https://registry.npmjs.org/react-speech-kit/-/react-speech-kit-3.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/react-speech-kit/-/react-speech-kit-3.0.1.tgz#8bd936adfe064be1c5a07e2992dfdfd772e80d14"
   integrity sha512-MXNOciISanhmnxpHJkBOev3M3NPDpW1T7nTc/eGw5pO9cXpoUccRxZkmr/IlpTPbPEneDNeTmbwri/YweyctZg==
 
 react-style-singleton@^2.2.1:

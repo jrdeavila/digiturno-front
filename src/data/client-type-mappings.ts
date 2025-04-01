@@ -8,5 +8,9 @@ export interface ClientTypeResponse {
 export function mapClientTypeResponseToClientType(
   response: ClientTypeResponse
 ): ClientType {
-  return new ClientType(response.id, response.name);
+  return {
+    id: response.id,
+    name: response.name,
+    slug: response.name.toLowerCase().replace(/\s+/g, "-")
+  };
 }
