@@ -46,7 +46,7 @@ const CreateShiftProvider: React.FC<{
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [dniSearched, setDniSearched] = useState("");
   const [isQualifying, setIsQualifying] = useState(false);
-  const [qualification, setQualification] = useState(0);
+  const [, setQualification] = useState(0);
   const [attentionProfile, setAttentionProfile] = useState<
     AttentionProfile | undefined
   >(undefined);

@@ -16,7 +16,6 @@ import {
 } from "@/hooks/use-module-service";
 import useMyModule from "@/hooks/use-my-module";
 import DefaultLayout from "@/layouts/default";
-import AttentionProfile from "@/models/attention-profile";
 import { useAttendantResource } from "@/providers/attendant-provider";
 import { useAttentionProfileResource } from "@/providers/attention-profile-provider";
 import CreateShiftProvider, {
@@ -37,23 +36,32 @@ export default function ReceptorPage() {
     >
       <ModuleProvider>
         <CreateShiftProvider>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
-            <div className="col-span-1 row-span-1">
-              <SearchClientForm enabledType={true} />
-            </div>
-            <div className="col-span-2 row-span-4">
-              <ShiftList />
-            </div>
-
-            <div className="col-span-1 row-span-1 p-2">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:grid-rows-4 h-full w-full">
+            <div className="lg:hidden col-span-2 row-span-1 p-2">
               <ShiftInfo />
             </div>
-            <div className="col-span-1 row-span-2 p-2">
+            <div className="md:col-span-2 lg:col-span-1 row-span-1">
+              <SearchClientForm enabledType={true} />
+            </div>
+            <div className="lg:hidden sm:col-span-2 lg:col-span-1 row-span-1 p-2">
               <AttentionProfileList />
               <CreateShiftButton />
             </div>
 
-            <div className="col-span-1 row-span-3">
+
+            <div className="hidden lg:block lg:col-span-2 lg:row-span-4">
+              <ShiftList />
+            </div>
+
+            <div className="hidden lg:block col-span-1 row-span-1 p-2">
+              <ShiftInfo />
+            </div>
+            <div className="hidden lg:block col-span-1 row-span-2 p-2">
+              <AttentionProfileList />
+              <CreateShiftButton />
+            </div>
+
+            <div className="hidden lg:block col-span-1 row-span-3">
               <AttentionProfileShiftInfo />
             </div>
           </div>
@@ -95,7 +103,6 @@ const AttentionProfileShiftInfo = () => {
                   <ModuleLiveInfo
                     key={module.id}
                     module={module}
-                    attentionProfile={ap}
                   />
                 ))}
             </div>
@@ -152,8 +159,7 @@ const AttentionProfileShiftInfo = () => {
 
 const ModuleLiveInfo: React.FC<{
   module: Module;
-  attentionProfile: AttentionProfile;
-}> = ({ module, attentionProfile }) => {
+}> = ({ module }) => {
   const { shifts } = useReceptorShifts();
   const [currentModule, setCurrentModule] = React.useState<Module>(module);
   const [attendant, setAttendant] = React.useState<Attendant | undefined>(

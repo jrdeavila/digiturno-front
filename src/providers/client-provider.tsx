@@ -1,4 +1,3 @@
-import useAsync from "@/hooks/use-async";
 import useCache from "@/hooks/use-cache";
 import useClientService from "@/hooks/use-client-service";
 import Client from "@/models/client";
@@ -65,27 +64,31 @@ const ClientProvider: React.FC<{
 
   // ==============================================================================
 
-  useAsync<Client[]>(
-    async () => {
+  useEffect(() => {
+    refreshClients();
+  }, [])
 
-      let clients = cache.get<Client[]>("clients");
+  // useAsync<Client[]>(
+  //   async () => {
 
-      if (clients) {
-        return clients;
+  //     let clients = cache.get<Client[]>("clients");
 
-      }
+  //     if (clients) {
+  //       return clients;
 
-      clients = await clientService.getClients();
-      cache.set("clients", clients);
+  //     }
 
-      return clients;
+  //     clients = await clientService.getClients();
+  //     cache.set("clients", clients);
 
-    },
-    (data) => setClients(data),
-    (error) => console.error(error),
-    undefined,
-    []
-  );
+  //     return clients;
+
+  //   },
+  //   (data) => setClients(data),
+  //   (error) => console.error(error),
+  //   undefined,
+  //   []
+  // );
 
   // ==============================================================================
 
@@ -137,7 +140,12 @@ const ClientProvider: React.FC<{
   // ==============================================================================
 
   const refreshClients = async () => {
-    const clients = await clientService.getClients();
+    let clients = cache.get<Client[]>("clients");
+    if (clients) {
+      setClients(clients);
+    }
+    clients = await clientService.getClients();
+    cache.set("clients", clients);
     setClients(clients);
   };
 
@@ -150,7 +158,14 @@ const ClientProvider: React.FC<{
   // ==============================================================================
 
   const addClient = (client: Client) => {
-    setClients([client, ...clients]);
+    // setClients([client, ...clients]);
+    let clients = cache.get<Client[]>("clients");
+    if (!clients) {
+      clients = [];
+    }
+    clients = [client, ...clients];
+    setClients(clients);
+    cache.set("clients", clients);
   };
 
   // ==============================================================================
