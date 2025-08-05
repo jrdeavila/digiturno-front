@@ -65,7 +65,7 @@ const ClientProvider: React.FC<{
   // ==============================================================================
 
   useEffect(() => {
-    refreshClients();
+    // refreshClients();
   }, [])
 
   // useAsync<Client[]>(

@@ -173,22 +173,29 @@ const SearchClientForm: React.FC<{
           }
 
           {
-            !values.name &&
-            values.dni && (forceSearching ? (
+            (forceSearching ? (
               <div className="mt-2 text-center py-2">
                 Buscando...
               </div>
             ) :
 
-              (<button
-                onClick={(e) => {
+              (<div className="flex flex-row gap-x-3">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    return forceSearchClient(values.dni)
+                  }}
+                  className="w-full bg-primary text-white rounded-lg py-2 cursor-pointer"
+                >
+                  Buscar cliente
+                </button>
+                <button onClick={(e) => {
                   e.preventDefault();
-                  return forceSearchClient(values.dni)
-                }}
-                className="w-full bg-primary text-white rounded-lg py-2 cursor-pointer"
-              >
-                Forzar búsqueda
-              </button>))
+                  resetForm();
+                }} className="w-full bg-red-600 text-white rounded-lg py-2 cursor-pointer">
+                  Limpiar
+                </button>
+              </div>))
           }
         </div>
       </form>
